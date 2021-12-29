@@ -1,0 +1,296 @@
+<!DOCTYPE HTML>
+<html lang="en" class="sidebar-visible no-js light">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Releases - OCI Runtime Specification</title>
+        <!-- Custom HTML head -->
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+        <link rel="icon" href="favicon.svg">
+        <link rel="shortcut icon" href="favicon.png">
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        <link rel="stylesheet" href="css/print.css" media="print">
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="fonts/fonts.css">
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="highlight.css">
+        <link rel="stylesheet" href="tomorrow-night.css">
+        <link rel="stylesheet" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+    </head>
+    <body>
+        <!-- Provide site root to javascript -->
+        <script type="text/javascript">
+            var path_to_root = "";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script type="text/javascript">
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script type="text/javascript">
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('no-js')
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add('js');
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script type="text/javascript">
+            var html = document.querySelector('html');
+            var sidebar = 'hidden';
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            }
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="spec.html">Open Container Initiative Runtime Specification</a></li><li class="chapter-item expanded "><a href="principles.html"><strong aria-hidden="true">1.</strong> The 5 principles of Standard Containers</a></li><li class="chapter-item expanded "><a href="bundle.html"><strong aria-hidden="true">2.</strong> Filesystem Bundle</a></li><li class="chapter-item expanded "><a href="runtime.html"><strong aria-hidden="true">3.</strong> Runtime and Lifecycle</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="runtime-linux.html"><strong aria-hidden="true">3.1.</strong> Linux Runtime</a></li></ol></li><li class="chapter-item expanded "><a href="config.html"><strong aria-hidden="true">4.</strong> Configuration</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="config-linux.html"><strong aria-hidden="true">4.1.</strong> Linux Container Configuration</a></li><li class="chapter-item expanded "><a href="config-solaris.html"><strong aria-hidden="true">4.2.</strong> Solaris Application Container Configuration</a></li><li class="chapter-item expanded "><a href="config-windows.html"><strong aria-hidden="true">4.3.</strong> Windows-specific Container Configuration</a></li><li class="chapter-item expanded "><a href="config-vm.html"><strong aria-hidden="true">4.4.</strong> Virtual-machine-specific Container Configuration</a></li><li class="chapter-item expanded "><a href="config-zos.html"><strong aria-hidden="true">4.5.</strong> z/OS Container Configuration</a></li></ol></li><li class="chapter-item expanded "><a href="glossary.html"><strong aria-hidden="true">5.</strong> Glossary</a></li><li class="chapter-item expanded "><a href="implementations.html"><strong aria-hidden="true">6.</strong> Implementations</a></li><li class="chapter-item expanded "><a href="style.html"><strong aria-hidden="true">7.</strong> Style and conventions</a></li><li class="chapter-item expanded "><a href="GOVERNANCE.html"><strong aria-hidden="true">8.</strong> Project governance</a></li><li class="chapter-item expanded "><a href="RELEASES.html" class="active"><strong aria-hidden="true">9.</strong> Releases</a></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky bordered">
+                    <div class="left-buttons">
+                        <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </button>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light (default)</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">OCI Runtime Specification</h1>
+
+                    <div class="right-buttons">
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script type="text/javascript">
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="releases"><a class="header" href="#releases">Releases</a></h1>
+<p>The release process hopes to encourage early, consistent consensus-building during project development.
+The mechanisms used are regular community communication on the mailing list about progress, scheduled meetings for issue resolution and release triage, and regularly paced and communicated releases.
+Releases are proposed and adopted or rejected using the usual <a href="GOVERNANCE.html">project governance</a> rules and procedures.</p>
+<p>An anti-pattern that we want to avoid is heavy development or discussions &quot;late cycle&quot; around major releases.
+We want to build a community that is involved and communicates consistently through all releases instead of relying on &quot;silent periods&quot; as a judge of stability.</p>
+<h2 id="parallel-releases"><a class="header" href="#parallel-releases">Parallel releases</a></h2>
+<p>A single project MAY consider several motions to release in parallel.
+However each motion to release after the initial 0.1.0 MUST be based on a previous release that has already landed.</p>
+<p>For example, runtime-spec maintainers may propose a v1.0.0-rc2 on the 1st of the month and a v0.9.1 bugfix on the 2nd of the month.
+They may not propose a v1.0.0-rc3 until the v1.0.0-rc2 is accepted (on the 7th if the vote initiated on the 1st passes).</p>
+<h2 id="specifications"><a class="header" href="#specifications">Specifications</a></h2>
+<p>The OCI maintains three categories of projects: specifications, applications, and conformance-testing tools.
+However, specification releases have special restrictions in the <a href="https://www.opencontainers.org/about/governance">OCI charter</a>:</p>
+<ul>
+<li>They are the target of backwards compatibility (§7.g), and</li>
+<li>They are subject to the OFWa patent grant (§8.d and e).</li>
+</ul>
+<p>To avoid unfortunate side effects (onerous backwards compatibility requirements or Member resignations), the following additional procedures apply to specification releases:</p>
+<h3 id="planning-a-release"><a class="header" href="#planning-a-release">Planning a release</a></h3>
+<p>Every OCI specification project SHOULD hold meetings that involve maintainers reviewing pull requests, debating outstanding issues, and planning releases.
+This meeting MUST be advertised on the project README and MAY happen on a phone call, video conference, or on IRC.
+Maintainers MUST send updates to the dev@opencontainers.org with results of these meetings.</p>
+<p>Before the specification reaches v1.0.0, the meetings SHOULD be weekly.
+Once a specification has reached v1.0.0, the maintainers may alter the cadence, but a meeting MUST be held within four weeks of the previous meeting.</p>
+<p>The release plans, corresponding milestones and estimated due dates MUST be published on GitHub (e.g. https://github.com/opencontainers/runtime-spec/milestones).
+GitHub milestones and issues are only used for community organization and all releases MUST follow the <a href="GOVERNANCE.html">project governance</a> rules and procedures.</p>
+<h3 id="timelines"><a class="header" href="#timelines">Timelines</a></h3>
+<p>Specifications have a variety of different timelines in their lifecycle.</p>
+<ul>
+<li>Pre-v1.0.0 specifications SHOULD release on a monthly cadence to garner feedback.</li>
+<li>Major specification releases MUST release at least three release candidates spaced a minimum of one week apart.
+This means a major release like a v1.0.0 or v2.0.0 release will take 1 month at minimum: one week for rc1, one week for rc2, one week for rc3, and one week for the major release itself.
+Maintainers SHOULD strive to make zero breaking changes during this cycle of release candidates and SHOULD restart the three-candidate count when a breaking change is introduced.
+For example if a breaking change is introduced in v1.0.0-rc2 then the series would end with v1.0.0-rc4 and v1.0.0.</li>
+<li>Minor and patch releases SHOULD be made on an as-needed basis.</li>
+</ul>
+<h2 id="checklist"><a class="header" href="#checklist">Checklist</a></h2>
+<p>Releases usually follow a few steps:</p>
+<ul>
+<li><input disabled="" type="checkbox"/>
+prepare a pull-request for the release
+<ul>
+<li><input disabled="" type="checkbox"/>
+a commit updating <code>./ChangeLog</code>
+<ul>
+<li><input disabled="" type="checkbox"/>
+<code>git log --oneline --no-merges --decorate --name-status v1.0.1..HEAD | vim -</code></li>
+<li><input disabled="" type="checkbox"/>
+<code>:% s/(pr\/\(\d*\))\(.*\)/\2 (#\1)/</code> to move the PR to the end of line and match previous formatting</li>
+<li><input disabled="" type="checkbox"/>
+review <code>(^M|^A|^D)</code> for impact of the commit</li>
+<li><input disabled="" type="checkbox"/>
+group commits to <code>Additions:</code>, <code>Minor fixes and documentation:</code>, <code>Breaking changes:</code></li>
+<li><input disabled="" type="checkbox"/>
+delete the <code>(^M|^A|^D)</code> lines, <code>:%!grep -vE '(^M|^A|^D)'</code></li>
+<li><input disabled="" type="checkbox"/>
+merge multi-commit PRs (so each line has a <code>(#num)</code> suffix)</li>
+<li><input disabled="" type="checkbox"/>
+drop hash and indent, <code>:'&lt;,'&gt; s/^\w*  /^I* /</code></li>
+</ul>
+</li>
+<li><input disabled="" type="checkbox"/>
+a commit bumping <code>./specs-go/version.go</code> to next version and empty the <code>VersionDev</code> variable</li>
+<li><input disabled="" type="checkbox"/>
+a commit adding back the &quot;-dev&quot; to <code>VersionDev</code></li>
+</ul>
+</li>
+<li><input disabled="" type="checkbox"/>
+send email to dev@opencontainers.org
+<ul>
+<li><input disabled="" type="checkbox"/>
+copy the exact commit hash for bumping the version from the pull-request (since master always stays as &quot;-dev&quot;)</li>
+<li><input disabled="" type="checkbox"/>
+count the PRs since last release (that this version is tracking, in the cases of multiple branching), like <code>git log --pretty=oneline --no-merges --decorate $priorTag..$versionBumpCommit  | grep \(pr\/ | wc -l</code></li>
+<li><input disabled="" type="checkbox"/>
+get the date for a week from now, like <code>TZ=UTC date --date='next week'</code></li>
+<li><input disabled="" type="checkbox"/>
+OPTIONAL find a cute animal gif to attach to the email, and subsequently the release description</li>
+<li><input disabled="" type="checkbox"/>
+subject line like <code>[runtime-spec VOTE] tag $versionBumpCommit as $version (closes $dateWeekFromNowUTC)</code></li>
+<li><input disabled="" type="checkbox"/>
+email body like</li>
+</ul>
+</li>
+</ul>
+<pre><code>Hey everyone,
+
+There have been $numPRs PRs merged since $priorTag release (https://github.com/opencontainers/runtime-spec/compare/$priorTag...$versionBumpCommit).
+
+$linkToPullRequest
+
+Please respond LGTM or REJECT (with reasoning).
+
+$sig
+</code></pre>
+<ul>
+<li><input disabled="" type="checkbox"/>
+edit/update the pull-request to link to the VOTE thread, from https://groups.google.com/a/opencontainers.org/forum/#!forum/dev</li>
+<li><input disabled="" type="checkbox"/>
+a week later, if the vote passes, merge the PR
+<ul>
+<li><input disabled="" type="checkbox"/>
+<code>git tag -s $version $versionBumpCommit</code></li>
+<li><input disabled="" type="checkbox"/>
+<code>git push --tags</code></li>
+</ul>
+</li>
+<li><input disabled="" type="checkbox"/>
+produce release documents
+<ul>
+<li><input disabled="" type="checkbox"/>
+git checkout the release tag, like <code>git checkout $version</code></li>
+<li><input disabled="" type="checkbox"/>
+<code>make docs</code></li>
+<li><input disabled="" type="checkbox"/>
+rename the output PDF and HTML file to include version, like `mv output/oci-runtime-spec.pdf output/oci-runtime-spec-$version.pdf``</li>
+<li><input disabled="" type="checkbox"/>
+attach these docs to the release on https://github.com/opencontainers/runtime-spec/releases</li>
+<li><input disabled="" type="checkbox"/>
+link to the the VOTE thread and include the passing vote count</li>
+<li><input disabled="" type="checkbox"/>
+link to the pull request that merged the release</li>
+</ul>
+</li>
+</ul>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="GOVERNANCE.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="GOVERNANCE.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+        <script type="text/javascript">
+            window.playground_copyable = true;
+        </script>
+        <script src="elasticlunr.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="mark.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="searcher.js" type="text/javascript" charset="utf-8"></script>
+        <script src="clipboard.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="highlight.js" type="text/javascript" charset="utf-8"></script>
+        <script src="book.js" type="text/javascript" charset="utf-8"></script>
+
+        <!-- Custom JS scripts -->
+    </body>
+</html>

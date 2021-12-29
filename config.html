@@ -1,0 +1,1104 @@
+<!DOCTYPE HTML>
+<html lang="en" class="sidebar-visible no-js light">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Configuration - OCI Runtime Specification</title>
+        <!-- Custom HTML head -->
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+        <link rel="icon" href="favicon.svg">
+        <link rel="shortcut icon" href="favicon.png">
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        <link rel="stylesheet" href="css/print.css" media="print">
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="fonts/fonts.css">
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="highlight.css">
+        <link rel="stylesheet" href="tomorrow-night.css">
+        <link rel="stylesheet" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+    </head>
+    <body>
+        <!-- Provide site root to javascript -->
+        <script type="text/javascript">
+            var path_to_root = "";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script type="text/javascript">
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script type="text/javascript">
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('no-js')
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add('js');
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script type="text/javascript">
+            var html = document.querySelector('html');
+            var sidebar = 'hidden';
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            }
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="spec.html">Open Container Initiative Runtime Specification</a></li><li class="chapter-item expanded "><a href="principles.html"><strong aria-hidden="true">1.</strong> The 5 principles of Standard Containers</a></li><li class="chapter-item expanded "><a href="bundle.html"><strong aria-hidden="true">2.</strong> Filesystem Bundle</a></li><li class="chapter-item expanded "><a href="runtime.html"><strong aria-hidden="true">3.</strong> Runtime and Lifecycle</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="runtime-linux.html"><strong aria-hidden="true">3.1.</strong> Linux Runtime</a></li></ol></li><li class="chapter-item expanded "><a href="config.html" class="active"><strong aria-hidden="true">4.</strong> Configuration</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="config-linux.html"><strong aria-hidden="true">4.1.</strong> Linux Container Configuration</a></li><li class="chapter-item expanded "><a href="config-solaris.html"><strong aria-hidden="true">4.2.</strong> Solaris Application Container Configuration</a></li><li class="chapter-item expanded "><a href="config-windows.html"><strong aria-hidden="true">4.3.</strong> Windows-specific Container Configuration</a></li><li class="chapter-item expanded "><a href="config-vm.html"><strong aria-hidden="true">4.4.</strong> Virtual-machine-specific Container Configuration</a></li><li class="chapter-item expanded "><a href="config-zos.html"><strong aria-hidden="true">4.5.</strong> z/OS Container Configuration</a></li></ol></li><li class="chapter-item expanded "><a href="glossary.html"><strong aria-hidden="true">5.</strong> Glossary</a></li><li class="chapter-item expanded "><a href="implementations.html"><strong aria-hidden="true">6.</strong> Implementations</a></li><li class="chapter-item expanded "><a href="style.html"><strong aria-hidden="true">7.</strong> Style and conventions</a></li><li class="chapter-item expanded "><a href="GOVERNANCE.html"><strong aria-hidden="true">8.</strong> Project governance</a></li><li class="chapter-item expanded "><a href="RELEASES.html"><strong aria-hidden="true">9.</strong> Releases</a></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky bordered">
+                    <div class="left-buttons">
+                        <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </button>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light (default)</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">OCI Runtime Specification</h1>
+
+                    <div class="right-buttons">
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script type="text/javascript">
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="configuration"><a class="header" href="#configuration"><a name="configuration" />Configuration</a></h1>
+<p>This configuration file contains metadata necessary to implement <a href="runtime.html#operations">standard operations</a> against the container.
+This includes the process to run, environment variables to inject, sandboxing features to use, etc.</p>
+<p>The canonical schema is defined in this document, but there is a JSON Schema in <a href="schema/config-schema.json"><code>schema/config-schema.json</code></a> and Go bindings in <a href="specs-go/config.go"><code>specs-go/config.go</code></a>.
+<a href="spec.html#platforms">Platform</a>-specific configuration schema are defined in the <a href="#platform-specific-configuration">platform-specific documents</a> linked below.
+For properties that are only defined for some <a href="spec.html#platforms">platforms</a>, the Go property has a <code>platform</code> tag listing those protocols (e.g. <code>platform:&quot;linux,solaris&quot;</code>).</p>
+<p>Below is a detailed description of each field defined in the configuration format and valid values are specified.
+Platform-specific fields are identified as such.
+For all platform-specific configuration values, the scope defined below in the <a href="#platform-specific-configuration">Platform-specific configuration</a> section applies.</p>
+<h2 id="specification-version"><a class="header" href="#specification-version"><a name="configSpecificationVersion" />Specification version</a></h2>
+<ul>
+<li><strong><code>ociVersion</code></strong> (string, REQUIRED) MUST be in <a href="http://semver.org/spec/v2.0.0.html">SemVer v2.0.0</a> format and specifies the version of the Open Container Initiative Runtime Specification with which the bundle complies.
+The Open Container Initiative Runtime Specification follows semantic versioning and retains forward and backward compatibility within major versions.
+For example, if a configuration is compliant with version 1.1 of this specification, it is compatible with all runtimes that support any 1.1 or later release of this specification, but is not compatible with a runtime that supports 1.0 and not 1.1.</li>
+</ul>
+<h3 id="example"><a class="header" href="#example">Example</a></h3>
+<pre><code class="language-json">&quot;ociVersion&quot;: &quot;0.1.0&quot;
+</code></pre>
+<h2 id="root"><a class="header" href="#root"><a name="configRoot" />Root</a></h2>
+<p><strong><code>root</code></strong> (object, OPTIONAL) specifies the container's root filesystem.
+On Windows, for Windows Server Containers, this field is REQUIRED.
+For <a href="config-windows.html#hyperv">Hyper-V Containers</a>, this field MUST NOT be set.</p>
+<p>On all other platforms, this field is REQUIRED.</p>
+<ul>
+<li>
+<p><strong><code>path</code></strong> (string, REQUIRED) Specifies the path to the root filesystem for the container.</p>
+<ul>
+<li>On Windows, <code>path</code> MUST be a <a href="https://aka.ms/nb3hqb">volume GUID path</a>.</li>
+<li>On POSIX platforms, <code>path</code> is either an absolute path or a relative path to the bundle.
+For example, with a bundle at <code>/to/bundle</code> and a root filesystem at <code>/to/bundle/rootfs</code>, the <code>path</code> value can be either <code>/to/bundle/rootfs</code> or <code>rootfs</code>.
+The value SHOULD be the conventional <code>rootfs</code>.</li>
+</ul>
+<p>A directory MUST exist at the path declared by the field.</p>
+</li>
+<li>
+<p><strong><code>readonly</code></strong> (bool, OPTIONAL) If true then the root filesystem MUST be read-only inside the container, defaults to false.</p>
+<ul>
+<li>On Windows, this field MUST be omitted or false.</li>
+</ul>
+</li>
+</ul>
+<h3 id="example-posix-platforms"><a class="header" href="#example-posix-platforms">Example (POSIX platforms)</a></h3>
+<pre><code class="language-json">&quot;root&quot;: {
+    &quot;path&quot;: &quot;rootfs&quot;,
+    &quot;readonly&quot;: true
+}
+</code></pre>
+<h3 id="example-windows"><a class="header" href="#example-windows">Example (Windows)</a></h3>
+<pre><code class="language-json">&quot;root&quot;: {
+    &quot;path&quot;: &quot;\\\\?\\Volume{ec84d99e-3f02-11e7-ac6c-00155d7682cf}\\&quot;
+}
+</code></pre>
+<h2 id="mounts"><a class="header" href="#mounts"><a name="configMounts" />Mounts</a></h2>
+<p><strong><code>mounts</code></strong> (array of objects, OPTIONAL) specifies additional mounts beyond <a href="#root"><code>root</code></a>.
+The runtime MUST mount entries in the listed order.
+For Linux, the parameters are as documented in <a href="http://man7.org/linux/man-pages/man2/mount.2.html">mount(2)</a> system call man page.
+For Solaris, the mount entry corresponds to the 'fs' resource in the <a href="http://docs.oracle.com/cd/E86824_01/html/E54764/zonecfg-1m.html">zonecfg(1M)</a> man page.</p>
+<ul>
+<li><strong><code>destination</code></strong> (string, REQUIRED) Destination of mount point: path inside container.
+This value MUST be an absolute path.
+<ul>
+<li>Windows: one mount destination MUST NOT be nested within another mount (e.g., c:\foo and c:\foo\bar).</li>
+<li>Solaris: corresponds to &quot;dir&quot; of the fs resource in <a href="http://docs.oracle.com/cd/E86824_01/html/E54764/zonecfg-1m.html">zonecfg(1M)</a>.</li>
+</ul>
+</li>
+<li><strong><code>source</code></strong> (string, OPTIONAL) A device name, but can also be a file or directory name for bind mounts or a dummy.
+Path values for bind mounts are either absolute or relative to the bundle.
+A mount is a bind mount if it has either <code>bind</code> or <code>rbind</code> in the options.
+<ul>
+<li>Windows: a local directory on the filesystem of the container host. UNC paths and mapped drives are not supported.</li>
+<li>Solaris: corresponds to &quot;special&quot; of the fs resource in <a href="http://docs.oracle.com/cd/E86824_01/html/E54764/zonecfg-1m.html">zonecfg(1M)</a>.</li>
+</ul>
+</li>
+<li><strong><code>options</code></strong> (array of strings, OPTIONAL) Mount options of the filesystem to be used.
+<ul>
+<li>Linux: supported options are listed in the <a href="http://man7.org/linux/man-pages/man8/mount.8.html">mount(8)</a> man page.
+Note both <a href="http://man7.org/linux/man-pages/man8/mount.8.html#FILESYSTEM-INDEPENDENT_MOUNT_OPTIONS">filesystem-independent</a> and <a href="http://man7.org/linux/man-pages/man8/mount.8.html#FILESYSTEM-SPECIFIC_MOUNT_OPTIONS">filesystem-specific</a> options are listed.</li>
+<li>Solaris: corresponds to &quot;options&quot; of the fs resource in <a href="http://docs.oracle.com/cd/E86824_01/html/E54764/zonecfg-1m.html">zonecfg(1M)</a>.</li>
+<li>Windows: runtimes MUST support <code>ro</code>, mounting the filesystem read-only when <code>ro</code> is given.</li>
+</ul>
+</li>
+</ul>
+<h3 id="example-windows-1"><a class="header" href="#example-windows-1">Example (Windows)</a></h3>
+<pre><code class="language-json">&quot;mounts&quot;: [
+    {
+        &quot;destination&quot;: &quot;C:\\folder-inside-container&quot;,
+        &quot;source&quot;: &quot;C:\\folder-on-host&quot;,
+        &quot;options&quot;: [&quot;ro&quot;]
+    }
+]
+</code></pre>
+<h3 id="posix-platform-mounts"><a class="header" href="#posix-platform-mounts"><a name="configPOSIXMounts" />POSIX-platform Mounts</a></h3>
+<p>For POSIX platforms the <code>mounts</code> structure has the following fields:</p>
+<ul>
+<li><strong><code>type</code></strong> (string, OPTIONAL) The type of the filesystem to be mounted.
+<ul>
+<li>Linux: filesystem types supported by the kernel as listed in <em>/proc/filesystems</em> (e.g., &quot;minix&quot;, &quot;ext2&quot;, &quot;ext3&quot;, &quot;jfs&quot;, &quot;xfs&quot;, &quot;reiserfs&quot;, &quot;msdos&quot;, &quot;proc&quot;, &quot;nfs&quot;, &quot;iso9660&quot;). For bind mounts (when <code>options</code> include either <code>bind</code> or <code>rbind</code>), the type is a dummy, often &quot;none&quot; (not listed in <em>/proc/filesystems</em>).</li>
+<li>Solaris: corresponds to &quot;type&quot; of the fs resource in <a href="http://docs.oracle.com/cd/E86824_01/html/E54764/zonecfg-1m.html">zonecfg(1M)</a>.</li>
+</ul>
+</li>
+</ul>
+<h3 id="example-linux"><a class="header" href="#example-linux">Example (Linux)</a></h3>
+<pre><code class="language-json">&quot;mounts&quot;: [
+    {
+        &quot;destination&quot;: &quot;/tmp&quot;,
+        &quot;type&quot;: &quot;tmpfs&quot;,
+        &quot;source&quot;: &quot;tmpfs&quot;,
+        &quot;options&quot;: [&quot;nosuid&quot;,&quot;strictatime&quot;,&quot;mode=755&quot;,&quot;size=65536k&quot;]
+    },
+    {
+        &quot;destination&quot;: &quot;/data&quot;,
+        &quot;type&quot;: &quot;none&quot;,
+        &quot;source&quot;: &quot;/volumes/testing&quot;,
+        &quot;options&quot;: [&quot;rbind&quot;,&quot;rw&quot;]
+    }
+]
+</code></pre>
+<h3 id="example-solaris"><a class="header" href="#example-solaris">Example (Solaris)</a></h3>
+<pre><code class="language-json">&quot;mounts&quot;: [
+    {
+        &quot;destination&quot;: &quot;/opt/local&quot;,
+        &quot;type&quot;: &quot;lofs&quot;,
+        &quot;source&quot;: &quot;/usr/local&quot;,
+        &quot;options&quot;: [&quot;ro&quot;,&quot;nodevices&quot;]
+    },
+    {
+        &quot;destination&quot;: &quot;/opt/sfw&quot;,
+        &quot;type&quot;: &quot;lofs&quot;,
+        &quot;source&quot;: &quot;/opt/sfw&quot;
+    }
+]
+</code></pre>
+<h2 id="process"><a class="header" href="#process"><a name="configProcess" />Process</a></h2>
+<p><strong><code>process</code></strong> (object, OPTIONAL) specifies the container process.
+This property is REQUIRED when <a href="runtime.html#start"><code>start</code></a> is called.</p>
+<ul>
+<li><strong><code>terminal</code></strong> (bool, OPTIONAL) specifies whether a terminal is attached to the process, defaults to false.
+As an example, if set to true on Linux a pseudoterminal pair is allocated for the process and the pseudoterminal pty is duplicated on the process's <a href="http://man7.org/linux/man-pages/man3/stdin.3.html">standard streams</a>.</li>
+<li><strong><code>consoleSize</code></strong> (object, OPTIONAL) specifies the console size in characters of the terminal.
+Runtimes MUST ignore <code>consoleSize</code> if <code>terminal</code> is <code>false</code> or unset.
+<ul>
+<li><strong><code>height</code></strong> (uint, REQUIRED)</li>
+<li><strong><code>width</code></strong> (uint, REQUIRED)</li>
+</ul>
+</li>
+<li><strong><code>cwd</code></strong> (string, REQUIRED) is the working directory that will be set for the executable.
+This value MUST be an absolute path.</li>
+<li><strong><code>env</code></strong> (array of strings, OPTIONAL) with the same semantics as <a href="http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap08.html#tag_08_01">IEEE Std 1003.1-2008's <code>environ</code></a>.</li>
+<li><strong><code>args</code></strong> (array of strings, OPTIONAL) with similar semantics to <a href="http://pubs.opengroup.org/onlinepubs/9699919799/functions/exec.html">IEEE Std 1003.1-2008 <code>execvp</code>'s <em>argv</em></a>.
+This specification extends the IEEE standard in that at least one entry is REQUIRED (non-Windows), and that entry is used with the same semantics as <code>execvp</code>'s <em>file</em>. This field is OPTIONAL on Windows, and <code>commandLine</code> is REQUIRED if this field is omitted.</li>
+<li><strong><code>commandLine</code></strong> (string, OPTIONAL) specifies the full command line to be executed on Windows.
+This is the preferred means of supplying the command line on Windows. If omitted, the runtime will fall back to escaping and concatenating fields from <code>args</code> before making the system call into Windows.</li>
+</ul>
+<h3 id="posix-process"><a class="header" href="#posix-process"><a name="configPOSIXProcess" />POSIX process</a></h3>
+<p>For systems that support POSIX rlimits (for example Linux and Solaris), the <code>process</code> object supports the following process-specific properties:</p>
+<ul>
+<li>
+<p><strong><code>rlimits</code></strong> (array of objects, OPTIONAL) allows setting resource limits for the process.
+Each entry has the following structure:</p>
+<ul>
+<li>
+<p><strong><code>type</code></strong> (string, REQUIRED) the platform resource being limited.</p>
+<ul>
+<li>Linux: valid values are defined in the <a href="http://man7.org/linux/man-pages/man2/getrlimit.2.html"><code>getrlimit(2)</code></a> man page, such as <code>RLIMIT_MSGQUEUE</code>.</li>
+<li>Solaris: valid values are defined in the <a href="http://pubs.opengroup.org/onlinepubs/9699919799/functions/getrlimit.html"><code>getrlimit(3)</code></a> man page, such as <code>RLIMIT_CORE</code>.</li>
+</ul>
+<p>The runtime MUST <a href="runtime.html#errors">generate an error</a> for any values which cannot be mapped to a relevant kernel interface.
+For each entry in <code>rlimits</code>, a <a href="http://pubs.opengroup.org/onlinepubs/9699919799/functions/getrlimit.html"><code>getrlimit(3)</code></a> on <code>type</code> MUST succeed.
+For the following properties, <code>rlim</code> refers to the status returned by the <code>getrlimit(3)</code> call.</p>
+</li>
+<li>
+<p><strong><code>soft</code></strong> (uint64, REQUIRED) the value of the limit enforced for the corresponding resource.
+<code>rlim.rlim_cur</code> MUST match the configured value.</p>
+</li>
+<li>
+<p><strong><code>hard</code></strong> (uint64, REQUIRED) the ceiling for the soft limit that could be set by an unprivileged process.
+<code>rlim.rlim_max</code> MUST match the configured value.
+Only a privileged process (e.g. one with the <code>CAP_SYS_RESOURCE</code> capability) can raise a hard limit.</p>
+</li>
+</ul>
+<p>If <code>rlimits</code> contains duplicated entries with same <code>type</code>, the runtime MUST <a href="runtime.html#errors">generate an error</a>.</p>
+</li>
+</ul>
+<h3 id="linux-process"><a class="header" href="#linux-process"><a name="configLinuxProcess" />Linux Process</a></h3>
+<p>For Linux-based systems, the <code>process</code> object supports the following process-specific properties.</p>
+<ul>
+<li>
+<p><strong><code>apparmorProfile</code></strong> (string, OPTIONAL) specifies the name of the AppArmor profile for the process.
+For more information about AppArmor, see <a href="https://wiki.ubuntu.com/AppArmor">AppArmor documentation</a>.</p>
+</li>
+<li>
+<p><strong><code>capabilities</code></strong> (object, OPTIONAL) is an object containing arrays that specifies the sets of capabilities for the process.
+Valid values are defined in the <a href="http://man7.org/linux/man-pages/man7/capabilities.7.html">capabilities(7)</a> man page, such as <code>CAP_CHOWN</code>.
+Any value which cannot be mapped to a relevant kernel interface, or cannot
+be granted otherwise MUST be <a href="runtime.html#warnings">logged as a warning</a> by
+the runtime. Runtimes SHOULD NOT fail if the container configuration requests
+capabilities that cannot be granted, for example, if the runtime operates in
+a restricted environment with a limited set of capabilities.
+<code>capabilities</code> contains the following properties:</p>
+<ul>
+<li><strong><code>effective</code></strong> (array of strings, OPTIONAL) the <code>effective</code> field is an array of effective capabilities that are kept for the process.</li>
+<li><strong><code>bounding</code></strong> (array of strings, OPTIONAL) the <code>bounding</code> field is an array of bounding capabilities that are kept for the process.</li>
+<li><strong><code>inheritable</code></strong> (array of strings, OPTIONAL) the <code>inheritable</code> field is an array of inheritable capabilities that are kept for the process.</li>
+<li><strong><code>permitted</code></strong> (array of strings, OPTIONAL) the <code>permitted</code> field is an array of permitted capabilities that are kept for the process.</li>
+<li><strong><code>ambient</code></strong> (array of strings, OPTIONAL) the <code>ambient</code> field is an array of ambient capabilities that are kept for the process.</li>
+</ul>
+</li>
+<li>
+<p><strong><code>noNewPrivileges</code></strong> (bool, OPTIONAL) setting <code>noNewPrivileges</code> to true prevents the process from gaining additional privileges.
+As an example, the <a href="https://www.kernel.org/doc/Documentation/prctl/no_new_privs.txt"><code>no_new_privs</code></a> article in the kernel documentation has information on how this is achieved using a <code>prctl</code> system call on Linux.</p>
+</li>
+<li>
+<p><strong><code>oomScoreAdj</code></strong> <em>(int, OPTIONAL)</em> adjusts the oom-killer score in <code>[pid]/oom_score_adj</code> for the process's <code>[pid]</code> in a <a href="https://www.kernel.org/doc/Documentation/filesystems/proc.txt">proc pseudo-filesystem</a>.
+If <code>oomScoreAdj</code> is set, the runtime MUST set <code>oom_score_adj</code> to the given value.
+If <code>oomScoreAdj</code> is not set, the runtime MUST NOT change the value of <code>oom_score_adj</code>.</p>
+<p>This is a per-process setting, where as <a href="config-linux.html#memory"><code>disableOOMKiller</code></a> is scoped for a memory cgroup.
+For more information on how these two settings work together, see <a href="https://www.kernel.org/doc/Documentation/cgroup-v1/memory.txt">the memory cgroup documentation section 10. OOM Contol</a>.</p>
+</li>
+<li>
+<p><strong><code>selinuxLabel</code></strong> (string, OPTIONAL) specifies the SELinux label for the process.
+For more information about SELinux, see  <a href="http://selinuxproject.org/page/Main_Page">SELinux documentation</a>.</p>
+</li>
+</ul>
+<h3 id="user"><a class="header" href="#user"><a name="configUser" />User</a></h3>
+<p>The user for the process is a platform-specific structure that allows specific control over which user the process runs as.</p>
+<h4 id="posix-platform-user"><a class="header" href="#posix-platform-user"><a name="configPOSIXUser" />POSIX-platform User</a></h4>
+<p>For POSIX platforms the <code>user</code> structure has the following fields:</p>
+<ul>
+<li><strong><code>uid</code></strong> (int, REQUIRED) specifies the user ID in the <a href="glossary.html#container-namespace">container namespace</a>.</li>
+<li><strong><code>gid</code></strong> (int, REQUIRED) specifies the group ID in the <a href="glossary.html#container-namespace">container namespace</a>.</li>
+<li><strong><code>umask</code></strong> (int, OPTIONAL) specifies the [umask][umask_2] of the user. If unspecified, the umask should not be changed from the calling process' umask.</li>
+<li><strong><code>additionalGids</code></strong> (array of ints, OPTIONAL) specifies additional group IDs in the <a href="glossary.html#container-namespace">container namespace</a> to be added to the process.</li>
+</ul>
+<p><em>Note: symbolic name for uid and gid, such as uname and gname respectively, are left to upper levels to derive (i.e. <code>/etc/passwd</code> parsing, NSS, etc)</em></p>
+<h3 id="example-linux-1"><a class="header" href="#example-linux-1">Example (Linux)</a></h3>
+<pre><code class="language-json">&quot;process&quot;: {
+    &quot;terminal&quot;: true,
+    &quot;consoleSize&quot;: {
+        &quot;height&quot;: 25,
+        &quot;width&quot;: 80
+    },
+    &quot;user&quot;: {
+        &quot;uid&quot;: 1,
+        &quot;gid&quot;: 1,
+        &quot;umask&quot;: 63,
+        &quot;additionalGids&quot;: [5, 6]
+    },
+    &quot;env&quot;: [
+        &quot;PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin&quot;,
+        &quot;TERM=xterm&quot;
+    ],
+    &quot;cwd&quot;: &quot;/root&quot;,
+    &quot;args&quot;: [
+        &quot;sh&quot;
+    ],
+    &quot;apparmorProfile&quot;: &quot;acme_secure_profile&quot;,
+    &quot;selinuxLabel&quot;: &quot;system_u:system_r:svirt_lxc_net_t:s0:c124,c675&quot;,
+    &quot;noNewPrivileges&quot;: true,
+    &quot;capabilities&quot;: {
+        &quot;bounding&quot;: [
+            &quot;CAP_AUDIT_WRITE&quot;,
+            &quot;CAP_KILL&quot;,
+            &quot;CAP_NET_BIND_SERVICE&quot;
+        ],
+       &quot;permitted&quot;: [
+            &quot;CAP_AUDIT_WRITE&quot;,
+            &quot;CAP_KILL&quot;,
+            &quot;CAP_NET_BIND_SERVICE&quot;
+        ],
+       &quot;inheritable&quot;: [
+            &quot;CAP_AUDIT_WRITE&quot;,
+            &quot;CAP_KILL&quot;,
+            &quot;CAP_NET_BIND_SERVICE&quot;
+        ],
+        &quot;effective&quot;: [
+            &quot;CAP_AUDIT_WRITE&quot;,
+            &quot;CAP_KILL&quot;
+        ],
+        &quot;ambient&quot;: [
+            &quot;CAP_NET_BIND_SERVICE&quot;
+        ]
+    },
+    &quot;rlimits&quot;: [
+        {
+            &quot;type&quot;: &quot;RLIMIT_NOFILE&quot;,
+            &quot;hard&quot;: 1024,
+            &quot;soft&quot;: 1024
+        }
+    ]
+}
+</code></pre>
+<h3 id="example-solaris-1"><a class="header" href="#example-solaris-1">Example (Solaris)</a></h3>
+<pre><code class="language-json">&quot;process&quot;: {
+    &quot;terminal&quot;: true,
+    &quot;consoleSize&quot;: {
+        &quot;height&quot;: 25,
+        &quot;width&quot;: 80
+    },
+    &quot;user&quot;: {
+        &quot;uid&quot;: 1,
+        &quot;gid&quot;: 1,
+        &quot;umask&quot;: 7,
+        &quot;additionalGids&quot;: [2, 8]
+    },
+    &quot;env&quot;: [
+        &quot;PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin&quot;,
+        &quot;TERM=xterm&quot;
+    ],
+    &quot;cwd&quot;: &quot;/root&quot;,
+    &quot;args&quot;: [
+        &quot;/usr/bin/bash&quot;
+    ]
+}
+</code></pre>
+<h4 id="windows-user"><a class="header" href="#windows-user"><a name="configWindowsUser" />Windows User</a></h4>
+<p>For Windows based systems the user structure has the following fields:</p>
+<ul>
+<li><strong><code>username</code></strong> (string, OPTIONAL) specifies the user name for the process.</li>
+</ul>
+<h3 id="example-windows-2"><a class="header" href="#example-windows-2">Example (Windows)</a></h3>
+<pre><code class="language-json">&quot;process&quot;: {
+    &quot;terminal&quot;: true,
+    &quot;user&quot;: {
+        &quot;username&quot;: &quot;containeradministrator&quot;
+    },
+    &quot;env&quot;: [
+        &quot;VARIABLE=1&quot;
+    ],
+    &quot;cwd&quot;: &quot;c:\\foo&quot;,
+    &quot;args&quot;: [
+        &quot;someapp.exe&quot;,
+    ]
+}
+</code></pre>
+<h2 id="hostname"><a class="header" href="#hostname"><a name="configHostname" />Hostname</a></h2>
+<ul>
+<li><strong><code>hostname</code></strong> (string, OPTIONAL) specifies the container's hostname as seen by processes running inside the container.
+On Linux, for example, this will change the hostname in the <a href="glossary.html#container-namespace">container</a> <a href="http://man7.org/linux/man-pages/man7/namespaces.7.html">UTS namespace</a>.
+Depending on your <a href="config-linux.html#namespaces">namespace configuration</a>, the container UTS namespace may be the <a href="glossary.html#runtime-namespace">runtime</a> <a href="http://man7.org/linux/man-pages/man7/namespaces.7.html">UTS namespace</a>.</li>
+</ul>
+<h3 id="example-1"><a class="header" href="#example-1">Example</a></h3>
+<pre><code class="language-json">&quot;hostname&quot;: &quot;mrsdalloway&quot;
+</code></pre>
+<h2 id="platform-specific-configuration"><a class="header" href="#platform-specific-configuration"><a name="configPlatformSpecificConfiguration" />Platform-specific configuration</a></h2>
+<ul>
+<li><strong><code>linux</code></strong> (object, OPTIONAL) <a href="config-linux.html">Linux-specific configuration</a>.
+This MAY be set if the target platform of this spec is <code>linux</code>.</li>
+<li><strong><code>windows</code></strong> (object, OPTIONAL) <a href="config-windows.html">Windows-specific configuration</a>.
+This MUST be set if the target platform of this spec is <code>windows</code>.</li>
+<li><strong><code>solaris</code></strong> (object, OPTIONAL) <a href="config-solaris.html">Solaris-specific configuration</a>.
+This MAY be set if the target platform of this spec is <code>solaris</code>.</li>
+<li><strong><code>vm</code></strong> (object, OPTIONAL) <a href="config-vm.html">Virtual-machine-specific configuration</a>.
+This MAY be set if the target platform and architecture of this spec support hardware virtualization.</li>
+<li><strong><code>zos</code></strong> (object, OPTIONAL) <a href="config-zos.html">z/OS-specific configuration</a>.
+This MAY be set if the target platform of this spec is <code>zos</code>.</li>
+</ul>
+<h3 id="example-linux-2"><a class="header" href="#example-linux-2">Example (Linux)</a></h3>
+<pre><code class="language-json">{
+    &quot;linux&quot;: {
+        &quot;namespaces&quot;: [
+            {
+                &quot;type&quot;: &quot;pid&quot;
+            }
+        ]
+    }
+}
+</code></pre>
+<h2 id="posix-platform-hooks"><a class="header" href="#posix-platform-hooks"><a name="configHooks" />POSIX-platform Hooks</a></h2>
+<p>For POSIX platforms, the configuration structure supports <code>hooks</code> for configuring custom actions related to the <a href="runtime.html#lifecycle">lifecycle</a> of the container.</p>
+<ul>
+<li><strong><code>hooks</code></strong> (object, OPTIONAL) MAY contain any of the following properties:
+<ul>
+<li><strong><code>prestart</code></strong> (array of objects, OPTIONAL, <strong>DEPRECATED</strong>) is an array of <a href="#prestart"><code>prestart</code> hooks</a>.
+<ul>
+<li>Entries in the array contain the following properties:
+<ul>
+<li><strong><code>path</code></strong> (string, REQUIRED) with similar semantics to <a href="http://pubs.opengroup.org/onlinepubs/9699919799/functions/exec.html">IEEE Std 1003.1-2008 <code>execv</code>'s <em>path</em></a>.
+This specification extends the IEEE standard in that <strong><code>path</code></strong> MUST be absolute.</li>
+<li><strong><code>args</code></strong> (array of strings, OPTIONAL) with the same semantics as <a href="http://pubs.opengroup.org/onlinepubs/9699919799/functions/exec.html">IEEE Std 1003.1-2008 <code>execv</code>'s <em>argv</em></a>.</li>
+<li><strong><code>env</code></strong> (array of strings, OPTIONAL) with the same semantics as <a href="http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap08.html#tag_08_01">IEEE Std 1003.1-2008's <code>environ</code></a>.</li>
+<li><strong><code>timeout</code></strong> (int, OPTIONAL) is the number of seconds before aborting the hook.
+If set, <code>timeout</code> MUST be greater than zero.</li>
+</ul>
+</li>
+<li>The value of <code>path</code> MUST resolve in the <a href="glossary.html#runtime-namespace">runtime namespace</a>.</li>
+<li>The <code>prestart</code> hooks MUST be executed in the <a href="glossary.html#runtime-namespace">runtime namespace</a>.</li>
+</ul>
+</li>
+<li><strong><code>createRuntime</code></strong> (array of objects, OPTIONAL) is an array of <a href="#createRuntime-hooks"><code>createRuntime</code> hooks</a>.
+<ul>
+<li>Entries in the array contain the following properties (the entries are identical to the entries in the deprecated <code>prestart</code> hooks):
+<ul>
+<li><strong><code>path</code></strong> (string, REQUIRED) with similar semantics to <a href="http://pubs.opengroup.org/onlinepubs/9699919799/functions/exec.html">IEEE Std 1003.1-2008 <code>execv</code>'s <em>path</em></a>.
+This specification extends the IEEE standard in that <strong><code>path</code></strong> MUST be absolute.</li>
+<li><strong><code>args</code></strong> (array of strings, OPTIONAL) with the same semantics as <a href="http://pubs.opengroup.org/onlinepubs/9699919799/functions/exec.html">IEEE Std 1003.1-2008 <code>execv</code>'s <em>argv</em></a>.</li>
+<li><strong><code>env</code></strong> (array of strings, OPTIONAL) with the same semantics as <a href="http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap08.html#tag_08_01">IEEE Std 1003.1-2008's <code>environ</code></a>.</li>
+<li><strong><code>timeout</code></strong> (int, OPTIONAL) is the number of seconds before aborting the hook.
+If set, <code>timeout</code> MUST be greater than zero.</li>
+</ul>
+</li>
+<li>The value of <code>path</code> MUST resolve in the <a href="glossary.html#runtime-namespace">runtime namespace</a>.</li>
+<li>The <code>createRuntime</code> hooks MUST be executed in the <a href="glossary.html#runtime-namespace">runtime namespace</a>.</li>
+</ul>
+</li>
+<li><strong><code>createContainer</code></strong> (array of objects, OPTIONAL) is an array of <a href="#createContainer-hooks"><code>createContainer</code> hooks</a>.
+<ul>
+<li>Entries in the array have the same schema as <code>createRuntime</code> entries.</li>
+<li>The value of <code>path</code> MUST resolve in the <a href="glossary.html#runtime-namespace">runtime namespace</a>.</li>
+<li>The <code>createContainer</code> hooks MUST be executed in the <a href="glossary.html#container-namespace">container namespace</a>.</li>
+</ul>
+</li>
+<li><strong><code>startContainer</code></strong> (array of objects, OPTIONAL) is an array of <a href="#startContainer-hooks"><code>startContainer</code> hooks</a>.
+<ul>
+<li>Entries in the array have the same schema as <code>createRuntime</code> entries.</li>
+<li>The value of <code>path</code> MUST resolve in the <a href="glossary.html#container-namespace">container namespace</a>.</li>
+<li>The <code>startContainer</code> hooks MUST be executed in the <a href="glossary.html#container-namespace">container namespace</a>.</li>
+</ul>
+</li>
+<li><strong><code>poststart</code></strong> (array of objects, OPTIONAL) is an array of <a href="#poststart"><code>poststart</code> hooks</a>.
+<ul>
+<li>Entries in the array have the same schema as <code>createRuntime</code> entries.</li>
+<li>The value of <code>path</code> MUST resolve in the <a href="glossary.html#runtime-namespace">runtime namespace</a>.</li>
+<li>The <code>poststart</code> hooks MUST be executed in the <a href="glossary.html#runtime-namespace">runtime namespace</a>.</li>
+</ul>
+</li>
+<li><strong><code>poststop</code></strong> (array of objects, OPTIONAL) is an array of <a href="#poststop"><code>poststop</code> hooks</a>.
+<ul>
+<li>Entries in the array have the same schema as <code>createRuntime</code> entries.</li>
+<li>The value of <code>path</code> MUST resolve in the <a href="glossary.html#runtime-namespace">runtime namespace</a>.</li>
+<li>The <code>poststop</code> hooks MUST be executed in the <a href="glossary.html#runtime-namespace">runtime namespace</a>.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p>Hooks allow users to specify programs to run before or after various lifecycle events.
+Hooks MUST be called in the listed order.
+The <a href="runtime.html#state">state</a> of the container MUST be passed to hooks over stdin so that they may do work appropriate to the current state of the container.</p>
+<h3 id="prestart"><a class="header" href="#prestart"><a name="configHooksPrestart" />Prestart</a></h3>
+<p>The <code>prestart</code> hooks MUST be called after the <a href="runtime.html#start"><code>start</code></a> operation is called but <a href="runtime.html#lifecycle">before the user-specified program command is executed</a>.
+On Linux, for example, they are called after the container namespaces are created, so they provide an opportunity to customize the container (e.g. the network namespace could be specified in this hook).</p>
+<p>Note: <code>prestart</code> hooks were deprecated in favor of <code>createRuntime</code>, <code>createContainer</code> and <code>startContainer</code> hooks, which allow more granular hook control during the create and start phase.</p>
+<p>The <code>prestart</code> hooks' path MUST resolve in the <a href="glossary.html#runtime-namespace">runtime namespace</a>.
+The <code>prestart</code> hooks MUST be executed in the <a href="glossary.html#runtime-namespace">runtime namespace</a>.</p>
+<h3 id="createruntime-hooks"><a class="header" href="#createruntime-hooks"><a name="configHooksCreateRuntime" />CreateRuntime Hooks</a></h3>
+<p>The <code>createRuntime</code> hooks MUST be called as part of the <a href="runtime.html#create"><code>create</code></a> operation after the runtime environment has been created (according to the configuration in config.json) but before the <code>pivot_root</code> or any equivalent operation has been executed.</p>
+<p>The <code>createRuntime</code> hooks' path MUST resolve in the <a href="glossary.html#runtime-namespace">runtime namespace</a>.
+The <code>createRuntime</code> hooks MUST be executed in the <a href="glossary.html#runtime-namespace">runtime namespace</a>.</p>
+<p>On Linux, for example, they are called after the container namespaces are created, so they provide an opportunity to customize the container (e.g. the network namespace could be specified in this hook).</p>
+<p>The definition of <code>createRuntime</code> hooks is currently underspecified and hooks authors, should only expect from the runtime that the mount namespace have been created and the mount operations performed. Other operations such as cgroups and SELinux/AppArmor labels might not have been performed by the runtime.</p>
+<p>Note: <code>runc</code> originally implemented <code>prestart</code> hooks contrary to the spec, namely as part of the <code>create</code> operation (instead of during the <code>start</code> operation). This incorrect implementation actually corresponds to <code>createRuntime</code> hooks. For runtimes that implement the deprecated <code>prestart</code> hooks as <code>createRuntime</code> hooks, <code>createRuntime</code> hooks MUST be called after the <code>prestart</code> hooks.</p>
+<h3 id="createcontainer-hooks"><a class="header" href="#createcontainer-hooks"><a name="configHooksCreateContainer" />CreateContainer Hooks</a></h3>
+<p>The <code>createContainer</code> hooks MUST be called as part of the <a href="runtime.html#create"><code>create</code></a> operation after the runtime environment has been created (according to the configuration in config.json) but before the <code>pivot_root</code> or any equivalent operation has been executed.
+The <code>createContainer</code> hooks MUST be called after the <code>createRuntime</code> hooks.</p>
+<p>The <code>createContainer</code> hooks' path MUST resolve in the <a href="glossary.html#runtime-namespace">runtime namespace</a>.
+The <code>createContainer</code> hooks MUST be executed in the <a href="glossary.html#container-namespace">container namespace</a>.</p>
+<p>For example, on Linux this would happen before the <code>pivot_root</code> operation is executed but after the mount namespace was created and setup.</p>
+<p>The definition of <code>createContainer</code> hooks is currently underspecified and hooks authors, should only expect from the runtime that the mount namespace and different mounts will be setup. Other operations such as cgroups and SELinux/AppArmor labels might not have been performed by the runtime.</p>
+<h3 id="startcontainer-hooks"><a class="header" href="#startcontainer-hooks"><a name="configHooksStartContainer" />StartContainer Hooks</a></h3>
+<p>The <code>startContainer</code> hooks MUST be called <a href="runtime.html#lifecycle">before the user-specified process is executed</a> as part of the <a href="runtime.html#start"><code>start</code></a> operation.
+This hook can be used to execute some operations in the container, for example running the <code>ldconfig</code> binary on linux before the container process is spawned.</p>
+<p>The <code>startContainer</code> hooks' path MUST resolve in the <a href="glossary.html#container-namespace">container namespace</a>.
+The <code>startContainer</code> hooks MUST be executed in the <a href="glossary.html#container-namespace">container namespace</a>.</p>
+<h3 id="poststart"><a class="header" href="#poststart"><a name="configHooksPoststart" />Poststart</a></h3>
+<p>The <code>poststart</code> hooks MUST be called <a href="runtime.html#lifecycle">after the user-specified process is executed</a> but before the <a href="runtime.html#start"><code>start</code></a> operation returns.
+For example, this hook can notify the user that the container process is spawned.</p>
+<p>The <code>poststart</code> hooks' path MUST resolve in the <a href="glossary.html#runtime-namespace">runtime namespace</a>.
+The <code>poststart</code> hooks MUST be executed in the <a href="glossary.html#runtime-namespace">runtime namespace</a>.</p>
+<h3 id="poststop"><a class="header" href="#poststop"><a name="configHooksPoststop" />Poststop</a></h3>
+<p>The <code>poststop</code> hooks MUST be called <a href="runtime.html#lifecycle">after the container is deleted</a> but before the <a href="runtime.html#delete"><code>delete</code></a> operation returns.
+Cleanup or debugging functions are examples of such a hook.</p>
+<p>The <code>poststop</code> hooks' path MUST resolve in the <a href="glossary.html#runtime-namespace">runtime namespace</a>.
+The <code>poststop</code> hooks MUST be executed in the <a href="glossary.html#runtime-namespace">runtime namespace</a>.</p>
+<h3 id="summary"><a class="header" href="#summary">Summary</a></h3>
+<p>See the below table for a summary of hooks and when they are called:</p>
+<table><thead><tr><th>Name</th><th>Namespace</th><th>When</th></tr></thead><tbody>
+<tr><td><code>prestart</code> (Deprecated)</td><td>runtime</td><td>After the start  operation is called but before the user-specified program command is executed.</td></tr>
+<tr><td><code>createRuntime</code></td><td>runtime</td><td>During the create operation, after the runtime environment has been created and before the pivot root or any equivalent operation.</td></tr>
+<tr><td><code>createContainer</code></td><td>container</td><td>During the create operation, after the runtime environment has been created and before the pivot root or any equivalent operation.</td></tr>
+<tr><td><code>startContainer</code></td><td>container</td><td>After the start operation is called but before the user-specified program command is executed.</td></tr>
+<tr><td><code>poststart</code></td><td>runtime</td><td>After the user-specified process is executed but before the start operation returns.</td></tr>
+<tr><td><code>poststop</code></td><td>runtime</td><td>After the container is deleted but before the delete operation returns.</td></tr>
+</tbody></table>
+<h3 id="example-2"><a class="header" href="#example-2">Example</a></h3>
+<pre><code class="language-json">&quot;hooks&quot;: {
+    &quot;prestart&quot;: [
+        {
+            &quot;path&quot;: &quot;/usr/bin/fix-mounts&quot;,
+            &quot;args&quot;: [&quot;fix-mounts&quot;, &quot;arg1&quot;, &quot;arg2&quot;],
+            &quot;env&quot;:  [ &quot;key1=value1&quot;]
+        },
+        {
+            &quot;path&quot;: &quot;/usr/bin/setup-network&quot;
+        }
+    ],
+    &quot;createRuntime&quot;: [
+        {
+            &quot;path&quot;: &quot;/usr/bin/fix-mounts&quot;,
+            &quot;args&quot;: [&quot;fix-mounts&quot;, &quot;arg1&quot;, &quot;arg2&quot;],
+            &quot;env&quot;:  [ &quot;key1=value1&quot;]
+        },
+        {
+            &quot;path&quot;: &quot;/usr/bin/setup-network&quot;
+        }
+    ],
+    &quot;createContainer&quot;: [
+        {
+            &quot;path&quot;: &quot;/usr/bin/mount-hook&quot;,
+            &quot;args&quot;: [&quot;-mount&quot;, &quot;arg1&quot;, &quot;arg2&quot;],
+            &quot;env&quot;:  [ &quot;key1=value1&quot;]
+        }
+    ],
+    &quot;startContainer&quot;: [
+        {
+            &quot;path&quot;: &quot;/usr/bin/refresh-ldcache&quot;
+        }
+    ],
+    &quot;poststart&quot;: [
+        {
+            &quot;path&quot;: &quot;/usr/bin/notify-start&quot;,
+            &quot;timeout&quot;: 5
+        }
+    ],
+    &quot;poststop&quot;: [
+        {
+            &quot;path&quot;: &quot;/usr/sbin/cleanup.sh&quot;,
+            &quot;args&quot;: [&quot;cleanup.sh&quot;, &quot;-f&quot;]
+        }
+    ]
+}
+</code></pre>
+<h2 id="annotations"><a class="header" href="#annotations"><a name="configAnnotations" />Annotations</a></h2>
+<p><strong><code>annotations</code></strong> (object, OPTIONAL) contains arbitrary metadata for the container.
+This information MAY be structured or unstructured.
+Annotations MUST be a key-value map.
+If there are no annotations then this property MAY either be absent or an empty map.</p>
+<p>Keys MUST be strings.
+Keys MUST NOT be an empty string.
+Keys SHOULD be named using a reverse domain notation - e.g. <code>com.example.myKey</code>.
+Keys using the <code>org.opencontainers</code> namespace are reserved and MUST NOT be used by subsequent specifications.
+Runtimes MUST handle unknown annotation keys like any other <a href="#extensibility">unknown property</a>.</p>
+<p>Values MUST be strings.
+Values MAY be an empty string.</p>
+<pre><code class="language-json">&quot;annotations&quot;: {
+    &quot;com.example.gpu-cores&quot;: &quot;2&quot;
+}
+</code></pre>
+<h2 id="extensibility"><a class="header" href="#extensibility"><a name="configExtensibility" />Extensibility</a></h2>
+<p>Runtimes MAY <a href="runtime.html#warnings">log</a> unknown properties but MUST otherwise ignore them.
+That includes not <a href="runtime.html#errors">generating errors</a> if they encounter an unknown property.</p>
+<h2 id="valid-values"><a class="header" href="#valid-values">Valid values</a></h2>
+<p>Runtimes MUST generate an error when invalid or unsupported values are encountered.
+Unless support for a valid value is explicitly required, runtimes MAY choose which subset of the valid values it will support.</p>
+<h2 id="configuration-schema-example"><a class="header" href="#configuration-schema-example">Configuration Schema Example</a></h2>
+<p>Here is a full example <code>config.json</code> for reference.</p>
+<pre><code class="language-json">{
+    &quot;ociVersion&quot;: &quot;1.0.1&quot;,
+    &quot;process&quot;: {
+        &quot;terminal&quot;: true,
+        &quot;user&quot;: {
+            &quot;uid&quot;: 1,
+            &quot;gid&quot;: 1,
+            &quot;additionalGids&quot;: [
+                5,
+                6
+            ]
+        },
+        &quot;args&quot;: [
+            &quot;sh&quot;
+        ],
+        &quot;env&quot;: [
+            &quot;PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin&quot;,
+            &quot;TERM=xterm&quot;
+        ],
+        &quot;cwd&quot;: &quot;/&quot;,
+        &quot;capabilities&quot;: {
+            &quot;bounding&quot;: [
+                &quot;CAP_AUDIT_WRITE&quot;,
+                &quot;CAP_KILL&quot;,
+                &quot;CAP_NET_BIND_SERVICE&quot;
+            ],
+            &quot;permitted&quot;: [
+                &quot;CAP_AUDIT_WRITE&quot;,
+                &quot;CAP_KILL&quot;,
+                &quot;CAP_NET_BIND_SERVICE&quot;
+            ],
+            &quot;inheritable&quot;: [
+                &quot;CAP_AUDIT_WRITE&quot;,
+                &quot;CAP_KILL&quot;,
+                &quot;CAP_NET_BIND_SERVICE&quot;
+            ],
+            &quot;effective&quot;: [
+                &quot;CAP_AUDIT_WRITE&quot;,
+                &quot;CAP_KILL&quot;
+            ],
+            &quot;ambient&quot;: [
+                &quot;CAP_NET_BIND_SERVICE&quot;
+            ]
+        },
+        &quot;rlimits&quot;: [
+            {
+                &quot;type&quot;: &quot;RLIMIT_CORE&quot;,
+                &quot;hard&quot;: 1024,
+                &quot;soft&quot;: 1024
+            },
+            {
+                &quot;type&quot;: &quot;RLIMIT_NOFILE&quot;,
+                &quot;hard&quot;: 1024,
+                &quot;soft&quot;: 1024
+            }
+        ],
+        &quot;apparmorProfile&quot;: &quot;acme_secure_profile&quot;,
+        &quot;oomScoreAdj&quot;: 100,
+        &quot;selinuxLabel&quot;: &quot;system_u:system_r:svirt_lxc_net_t:s0:c124,c675&quot;,
+        &quot;noNewPrivileges&quot;: true
+    },
+    &quot;root&quot;: {
+        &quot;path&quot;: &quot;rootfs&quot;,
+        &quot;readonly&quot;: true
+    },
+    &quot;hostname&quot;: &quot;slartibartfast&quot;,
+    &quot;mounts&quot;: [
+        {
+            &quot;destination&quot;: &quot;/proc&quot;,
+            &quot;type&quot;: &quot;proc&quot;,
+            &quot;source&quot;: &quot;proc&quot;
+        },
+        {
+            &quot;destination&quot;: &quot;/dev&quot;,
+            &quot;type&quot;: &quot;tmpfs&quot;,
+            &quot;source&quot;: &quot;tmpfs&quot;,
+            &quot;options&quot;: [
+                &quot;nosuid&quot;,
+                &quot;strictatime&quot;,
+                &quot;mode=755&quot;,
+                &quot;size=65536k&quot;
+            ]
+        },
+        {
+            &quot;destination&quot;: &quot;/dev/pts&quot;,
+            &quot;type&quot;: &quot;devpts&quot;,
+            &quot;source&quot;: &quot;devpts&quot;,
+            &quot;options&quot;: [
+                &quot;nosuid&quot;,
+                &quot;noexec&quot;,
+                &quot;newinstance&quot;,
+                &quot;ptmxmode=0666&quot;,
+                &quot;mode=0620&quot;,
+                &quot;gid=5&quot;
+            ]
+        },
+        {
+            &quot;destination&quot;: &quot;/dev/shm&quot;,
+            &quot;type&quot;: &quot;tmpfs&quot;,
+            &quot;source&quot;: &quot;shm&quot;,
+            &quot;options&quot;: [
+                &quot;nosuid&quot;,
+                &quot;noexec&quot;,
+                &quot;nodev&quot;,
+                &quot;mode=1777&quot;,
+                &quot;size=65536k&quot;
+            ]
+        },
+        {
+            &quot;destination&quot;: &quot;/dev/mqueue&quot;,
+            &quot;type&quot;: &quot;mqueue&quot;,
+            &quot;source&quot;: &quot;mqueue&quot;,
+            &quot;options&quot;: [
+                &quot;nosuid&quot;,
+                &quot;noexec&quot;,
+                &quot;nodev&quot;
+            ]
+        },
+        {
+            &quot;destination&quot;: &quot;/sys&quot;,
+            &quot;type&quot;: &quot;sysfs&quot;,
+            &quot;source&quot;: &quot;sysfs&quot;,
+            &quot;options&quot;: [
+                &quot;nosuid&quot;,
+                &quot;noexec&quot;,
+                &quot;nodev&quot;
+            ]
+        },
+        {
+            &quot;destination&quot;: &quot;/sys/fs/cgroup&quot;,
+            &quot;type&quot;: &quot;cgroup&quot;,
+            &quot;source&quot;: &quot;cgroup&quot;,
+            &quot;options&quot;: [
+                &quot;nosuid&quot;,
+                &quot;noexec&quot;,
+                &quot;nodev&quot;,
+                &quot;relatime&quot;,
+                &quot;ro&quot;
+            ]
+        }
+    ],
+    &quot;hooks&quot;: {
+        &quot;prestart&quot;: [
+            {
+                &quot;path&quot;: &quot;/usr/bin/fix-mounts&quot;,
+                &quot;args&quot;: [
+                    &quot;fix-mounts&quot;,
+                    &quot;arg1&quot;,
+                    &quot;arg2&quot;
+                ],
+                &quot;env&quot;: [
+                    &quot;key1=value1&quot;
+                ]
+            },
+            {
+                &quot;path&quot;: &quot;/usr/bin/setup-network&quot;
+            }
+        ],
+        &quot;poststart&quot;: [
+            {
+                &quot;path&quot;: &quot;/usr/bin/notify-start&quot;,
+                &quot;timeout&quot;: 5
+            }
+        ],
+        &quot;poststop&quot;: [
+            {
+                &quot;path&quot;: &quot;/usr/sbin/cleanup.sh&quot;,
+                &quot;args&quot;: [
+                    &quot;cleanup.sh&quot;,
+                    &quot;-f&quot;
+                ]
+            }
+        ]
+    },
+    &quot;linux&quot;: {
+        &quot;devices&quot;: [
+            {
+                &quot;path&quot;: &quot;/dev/fuse&quot;,
+                &quot;type&quot;: &quot;c&quot;,
+                &quot;major&quot;: 10,
+                &quot;minor&quot;: 229,
+                &quot;fileMode&quot;: 438,
+                &quot;uid&quot;: 0,
+                &quot;gid&quot;: 0
+            },
+            {
+                &quot;path&quot;: &quot;/dev/sda&quot;,
+                &quot;type&quot;: &quot;b&quot;,
+                &quot;major&quot;: 8,
+                &quot;minor&quot;: 0,
+                &quot;fileMode&quot;: 432,
+                &quot;uid&quot;: 0,
+                &quot;gid&quot;: 0
+            }
+        ],
+        &quot;uidMappings&quot;: [
+            {
+                &quot;containerID&quot;: 0,
+                &quot;hostID&quot;: 1000,
+                &quot;size&quot;: 32000
+            }
+        ],
+        &quot;gidMappings&quot;: [
+            {
+                &quot;containerID&quot;: 0,
+                &quot;hostID&quot;: 1000,
+                &quot;size&quot;: 32000
+            }
+        ],
+        &quot;sysctl&quot;: {
+            &quot;net.ipv4.ip_forward&quot;: &quot;1&quot;,
+            &quot;net.core.somaxconn&quot;: &quot;256&quot;
+        },
+        &quot;cgroupsPath&quot;: &quot;/myRuntime/myContainer&quot;,
+        &quot;resources&quot;: {
+            &quot;network&quot;: {
+                &quot;classID&quot;: 1048577,
+                &quot;priorities&quot;: [
+                    {
+                        &quot;name&quot;: &quot;eth0&quot;,
+                        &quot;priority&quot;: 500
+                    },
+                    {
+                        &quot;name&quot;: &quot;eth1&quot;,
+                        &quot;priority&quot;: 1000
+                    }
+                ]
+            },
+            &quot;pids&quot;: {
+                &quot;limit&quot;: 32771
+            },
+            &quot;hugepageLimits&quot;: [
+                {
+                    &quot;pageSize&quot;: &quot;2MB&quot;,
+                    &quot;limit&quot;: 9223372036854772000
+                },
+                {
+                    &quot;pageSize&quot;: &quot;64KB&quot;,
+                    &quot;limit&quot;: 1000000
+                }
+            ],
+            &quot;memory&quot;: {
+                &quot;limit&quot;: 536870912,
+                &quot;reservation&quot;: 536870912,
+                &quot;swap&quot;: 536870912,
+                &quot;kernel&quot;: -1,
+                &quot;kernelTCP&quot;: -1,
+                &quot;swappiness&quot;: 0,
+                &quot;disableOOMKiller&quot;: false
+            },
+            &quot;cpu&quot;: {
+                &quot;shares&quot;: 1024,
+                &quot;quota&quot;: 1000000,
+                &quot;period&quot;: 500000,
+                &quot;realtimeRuntime&quot;: 950000,
+                &quot;realtimePeriod&quot;: 1000000,
+                &quot;cpus&quot;: &quot;2-3&quot;,
+                &quot;mems&quot;: &quot;0-7&quot;
+            },
+            &quot;devices&quot;: [
+                {
+                    &quot;allow&quot;: false,
+                    &quot;access&quot;: &quot;rwm&quot;
+                },
+                {
+                    &quot;allow&quot;: true,
+                    &quot;type&quot;: &quot;c&quot;,
+                    &quot;major&quot;: 10,
+                    &quot;minor&quot;: 229,
+                    &quot;access&quot;: &quot;rw&quot;
+                },
+                {
+                    &quot;allow&quot;: true,
+                    &quot;type&quot;: &quot;b&quot;,
+                    &quot;major&quot;: 8,
+                    &quot;minor&quot;: 0,
+                    &quot;access&quot;: &quot;r&quot;
+                }
+            ],
+            &quot;blockIO&quot;: {
+                &quot;weight&quot;: 10,
+                &quot;leafWeight&quot;: 10,
+                &quot;weightDevice&quot;: [
+                    {
+                        &quot;major&quot;: 8,
+                        &quot;minor&quot;: 0,
+                        &quot;weight&quot;: 500,
+                        &quot;leafWeight&quot;: 300
+                    },
+                    {
+                        &quot;major&quot;: 8,
+                        &quot;minor&quot;: 16,
+                        &quot;weight&quot;: 500
+                    }
+                ],
+                &quot;throttleReadBpsDevice&quot;: [
+                    {
+                        &quot;major&quot;: 8,
+                        &quot;minor&quot;: 0,
+                        &quot;rate&quot;: 600
+                    }
+                ],
+                &quot;throttleWriteIOPSDevice&quot;: [
+                    {
+                        &quot;major&quot;: 8,
+                        &quot;minor&quot;: 16,
+                        &quot;rate&quot;: 300
+                    }
+                ]
+            }
+        },
+        &quot;rootfsPropagation&quot;: &quot;slave&quot;,
+        &quot;seccomp&quot;: {
+            &quot;defaultAction&quot;: &quot;SCMP_ACT_ALLOW&quot;,
+            &quot;architectures&quot;: [
+                &quot;SCMP_ARCH_X86&quot;,
+                &quot;SCMP_ARCH_X32&quot;
+            ],
+            &quot;syscalls&quot;: [
+                {
+                    &quot;names&quot;: [
+                        &quot;getcwd&quot;,
+                        &quot;chmod&quot;
+                    ],
+                    &quot;action&quot;: &quot;SCMP_ACT_ERRNO&quot;
+                }
+            ]
+        },
+        &quot;namespaces&quot;: [
+            {
+                &quot;type&quot;: &quot;pid&quot;
+            },
+            {
+                &quot;type&quot;: &quot;network&quot;
+            },
+            {
+                &quot;type&quot;: &quot;ipc&quot;
+            },
+            {
+                &quot;type&quot;: &quot;uts&quot;
+            },
+            {
+                &quot;type&quot;: &quot;mount&quot;
+            },
+            {
+                &quot;type&quot;: &quot;user&quot;
+            },
+            {
+                &quot;type&quot;: &quot;cgroup&quot;
+            }
+        ],
+        &quot;maskedPaths&quot;: [
+            &quot;/proc/kcore&quot;,
+            &quot;/proc/latency_stats&quot;,
+            &quot;/proc/timer_stats&quot;,
+            &quot;/proc/sched_debug&quot;
+        ],
+        &quot;readonlyPaths&quot;: [
+            &quot;/proc/asound&quot;,
+            &quot;/proc/bus&quot;,
+            &quot;/proc/fs&quot;,
+            &quot;/proc/irq&quot;,
+            &quot;/proc/sys&quot;,
+            &quot;/proc/sysrq-trigger&quot;
+        ],
+        &quot;mountLabel&quot;: &quot;system_u:object_r:svirt_sandbox_file_t:s0:c715,c811&quot;
+    },
+    &quot;annotations&quot;: {
+        &quot;com.example.key1&quot;: &quot;value1&quot;,
+        &quot;com.example.key2&quot;: &quot;value2&quot;
+    }
+}
+</code></pre>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="runtime-linux.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+                            <a rel="next" href="config-linux.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="runtime-linux.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+                    <a rel="next" href="config-linux.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+        <script type="text/javascript">
+            window.playground_copyable = true;
+        </script>
+        <script src="elasticlunr.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="mark.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="searcher.js" type="text/javascript" charset="utf-8"></script>
+        <script src="clipboard.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="highlight.js" type="text/javascript" charset="utf-8"></script>
+        <script src="book.js" type="text/javascript" charset="utf-8"></script>
+
+        <!-- Custom JS scripts -->
+    </body>
+</html>

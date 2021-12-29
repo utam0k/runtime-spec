@@ -1,0 +1,227 @@
+<!DOCTYPE HTML>
+<html lang="en" class="sidebar-visible no-js light">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Project governance - OCI Runtime Specification</title>
+        <!-- Custom HTML head -->
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+        <link rel="icon" href="favicon.svg">
+        <link rel="shortcut icon" href="favicon.png">
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        <link rel="stylesheet" href="css/print.css" media="print">
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="fonts/fonts.css">
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="highlight.css">
+        <link rel="stylesheet" href="tomorrow-night.css">
+        <link rel="stylesheet" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+    </head>
+    <body>
+        <!-- Provide site root to javascript -->
+        <script type="text/javascript">
+            var path_to_root = "";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script type="text/javascript">
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script type="text/javascript">
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('no-js')
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add('js');
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script type="text/javascript">
+            var html = document.querySelector('html');
+            var sidebar = 'hidden';
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            }
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="spec.html">Open Container Initiative Runtime Specification</a></li><li class="chapter-item expanded "><a href="principles.html"><strong aria-hidden="true">1.</strong> The 5 principles of Standard Containers</a></li><li class="chapter-item expanded "><a href="bundle.html"><strong aria-hidden="true">2.</strong> Filesystem Bundle</a></li><li class="chapter-item expanded "><a href="runtime.html"><strong aria-hidden="true">3.</strong> Runtime and Lifecycle</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="runtime-linux.html"><strong aria-hidden="true">3.1.</strong> Linux Runtime</a></li></ol></li><li class="chapter-item expanded "><a href="config.html"><strong aria-hidden="true">4.</strong> Configuration</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="config-linux.html"><strong aria-hidden="true">4.1.</strong> Linux Container Configuration</a></li><li class="chapter-item expanded "><a href="config-solaris.html"><strong aria-hidden="true">4.2.</strong> Solaris Application Container Configuration</a></li><li class="chapter-item expanded "><a href="config-windows.html"><strong aria-hidden="true">4.3.</strong> Windows-specific Container Configuration</a></li><li class="chapter-item expanded "><a href="config-vm.html"><strong aria-hidden="true">4.4.</strong> Virtual-machine-specific Container Configuration</a></li><li class="chapter-item expanded "><a href="config-zos.html"><strong aria-hidden="true">4.5.</strong> z/OS Container Configuration</a></li></ol></li><li class="chapter-item expanded "><a href="glossary.html"><strong aria-hidden="true">5.</strong> Glossary</a></li><li class="chapter-item expanded "><a href="implementations.html"><strong aria-hidden="true">6.</strong> Implementations</a></li><li class="chapter-item expanded "><a href="style.html"><strong aria-hidden="true">7.</strong> Style and conventions</a></li><li class="chapter-item expanded "><a href="GOVERNANCE.html" class="active"><strong aria-hidden="true">8.</strong> Project governance</a></li><li class="chapter-item expanded "><a href="RELEASES.html"><strong aria-hidden="true">9.</strong> Releases</a></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky bordered">
+                    <div class="left-buttons">
+                        <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </button>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light (default)</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">OCI Runtime Specification</h1>
+
+                    <div class="right-buttons">
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script type="text/javascript">
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="project-governance"><a class="header" href="#project-governance">Project governance</a></h1>
+<p>The <a href="https://www.opencontainers.org/about/governance">OCI charter</a> §5.b.viii tasks an OCI Project's maintainers (listed in the repository's MAINTAINERS file and sometimes referred to as &quot;the TDC&quot;, <a href="https://www.opencontainers.org/about/governance">§5.e</a>) with:</p>
+<blockquote>
+<p>Creating, maintaining and enforcing governance guidelines for the TDC, approved by the maintainers, and which shall be posted visibly for the TDC.</p>
+</blockquote>
+<p>This section describes generic rules and procedures for fulfilling that mandate.</p>
+<h2 id="proposing-a-motion"><a class="header" href="#proposing-a-motion">Proposing a motion</a></h2>
+<p>A maintainer SHOULD propose a motion on the dev@opencontainers.org mailing list (except <a href="#security-issues">security issues</a>) with another maintainer as a co-sponsor.</p>
+<h2 id="voting"><a class="header" href="#voting">Voting</a></h2>
+<p>Voting on a proposed motion SHOULD happen on the dev@opencontainers.org mailing list (except <a href="#security-issues">security issues</a>) with maintainers posting LGTM or REJECT.
+Maintainers MAY also explicitly not vote by posting ABSTAIN (which is useful to revert a previous vote).
+Maintainers MAY post multiple times (e.g. as they revise their position based on feedback), but only their final post counts in the tally.
+A proposed motion is adopted if two-thirds of votes cast, a quorum having voted, are in favor of the release.</p>
+<p>Voting SHOULD remain open for a week to collect feedback from the wider community and allow the maintainers to digest the proposed motion.
+Under exceptional conditions (e.g. non-major security fix releases) proposals which reach quorum with unanimous support MAY be adopted earlier.</p>
+<p>A maintainer MAY choose to reply with REJECT.
+A maintainer posting a REJECT MUST include a list of concerns or links to written documentation for those concerns (e.g. GitHub issues or mailing-list threads).
+The maintainers SHOULD try to resolve the concerns and wait for the rejecting maintainer to change their opinion to LGTM.
+However, a motion MAY be adopted with REJECTs, as outlined in the previous paragraphs.</p>
+<h2 id="quorum"><a class="header" href="#quorum">Quorum</a></h2>
+<p>A quorum is established when at least two-thirds of maintainers have voted.</p>
+<p>For projects that are not specifications, a <a href="#release-approval">motion to release</a> MAY be adopted if the tally is at least three LGTMs and no REJECTs, even if three votes does not meet the usual two-thirds quorum.</p>
+<h2 id="security-issues"><a class="header" href="#security-issues">Security issues</a></h2>
+<p>Motions with sensitive security implications MUST be proposed on the security@opencontainers.org mailing list instead of dev@opencontainers.org, but should otherwise follow the standard <a href="#proposing-a-motion">proposal</a> process.
+The security@opencontainers.org mailing list includes all members of the TOB.
+The TOB will contact the project maintainers and provide a channel for discussing and voting on the motion, but voting will otherwise follow the standard <a href="#voting">voting</a> and <a href="#quorum">quorum</a> rules.
+The TOB and project maintainers will work together to notify affected parties before making an adopted motion public.</p>
+<h2 id="amendments"><a class="header" href="#amendments">Amendments</a></h2>
+<p>The <a href="#project-governance">project governance</a> rules and procedures MAY be amended or replaced using the procedures themselves.
+The MAINTAINERS of this project governance document is the total set of MAINTAINERS from all Open Containers projects (runC, runtime-spec, and image-spec).</p>
+<h2 id="subject-templates"><a class="header" href="#subject-templates">Subject templates</a></h2>
+<p>Maintainers are busy and get lots of email.
+To make project proposals recognizable, proposed motions SHOULD use the following subject templates.</p>
+<h3 id="proposing-a-motion-1"><a class="header" href="#proposing-a-motion-1">Proposing a motion</a></h3>
+<blockquote>
+<p>[{project} VOTE]: {motion description} (closes {end of voting window})</p>
+</blockquote>
+<p>For example:</p>
+<blockquote>
+<p>[runtime-spec VOTE]: Tag 0647920 as 1.0.0-rc (closes 2016-06-03 20:00 UTC)</p>
+</blockquote>
+<h3 id="tallying-results"><a class="header" href="#tallying-results">Tallying results</a></h3>
+<p>After voting closes, a maintainer SHOULD post a tally to the motion thread with a subject template like:</p>
+<blockquote>
+<p>[{project} {status}]: {motion description} (+{LGTMs} -{REJECTs} #{ABSTAINs})</p>
+</blockquote>
+<p>Where <code>{status}</code> is either <code>adopted</code> or <code>rejected</code>.
+For example:</p>
+<blockquote>
+<p>[runtime-spec adopted]: Tag 0647920 as 1.0.0-rc (+6 -0 #3)</p>
+</blockquote>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="style.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+                            <a rel="next" href="RELEASES.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="style.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+                    <a rel="next" href="RELEASES.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+        <script type="text/javascript">
+            window.playground_copyable = true;
+        </script>
+        <script src="elasticlunr.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="mark.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="searcher.js" type="text/javascript" charset="utf-8"></script>
+        <script src="clipboard.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="highlight.js" type="text/javascript" charset="utf-8"></script>
+        <script src="book.js" type="text/javascript" charset="utf-8"></script>
+
+        <!-- Custom JS scripts -->
+    </body>
+</html>

@@ -1,0 +1,2780 @@
+<!DOCTYPE HTML>
+<html lang="en" class="sidebar-visible no-js light">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>OCI Runtime Specification</title>
+        <meta name="robots" content="noindex" />
+        <!-- Custom HTML head -->
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+        <link rel="icon" href="favicon.svg">
+        <link rel="shortcut icon" href="favicon.png">
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        <link rel="stylesheet" href="css/print.css" media="print">
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="fonts/fonts.css">
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="highlight.css">
+        <link rel="stylesheet" href="tomorrow-night.css">
+        <link rel="stylesheet" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+    </head>
+    <body>
+        <!-- Provide site root to javascript -->
+        <script type="text/javascript">
+            var path_to_root = "";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script type="text/javascript">
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script type="text/javascript">
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('no-js')
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add('js');
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script type="text/javascript">
+            var html = document.querySelector('html');
+            var sidebar = 'hidden';
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            }
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="spec.html">Open Container Initiative Runtime Specification</a></li><li class="chapter-item expanded "><a href="principles.html"><strong aria-hidden="true">1.</strong> The 5 principles of Standard Containers</a></li><li class="chapter-item expanded "><a href="bundle.html"><strong aria-hidden="true">2.</strong> Filesystem Bundle</a></li><li class="chapter-item expanded "><a href="runtime.html"><strong aria-hidden="true">3.</strong> Runtime and Lifecycle</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="runtime-linux.html"><strong aria-hidden="true">3.1.</strong> Linux Runtime</a></li></ol></li><li class="chapter-item expanded "><a href="config.html"><strong aria-hidden="true">4.</strong> Configuration</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="config-linux.html"><strong aria-hidden="true">4.1.</strong> Linux Container Configuration</a></li><li class="chapter-item expanded "><a href="config-solaris.html"><strong aria-hidden="true">4.2.</strong> Solaris Application Container Configuration</a></li><li class="chapter-item expanded "><a href="config-windows.html"><strong aria-hidden="true">4.3.</strong> Windows-specific Container Configuration</a></li><li class="chapter-item expanded "><a href="config-vm.html"><strong aria-hidden="true">4.4.</strong> Virtual-machine-specific Container Configuration</a></li><li class="chapter-item expanded "><a href="config-zos.html"><strong aria-hidden="true">4.5.</strong> z/OS Container Configuration</a></li></ol></li><li class="chapter-item expanded "><a href="glossary.html"><strong aria-hidden="true">5.</strong> Glossary</a></li><li class="chapter-item expanded "><a href="implementations.html"><strong aria-hidden="true">6.</strong> Implementations</a></li><li class="chapter-item expanded "><a href="style.html"><strong aria-hidden="true">7.</strong> Style and conventions</a></li><li class="chapter-item expanded "><a href="GOVERNANCE.html"><strong aria-hidden="true">8.</strong> Project governance</a></li><li class="chapter-item expanded "><a href="RELEASES.html"><strong aria-hidden="true">9.</strong> Releases</a></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky bordered">
+                    <div class="left-buttons">
+                        <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </button>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light (default)</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">OCI Runtime Specification</h1>
+
+                    <div class="right-buttons">
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script type="text/javascript">
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="open-container-initiative-runtime-specification"><a class="header" href="#open-container-initiative-runtime-specification"><a name="openContainerInitiativeRuntimeSpecification" />Open Container Initiative Runtime Specification</a></h1>
+<p>The <a href="http://www.opencontainers.org">Open Container Initiative</a> develops specifications for standards on Operating System process and application containers.</p>
+<h1 id="abstract"><a class="header" href="#abstract"><a name="ociRuntimeSpecAbstract" />Abstract</a></h1>
+<p>The Open Container Initiative Runtime Specification aims to specify the configuration, execution environment, and lifecycle of a container.</p>
+<p>A container's configuration is specified as the <code>config.json</code> for the supported platforms and details the fields that enable the creation of a container.
+The execution environment is specified to ensure that applications running inside a container have a consistent environment between runtimes along with common actions defined for the container's lifecycle.</p>
+<h1 id="platforms"><a class="header" href="#platforms"><a name="ociRuntimeSpecPlatforms" />Platforms</a></h1>
+<p>Platforms defined by this specification are:</p>
+<ul>
+<li><code>linux</code>: <a href="runtime.html">runtime.md</a>, <a href="config.html">config.md</a>, <a href="config-linux.html">config-linux.md</a>, and <a href="runtime-linux.html">runtime-linux.md</a>.</li>
+<li><code>solaris</code>: <a href="runtime.html">runtime.md</a>, <a href="config.html">config.md</a>, and <a href="config-solaris.html">config-solaris.md</a>.</li>
+<li><code>windows</code>: <a href="runtime.html">runtime.md</a>, <a href="config.html">config.md</a>, and <a href="config-windows.html">config-windows.md</a>.</li>
+<li><code>vm</code>: <a href="runtime.html">runtime.md</a>, <a href="config.html">config.md</a>, and <a href="config-vm.html">config-vm.md</a>.</li>
+<li><code>zos</code>: <a href="runtime.html">runtime.md</a>, <a href="config.html">config.md</a>, and <a href="config-zos.html">config-zos.md</a>.</li>
+</ul>
+<h1 id="table-of-contents"><a class="header" href="#table-of-contents"><a name="ociRuntimeSpecTOC" />Table of Contents</a></h1>
+<ul>
+<li><a href="spec.html">Introduction</a>
+<ul>
+<li><a href="spec.html#notational-conventions">Notational Conventions</a></li>
+<li><a href="principles.html">Container Principles</a></li>
+</ul>
+</li>
+<li><a href="bundle.html">Filesystem Bundle</a></li>
+<li><a href="runtime.html">Runtime and Lifecycle</a>
+<ul>
+<li><a href="runtime-linux.html">Linux-specific Runtime and Lifecycle</a></li>
+</ul>
+</li>
+<li><a href="config.html">Configuration</a>
+<ul>
+<li><a href="config-linux.html">Linux-specific Configuration</a></li>
+<li><a href="config-solaris.html">Solaris-specific Configuration</a></li>
+<li><a href="config-windows.html">Windows-specific Configuration</a></li>
+<li><a href="config-vm.html">Virtual-Machine-specific Configuration</a></li>
+<li><a href="config-zos.html">z/OS-specific Configuration</a></li>
+</ul>
+</li>
+<li><a href="glossary.html">Glossary</a></li>
+</ul>
+<h1 id="notational-conventions"><a class="header" href="#notational-conventions"><a name="ociRuntimeSpecNotationalConventions" />Notational Conventions</a></h1>
+<p>The key words &quot;MUST&quot;, &quot;MUST NOT&quot;, &quot;REQUIRED&quot;, &quot;SHALL&quot;, &quot;SHALL NOT&quot;, &quot;SHOULD&quot;, &quot;SHOULD NOT&quot;, &quot;RECOMMENDED&quot;, &quot;NOT RECOMMENDED&quot;, &quot;MAY&quot;, and &quot;OPTIONAL&quot; are to be interpreted as described in <a href="http://tools.ietf.org/html/rfc2119">RFC 2119</a>.</p>
+<p>The key words &quot;unspecified&quot;, &quot;undefined&quot;, and &quot;implementation-defined&quot; are to be interpreted as described in the <a href="http://www.open-std.org/jtc1/sc22/wg14/www/C99RationaleV5.10.pdf#page=18">rationale for the C99 standard</a>.</p>
+<p>An implementation is not compliant for a given CPU architecture if it fails to satisfy one or more of the MUST, REQUIRED, or SHALL requirements for the <a href="spec.html#platforms">platforms</a> it implements.
+An implementation is compliant for a given CPU architecture if it satisfies all the MUST, REQUIRED, and SHALL requirements for the <a href="spec.html#platforms">platforms</a> it implements.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="the-5-principles-of-standard-containers"><a class="header" href="#the-5-principles-of-standard-containers"><a name="the5PrinciplesOfStandardContainers" />The 5 principles of Standard Containers</a></h1>
+<p>Define a unit of software delivery called a Standard Container.
+The goal of a Standard Container is to encapsulate a software component and all its dependencies in a format that is self-describing and portable, so that any compliant runtime can run it without extra dependencies, regardless of the underlying machine and the contents of the container.</p>
+<p>The specification for Standard Containers defines:</p>
+<ol>
+<li>configuration file formats</li>
+<li>a set of standard operations</li>
+<li>an execution environment.</li>
+</ol>
+<p>A great analogy for this is the physical shipping container used by the transportation industry.
+Shipping containers are a fundamental unit of delivery, they can be lifted, stacked, locked, loaded, unloaded and labelled.
+Irrespective of their contents, by standardizing the container itself it allowed for a consistent, more streamlined and efficient set of processes to be defined.
+For software Standard Containers offer similar functionality by being the fundamental, standardized, unit of delivery for a software package.</p>
+<h2 id="1-standard-operations"><a class="header" href="#1-standard-operations"><a name="standardOperations" />1. Standard operations</a></h2>
+<p>Standard Containers define a set of STANDARD OPERATIONS.
+They can be created, started, and stopped using standard container tools; copied and snapshotted using standard filesystem tools; and downloaded and uploaded using standard network tools.</p>
+<h2 id="2-content-agnostic"><a class="header" href="#2-content-agnostic"><a name="contentAgnostic" />2. Content-agnostic</a></h2>
+<p>Standard Containers are CONTENT-AGNOSTIC: all standard operations have the same effect regardless of the contents.
+They are started in the same way whether they contain a postgres database, a php application with its dependencies and application server, or Java build artifacts.</p>
+<h2 id="3-infrastructure-agnostic"><a class="header" href="#3-infrastructure-agnostic"><a name="infrastructureAgnostic" />3. Infrastructure-agnostic</a></h2>
+<p>Standard Containers are INFRASTRUCTURE-AGNOSTIC: they can be run in any OCI supported infrastructure.
+For example, a standard container can be bundled on a laptop, uploaded to cloud storage, downloaded, run and snapshotted by a build server at a fiber hotel in Virginia, uploaded to 10 staging servers in a home-made private cloud cluster, then sent to 30 production instances across 3 public cloud regions.</p>
+<h2 id="4-designed-for-automation"><a class="header" href="#4-designed-for-automation"><a name="designedForAutomation" />4. Designed for automation</a></h2>
+<p>Standard Containers are DESIGNED FOR AUTOMATION: because they offer the same standard operations regardless of content and infrastructure, Standard Containers, are extremely well-suited for automation.
+In fact, you could say automation is their secret weapon.</p>
+<p>Many things that once required time-consuming and error-prone human effort can now be programmed.
+Before Standard Containers, by the time a software component ran in production, it had been individually built, configured, bundled, documented, patched, vendored, templated, tweaked and instrumented by 10 different people on 10 different computers.
+Builds failed, libraries conflicted, mirrors crashed, post-it notes were lost, logs were misplaced, cluster updates were half-broken.
+The process was slow, inefficient and cost a fortune - and was entirely different depending on the language and infrastructure provider.</p>
+<h2 id="5-industrial-grade-delivery"><a class="header" href="#5-industrial-grade-delivery"><a name="industrialGradeDelivery" />5. Industrial-grade delivery</a></h2>
+<p>Standard Containers make INDUSTRIAL-GRADE DELIVERY of software a reality.
+Leveraging all of the properties listed above, Standard Containers are enabling large and small enterprises to streamline and automate their software delivery pipelines.
+Whether it is in-house devOps flows, or external customer-based software delivery mechanisms, Standard Containers are changing the way the community thinks about software packaging and delivery.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="filesystem-bundle"><a class="header" href="#filesystem-bundle"><a name="filesystemBundle" />Filesystem Bundle</a></h1>
+<h2 id="container-format"><a class="header" href="#container-format"><a name="containerFormat" />Container Format</a></h2>
+<p>This section defines a format for encoding a container as a <em>filesystem bundle</em> - a set of files organized in a certain way, and containing all the necessary data and metadata for any compliant runtime to perform all standard operations against it.
+See also <a href="https://en.wikipedia.org/wiki/Bundle_%28macOS%29">MacOS application bundles</a> for a similar use of the term <em>bundle</em>.</p>
+<p>The definition of a bundle is only concerned with how a container, and its configuration data, are stored on a local filesystem so that it can be consumed by a compliant runtime.</p>
+<p>A Standard Container bundle contains all the information needed to load and run a container.
+This includes the following artifacts:</p>
+<ol>
+<li>
+<p><a name="containerFormat01" /><code>config.json</code>: contains configuration data.
+This REQUIRED file MUST reside in the root of the bundle directory and MUST be named <code>config.json</code>.
+See <a href="config.html"><code>config.json</code></a> for more details.</p>
+</li>
+<li>
+<p><a name="containerFormat02" />container's root filesystem: the directory referenced by <a href="config.html#root"><code>root.path</code></a>, if that property is set in <code>config.json</code>.</p>
+</li>
+</ol>
+<p>When supplied, while these artifacts MUST all be present in a single directory on the local filesystem, that directory itself is not part of the bundle.
+In other words, a tar archive of a <em>bundle</em> will have these artifacts at the root of the archive, not nested within a top-level directory.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="runtime-and-lifecycle"><a class="header" href="#runtime-and-lifecycle"><a name="runtimeAndLifecycle" />Runtime and Lifecycle</a></h1>
+<h2 id="scope-of-a-container"><a class="header" href="#scope-of-a-container"><a name="runtimeScopeContainer" />Scope of a Container</a></h2>
+<p>The entity using a runtime to create a container MUST be able to use the operations defined in this specification against that same container.
+Whether other entities using the same, or other, instance of the runtime can see that container is out of scope of this specification.</p>
+<h2 id="state"><a class="header" href="#state"><a name="runtimeState" />State</a></h2>
+<p>The state of a container includes the following properties:</p>
+<ul>
+<li>
+<p><strong><code>ociVersion</code></strong> (string, REQUIRED) is version of the Open Container Initiative Runtime Specification with which the state complies.</p>
+</li>
+<li>
+<p><strong><code>id</code></strong> (string, REQUIRED) is the container's ID.
+This MUST be unique across all containers on this host.
+There is no requirement that it be unique across hosts.</p>
+</li>
+<li>
+<p><strong><code>status</code></strong> (string, REQUIRED) is the runtime state of the container.
+The value MAY be one of:</p>
+<ul>
+<li><code>creating</code>: the container is being created (step 2 in the <a href="runtime.html#lifecycle">lifecycle</a>)</li>
+<li><code>created</code>: the runtime has finished the <a href="runtime.html#create">create operation</a> (after step 2 in the <a href="runtime.html#lifecycle">lifecycle</a>), and the container process has neither exited nor executed the user-specified program</li>
+<li><code>running</code>: the container process has executed the user-specified program but has not exited (after step 8 in the <a href="runtime.html#lifecycle">lifecycle</a>)</li>
+<li><code>stopped</code>: the container process has exited (step 10 in the <a href="runtime.html#lifecycle">lifecycle</a>)</li>
+</ul>
+<p>Additional values MAY be defined by the runtime, however, they MUST be used to represent new runtime states not defined above.</p>
+</li>
+<li>
+<p><strong><code>pid</code></strong> (int, REQUIRED when <code>status</code> is <code>created</code> or <code>running</code> on Linux, OPTIONAL on other platforms) is the ID of the container process.
+For hooks executed in the runtime namespace, it is the pid as seen by the runtime.
+For hooks executed in the container namespace, it is the pid as seen by the container.</p>
+</li>
+<li>
+<p><strong><code>bundle</code></strong> (string, REQUIRED) is the absolute path to the container's bundle directory.
+This is provided so that consumers can find the container's configuration and root filesystem on the host.</p>
+</li>
+<li>
+<p><strong><code>annotations</code></strong> (map, OPTIONAL) contains the list of annotations associated with the container.
+If no annotations were provided then this property MAY either be absent or an empty map.</p>
+</li>
+</ul>
+<p>The state MAY include additional properties.</p>
+<p>When serialized in JSON, the format MUST adhere to the following pattern:</p>
+<pre><code class="language-json">{
+    &quot;ociVersion&quot;: &quot;0.2.0&quot;,
+    &quot;id&quot;: &quot;oci-container1&quot;,
+    &quot;status&quot;: &quot;running&quot;,
+    &quot;pid&quot;: 4422,
+    &quot;bundle&quot;: &quot;/containers/redis&quot;,
+    &quot;annotations&quot;: {
+        &quot;myKey&quot;: &quot;myValue&quot;
+    }
+}
+</code></pre>
+<p>See <a href="runtime.html#query-state">Query State</a> for information on retrieving the state of a container.</p>
+<h2 id="lifecycle"><a class="header" href="#lifecycle"><a name="runtimeLifecycle" />Lifecycle</a></h2>
+<p>The lifecycle describes the timeline of events that happen from when a container is created to when it ceases to exist.</p>
+<ol>
+<li>OCI compliant runtime's <a href="runtime.html#create"><code>create</code></a> command is invoked with a reference to the location of the bundle and a unique identifier.</li>
+<li>The container's runtime environment MUST be created according to the configuration in <a href="config.html"><code>config.json</code></a>.
+If the runtime is unable to create the environment specified in the <a href="config.html"><code>config.json</code></a>, it MUST <a href="runtime.html#errors">generate an error</a>.
+While the resources requested in the <a href="config.html"><code>config.json</code></a> MUST be created, the user-specified program (from <a href="config.html#process"><code>process</code></a>) MUST NOT be run at this time.
+Any updates to <a href="config.html"><code>config.json</code></a> after this step MUST NOT affect the container.</li>
+<li>The <a href="config.html#prestart"><code>prestart</code> hooks</a> MUST be invoked by the runtime.
+If any <code>prestart</code> hook fails, the runtime MUST <a href="runtime.html#errors">generate an error</a>, stop the container, and continue the lifecycle at step 12.</li>
+<li>The <a href="config.html#createRuntime-hooks"><code>createRuntime</code> hooks</a> MUST be invoked by the runtime.
+If any <code>createRuntime</code> hook fails, the runtime MUST <a href="runtime.html#errors">generate an error</a>, stop the container, and continue the lifecycle at step 12.</li>
+<li>The <a href="config.html#createContainer-hooks"><code>createContainer</code> hooks</a> MUST be invoked by the runtime.
+If any <code>createContainer</code> hook fails, the runtime MUST <a href="runtime.html#errors">generate an error</a>, stop the container, and continue the lifecycle at step 12.</li>
+<li>Runtime's <a href="runtime.html#start"><code>start</code></a> command is invoked with the unique identifier of the container.</li>
+<li>The <a href="config.html#startContainer-hooks"><code>startContainer</code> hooks</a> MUST be invoked by the runtime.
+If any <code>startContainer</code> hook fails, the runtime MUST <a href="runtime.html#errors">generate an error</a>, stop the container, and continue the lifecycle at step 12.</li>
+<li>The runtime MUST run the user-specified program, as specified by <a href="config.html#process"><code>process</code></a>.</li>
+<li>The <a href="config.html#poststart"><code>poststart</code> hooks</a> MUST be invoked by the runtime.
+If any <code>poststart</code> hook fails, the runtime MUST <a href="runtime.html#warnings">log a warning</a>, but the remaining hooks and lifecycle continue as if the hook had succeeded.</li>
+<li>The container process exits.
+This MAY happen due to erroring out, exiting, crashing or the runtime's <a href="runtime.html#kill"><code>kill</code></a> operation being invoked.</li>
+<li>Runtime's <a href="runtime.html#delete"><code>delete</code></a> command is invoked with the unique identifier of the container.</li>
+<li>The container MUST be destroyed by undoing the steps performed during create phase (step 2).</li>
+<li>The <a href="config.html#poststop"><code>poststop</code> hooks</a> MUST be invoked by the runtime.
+If any <code>poststop</code> hook fails, the runtime MUST <a href="runtime.html#warnings">log a warning</a>, but the remaining hooks and lifecycle continue as if the hook had succeeded.</li>
+</ol>
+<h2 id="errors"><a class="header" href="#errors"><a name="runtimeErrors" />Errors</a></h2>
+<p>In cases where the specified operation generates an error, this specification does not mandate how, or even if, that error is returned or exposed to the user of an implementation.
+Unless otherwise stated, generating an error MUST leave the state of the environment as if the operation were never attempted - modulo any possible trivial ancillary changes such as logging.</p>
+<h2 id="warnings"><a class="header" href="#warnings"><a name="runtimeWarnings" />Warnings</a></h2>
+<p>In cases where the specified operation logs a warning, this specification does not mandate how, or even if, that warning is returned or exposed to the user of an implementation.
+Unless otherwise stated, logging a warning does not change the flow of the operation; it MUST continue as if the warning had not been logged.</p>
+<h2 id="operations"><a class="header" href="#operations"><a name="runtimeOperations" />Operations</a></h2>
+<p>Unless otherwise stated, runtimes MUST support the following operations.</p>
+<p>Note: these operations are not specifying any command-line APIs, and the parameters are inputs for general operations.</p>
+<h3 id="query-state"><a class="header" href="#query-state"><a name="runtimeQueryState" />Query State</a></h3>
+<p><code>state &lt;container-id&gt;</code></p>
+<p>This operation MUST <a href="runtime.html#errors">generate an error</a> if it is not provided the ID of a container.
+Attempting to query a container that does not exist MUST <a href="runtime.html#errors">generate an error</a>.
+This operation MUST return the state of a container as specified in the <a href="runtime.html#state">State</a> section.</p>
+<h3 id="create"><a class="header" href="#create"><a name="runtimeCreate" />Create</a></h3>
+<p><code>create &lt;container-id&gt; &lt;path-to-bundle&gt;</code></p>
+<p>This operation MUST <a href="runtime.html#errors">generate an error</a> if it is not provided a path to the bundle and the container ID to associate with the container.
+If the ID provided is not unique across all containers within the scope of the runtime, or is not valid in any other way, the implementation MUST <a href="runtime.html#errors">generate an error</a> and a new container MUST NOT be created.
+This operation MUST create a new container.</p>
+<p>All of the properties configured in <a href="config.html"><code>config.json</code></a> except for <a href="config.html#process"><code>process</code></a> MUST be applied.
+<a href="config.html#process"><code>process.args</code></a> MUST NOT be applied until triggered by the <a href="runtime.html#start"><code>start</code></a> operation.
+The remaining <code>process</code> properties MAY be applied by this operation.
+If the runtime cannot apply a property as specified in the <a href="config.html">configuration</a>, it MUST <a href="runtime.html#errors">generate an error</a> and a new container MUST NOT be created.</p>
+<p>The runtime MAY validate <code>config.json</code> against this spec, either generically or with respect to the local system capabilities, before creating the container (<a href="runtime.html#lifecycle">step 2</a>).
+Runtime callers who are interested in pre-create validation can run <a href="implementations.html#testing--tools">bundle-validation tools</a> before invoking the create operation.</p>
+<p>Any changes made to the <a href="config.html"><code>config.json</code></a> file after this operation will not have an effect on the container.</p>
+<h3 id="start"><a class="header" href="#start"><a name="runtimeStart" />Start</a></h3>
+<p><code>start &lt;container-id&gt;</code></p>
+<p>This operation MUST <a href="runtime.html#errors">generate an error</a> if it is not provided the container ID.
+Attempting to <code>start</code> a container that is not <a href="runtime.html#state"><code>created</code></a> MUST have no effect on the container and MUST <a href="runtime.html#errors">generate an error</a>.
+This operation MUST run the user-specified program as specified by <a href="config.html#process"><code>process</code></a>.
+This operation MUST generate an error if <code>process</code> was not set.</p>
+<h3 id="kill"><a class="header" href="#kill"><a name="runtimeKill" />Kill</a></h3>
+<p><code>kill &lt;container-id&gt; &lt;signal&gt;</code></p>
+<p>This operation MUST <a href="runtime.html#errors">generate an error</a> if it is not provided the container ID.
+Attempting to send a signal to a container that is neither <a href="runtime.html#state"><code>created</code> nor <code>running</code></a> MUST have no effect on the container and MUST <a href="runtime.html#errors">generate an error</a>.
+This operation MUST send the specified signal to the container process.</p>
+<h3 id="delete"><a class="header" href="#delete"><a name="runtimeDelete" />Delete</a></h3>
+<p><code>delete &lt;container-id&gt;</code></p>
+<p>This operation MUST <a href="runtime.html#errors">generate an error</a> if it is not provided the container ID.
+Attempting to <code>delete</code> a container that is not <a href="runtime.html#state"><code>stopped</code></a> MUST have no effect on the container and MUST <a href="runtime.html#errors">generate an error</a>.
+Deleting a container MUST delete the resources that were created during the <code>create</code> step.
+Note that resources associated with the container, but not created by this container, MUST NOT be deleted.
+Once a container is deleted its ID MAY be used by a subsequent container.</p>
+<h2 id="hooks"><a class="header" href="#hooks"><a name="runtimeHooks" />Hooks</a></h2>
+<p>Many of the operations specified in this specification have &quot;hooks&quot; that allow for additional actions to be taken before or after each operation.
+See <a href="./config.html#posix-platform-hooks">runtime configuration for hooks</a> for more information.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="linux-runtime"><a class="header" href="#linux-runtime"><a name="linuxRuntime" />Linux Runtime</a></h1>
+<h2 id="file-descriptors"><a class="header" href="#file-descriptors"><a name="runtimeLinuxFileDescriptors" />File descriptors</a></h2>
+<p>By default, only the <code>stdin</code>, <code>stdout</code> and <code>stderr</code> file descriptors are kept open for the application by the runtime.
+The runtime MAY pass additional file descriptors to the application to support features such as <a href="http://0pointer.de/blog/projects/socket-activated-containers.html">socket activation</a>.
+Some of the file descriptors MAY be redirected to <code>/dev/null</code> even though they are open.</p>
+<h2 id="dev-symbolic-links"><a class="header" href="#dev-symbolic-links"><a name="runtimeLinuxDevSymbolicLinks" /> Dev symbolic links</a></h2>
+<p>While creating the container (step 2 in the <a href="runtime.html#lifecycle">lifecycle</a>), runtimes MUST create the following symlinks if the source file exists after processing <a href="config.html#mounts"><code>mounts</code></a>:</p>
+<table><thead><tr><th>Source</th><th>Destination</th></tr></thead><tbody>
+<tr><td>/proc/self/fd</td><td>/dev/fd</td></tr>
+<tr><td>/proc/self/fd/0</td><td>/dev/stdin</td></tr>
+<tr><td>/proc/self/fd/1</td><td>/dev/stdout</td></tr>
+<tr><td>/proc/self/fd/2</td><td>/dev/stderr</td></tr>
+</tbody></table>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="configuration"><a class="header" href="#configuration"><a name="configuration" />Configuration</a></h1>
+<p>This configuration file contains metadata necessary to implement <a href="runtime.html#operations">standard operations</a> against the container.
+This includes the process to run, environment variables to inject, sandboxing features to use, etc.</p>
+<p>The canonical schema is defined in this document, but there is a JSON Schema in <a href="schema/config-schema.json"><code>schema/config-schema.json</code></a> and Go bindings in <a href="specs-go/config.go"><code>specs-go/config.go</code></a>.
+<a href="spec.html#platforms">Platform</a>-specific configuration schema are defined in the <a href="config.html#platform-specific-configuration">platform-specific documents</a> linked below.
+For properties that are only defined for some <a href="spec.html#platforms">platforms</a>, the Go property has a <code>platform</code> tag listing those protocols (e.g. <code>platform:&quot;linux,solaris&quot;</code>).</p>
+<p>Below is a detailed description of each field defined in the configuration format and valid values are specified.
+Platform-specific fields are identified as such.
+For all platform-specific configuration values, the scope defined below in the <a href="config.html#platform-specific-configuration">Platform-specific configuration</a> section applies.</p>
+<h2 id="specification-version"><a class="header" href="#specification-version"><a name="configSpecificationVersion" />Specification version</a></h2>
+<ul>
+<li><strong><code>ociVersion</code></strong> (string, REQUIRED) MUST be in <a href="http://semver.org/spec/v2.0.0.html">SemVer v2.0.0</a> format and specifies the version of the Open Container Initiative Runtime Specification with which the bundle complies.
+The Open Container Initiative Runtime Specification follows semantic versioning and retains forward and backward compatibility within major versions.
+For example, if a configuration is compliant with version 1.1 of this specification, it is compatible with all runtimes that support any 1.1 or later release of this specification, but is not compatible with a runtime that supports 1.0 and not 1.1.</li>
+</ul>
+<h3 id="example"><a class="header" href="#example">Example</a></h3>
+<pre><code class="language-json">&quot;ociVersion&quot;: &quot;0.1.0&quot;
+</code></pre>
+<h2 id="root"><a class="header" href="#root"><a name="configRoot" />Root</a></h2>
+<p><strong><code>root</code></strong> (object, OPTIONAL) specifies the container's root filesystem.
+On Windows, for Windows Server Containers, this field is REQUIRED.
+For <a href="config-windows.html#hyperv">Hyper-V Containers</a>, this field MUST NOT be set.</p>
+<p>On all other platforms, this field is REQUIRED.</p>
+<ul>
+<li>
+<p><strong><code>path</code></strong> (string, REQUIRED) Specifies the path to the root filesystem for the container.</p>
+<ul>
+<li>On Windows, <code>path</code> MUST be a <a href="https://aka.ms/nb3hqb">volume GUID path</a>.</li>
+<li>On POSIX platforms, <code>path</code> is either an absolute path or a relative path to the bundle.
+For example, with a bundle at <code>/to/bundle</code> and a root filesystem at <code>/to/bundle/rootfs</code>, the <code>path</code> value can be either <code>/to/bundle/rootfs</code> or <code>rootfs</code>.
+The value SHOULD be the conventional <code>rootfs</code>.</li>
+</ul>
+<p>A directory MUST exist at the path declared by the field.</p>
+</li>
+<li>
+<p><strong><code>readonly</code></strong> (bool, OPTIONAL) If true then the root filesystem MUST be read-only inside the container, defaults to false.</p>
+<ul>
+<li>On Windows, this field MUST be omitted or false.</li>
+</ul>
+</li>
+</ul>
+<h3 id="example-posix-platforms"><a class="header" href="#example-posix-platforms">Example (POSIX platforms)</a></h3>
+<pre><code class="language-json">&quot;root&quot;: {
+    &quot;path&quot;: &quot;rootfs&quot;,
+    &quot;readonly&quot;: true
+}
+</code></pre>
+<h3 id="example-windows"><a class="header" href="#example-windows">Example (Windows)</a></h3>
+<pre><code class="language-json">&quot;root&quot;: {
+    &quot;path&quot;: &quot;\\\\?\\Volume{ec84d99e-3f02-11e7-ac6c-00155d7682cf}\\&quot;
+}
+</code></pre>
+<h2 id="mounts"><a class="header" href="#mounts"><a name="configMounts" />Mounts</a></h2>
+<p><strong><code>mounts</code></strong> (array of objects, OPTIONAL) specifies additional mounts beyond <a href="config.html#root"><code>root</code></a>.
+The runtime MUST mount entries in the listed order.
+For Linux, the parameters are as documented in <a href="http://man7.org/linux/man-pages/man2/mount.2.html">mount(2)</a> system call man page.
+For Solaris, the mount entry corresponds to the 'fs' resource in the <a href="http://docs.oracle.com/cd/E86824_01/html/E54764/zonecfg-1m.html">zonecfg(1M)</a> man page.</p>
+<ul>
+<li><strong><code>destination</code></strong> (string, REQUIRED) Destination of mount point: path inside container.
+This value MUST be an absolute path.
+<ul>
+<li>Windows: one mount destination MUST NOT be nested within another mount (e.g., c:\foo and c:\foo\bar).</li>
+<li>Solaris: corresponds to &quot;dir&quot; of the fs resource in <a href="http://docs.oracle.com/cd/E86824_01/html/E54764/zonecfg-1m.html">zonecfg(1M)</a>.</li>
+</ul>
+</li>
+<li><strong><code>source</code></strong> (string, OPTIONAL) A device name, but can also be a file or directory name for bind mounts or a dummy.
+Path values for bind mounts are either absolute or relative to the bundle.
+A mount is a bind mount if it has either <code>bind</code> or <code>rbind</code> in the options.
+<ul>
+<li>Windows: a local directory on the filesystem of the container host. UNC paths and mapped drives are not supported.</li>
+<li>Solaris: corresponds to &quot;special&quot; of the fs resource in <a href="http://docs.oracle.com/cd/E86824_01/html/E54764/zonecfg-1m.html">zonecfg(1M)</a>.</li>
+</ul>
+</li>
+<li><strong><code>options</code></strong> (array of strings, OPTIONAL) Mount options of the filesystem to be used.
+<ul>
+<li>Linux: supported options are listed in the <a href="http://man7.org/linux/man-pages/man8/mount.8.html">mount(8)</a> man page.
+Note both <a href="http://man7.org/linux/man-pages/man8/mount.8.html#FILESYSTEM-INDEPENDENT_MOUNT_OPTIONS">filesystem-independent</a> and <a href="http://man7.org/linux/man-pages/man8/mount.8.html#FILESYSTEM-SPECIFIC_MOUNT_OPTIONS">filesystem-specific</a> options are listed.</li>
+<li>Solaris: corresponds to &quot;options&quot; of the fs resource in <a href="http://docs.oracle.com/cd/E86824_01/html/E54764/zonecfg-1m.html">zonecfg(1M)</a>.</li>
+<li>Windows: runtimes MUST support <code>ro</code>, mounting the filesystem read-only when <code>ro</code> is given.</li>
+</ul>
+</li>
+</ul>
+<h3 id="example-windows-1"><a class="header" href="#example-windows-1">Example (Windows)</a></h3>
+<pre><code class="language-json">&quot;mounts&quot;: [
+    {
+        &quot;destination&quot;: &quot;C:\\folder-inside-container&quot;,
+        &quot;source&quot;: &quot;C:\\folder-on-host&quot;,
+        &quot;options&quot;: [&quot;ro&quot;]
+    }
+]
+</code></pre>
+<h3 id="posix-platform-mounts"><a class="header" href="#posix-platform-mounts"><a name="configPOSIXMounts" />POSIX-platform Mounts</a></h3>
+<p>For POSIX platforms the <code>mounts</code> structure has the following fields:</p>
+<ul>
+<li><strong><code>type</code></strong> (string, OPTIONAL) The type of the filesystem to be mounted.
+<ul>
+<li>Linux: filesystem types supported by the kernel as listed in <em>/proc/filesystems</em> (e.g., &quot;minix&quot;, &quot;ext2&quot;, &quot;ext3&quot;, &quot;jfs&quot;, &quot;xfs&quot;, &quot;reiserfs&quot;, &quot;msdos&quot;, &quot;proc&quot;, &quot;nfs&quot;, &quot;iso9660&quot;). For bind mounts (when <code>options</code> include either <code>bind</code> or <code>rbind</code>), the type is a dummy, often &quot;none&quot; (not listed in <em>/proc/filesystems</em>).</li>
+<li>Solaris: corresponds to &quot;type&quot; of the fs resource in <a href="http://docs.oracle.com/cd/E86824_01/html/E54764/zonecfg-1m.html">zonecfg(1M)</a>.</li>
+</ul>
+</li>
+</ul>
+<h3 id="example-linux"><a class="header" href="#example-linux">Example (Linux)</a></h3>
+<pre><code class="language-json">&quot;mounts&quot;: [
+    {
+        &quot;destination&quot;: &quot;/tmp&quot;,
+        &quot;type&quot;: &quot;tmpfs&quot;,
+        &quot;source&quot;: &quot;tmpfs&quot;,
+        &quot;options&quot;: [&quot;nosuid&quot;,&quot;strictatime&quot;,&quot;mode=755&quot;,&quot;size=65536k&quot;]
+    },
+    {
+        &quot;destination&quot;: &quot;/data&quot;,
+        &quot;type&quot;: &quot;none&quot;,
+        &quot;source&quot;: &quot;/volumes/testing&quot;,
+        &quot;options&quot;: [&quot;rbind&quot;,&quot;rw&quot;]
+    }
+]
+</code></pre>
+<h3 id="example-solaris"><a class="header" href="#example-solaris">Example (Solaris)</a></h3>
+<pre><code class="language-json">&quot;mounts&quot;: [
+    {
+        &quot;destination&quot;: &quot;/opt/local&quot;,
+        &quot;type&quot;: &quot;lofs&quot;,
+        &quot;source&quot;: &quot;/usr/local&quot;,
+        &quot;options&quot;: [&quot;ro&quot;,&quot;nodevices&quot;]
+    },
+    {
+        &quot;destination&quot;: &quot;/opt/sfw&quot;,
+        &quot;type&quot;: &quot;lofs&quot;,
+        &quot;source&quot;: &quot;/opt/sfw&quot;
+    }
+]
+</code></pre>
+<h2 id="process"><a class="header" href="#process"><a name="configProcess" />Process</a></h2>
+<p><strong><code>process</code></strong> (object, OPTIONAL) specifies the container process.
+This property is REQUIRED when <a href="runtime.html#start"><code>start</code></a> is called.</p>
+<ul>
+<li><strong><code>terminal</code></strong> (bool, OPTIONAL) specifies whether a terminal is attached to the process, defaults to false.
+As an example, if set to true on Linux a pseudoterminal pair is allocated for the process and the pseudoterminal pty is duplicated on the process's <a href="http://man7.org/linux/man-pages/man3/stdin.3.html">standard streams</a>.</li>
+<li><strong><code>consoleSize</code></strong> (object, OPTIONAL) specifies the console size in characters of the terminal.
+Runtimes MUST ignore <code>consoleSize</code> if <code>terminal</code> is <code>false</code> or unset.
+<ul>
+<li><strong><code>height</code></strong> (uint, REQUIRED)</li>
+<li><strong><code>width</code></strong> (uint, REQUIRED)</li>
+</ul>
+</li>
+<li><strong><code>cwd</code></strong> (string, REQUIRED) is the working directory that will be set for the executable.
+This value MUST be an absolute path.</li>
+<li><strong><code>env</code></strong> (array of strings, OPTIONAL) with the same semantics as <a href="http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap08.html#tag_08_01">IEEE Std 1003.1-2008's <code>environ</code></a>.</li>
+<li><strong><code>args</code></strong> (array of strings, OPTIONAL) with similar semantics to <a href="http://pubs.opengroup.org/onlinepubs/9699919799/functions/exec.html">IEEE Std 1003.1-2008 <code>execvp</code>'s <em>argv</em></a>.
+This specification extends the IEEE standard in that at least one entry is REQUIRED (non-Windows), and that entry is used with the same semantics as <code>execvp</code>'s <em>file</em>. This field is OPTIONAL on Windows, and <code>commandLine</code> is REQUIRED if this field is omitted.</li>
+<li><strong><code>commandLine</code></strong> (string, OPTIONAL) specifies the full command line to be executed on Windows.
+This is the preferred means of supplying the command line on Windows. If omitted, the runtime will fall back to escaping and concatenating fields from <code>args</code> before making the system call into Windows.</li>
+</ul>
+<h3 id="posix-process"><a class="header" href="#posix-process"><a name="configPOSIXProcess" />POSIX process</a></h3>
+<p>For systems that support POSIX rlimits (for example Linux and Solaris), the <code>process</code> object supports the following process-specific properties:</p>
+<ul>
+<li>
+<p><strong><code>rlimits</code></strong> (array of objects, OPTIONAL) allows setting resource limits for the process.
+Each entry has the following structure:</p>
+<ul>
+<li>
+<p><strong><code>type</code></strong> (string, REQUIRED) the platform resource being limited.</p>
+<ul>
+<li>Linux: valid values are defined in the <a href="http://man7.org/linux/man-pages/man2/getrlimit.2.html"><code>getrlimit(2)</code></a> man page, such as <code>RLIMIT_MSGQUEUE</code>.</li>
+<li>Solaris: valid values are defined in the <a href="http://pubs.opengroup.org/onlinepubs/9699919799/functions/getrlimit.html"><code>getrlimit(3)</code></a> man page, such as <code>RLIMIT_CORE</code>.</li>
+</ul>
+<p>The runtime MUST <a href="runtime.html#errors">generate an error</a> for any values which cannot be mapped to a relevant kernel interface.
+For each entry in <code>rlimits</code>, a <a href="http://pubs.opengroup.org/onlinepubs/9699919799/functions/getrlimit.html"><code>getrlimit(3)</code></a> on <code>type</code> MUST succeed.
+For the following properties, <code>rlim</code> refers to the status returned by the <code>getrlimit(3)</code> call.</p>
+</li>
+<li>
+<p><strong><code>soft</code></strong> (uint64, REQUIRED) the value of the limit enforced for the corresponding resource.
+<code>rlim.rlim_cur</code> MUST match the configured value.</p>
+</li>
+<li>
+<p><strong><code>hard</code></strong> (uint64, REQUIRED) the ceiling for the soft limit that could be set by an unprivileged process.
+<code>rlim.rlim_max</code> MUST match the configured value.
+Only a privileged process (e.g. one with the <code>CAP_SYS_RESOURCE</code> capability) can raise a hard limit.</p>
+</li>
+</ul>
+<p>If <code>rlimits</code> contains duplicated entries with same <code>type</code>, the runtime MUST <a href="runtime.html#errors">generate an error</a>.</p>
+</li>
+</ul>
+<h3 id="linux-process"><a class="header" href="#linux-process"><a name="configLinuxProcess" />Linux Process</a></h3>
+<p>For Linux-based systems, the <code>process</code> object supports the following process-specific properties.</p>
+<ul>
+<li>
+<p><strong><code>apparmorProfile</code></strong> (string, OPTIONAL) specifies the name of the AppArmor profile for the process.
+For more information about AppArmor, see <a href="https://wiki.ubuntu.com/AppArmor">AppArmor documentation</a>.</p>
+</li>
+<li>
+<p><strong><code>capabilities</code></strong> (object, OPTIONAL) is an object containing arrays that specifies the sets of capabilities for the process.
+Valid values are defined in the <a href="http://man7.org/linux/man-pages/man7/capabilities.7.html">capabilities(7)</a> man page, such as <code>CAP_CHOWN</code>.
+Any value which cannot be mapped to a relevant kernel interface, or cannot
+be granted otherwise MUST be <a href="runtime.html#warnings">logged as a warning</a> by
+the runtime. Runtimes SHOULD NOT fail if the container configuration requests
+capabilities that cannot be granted, for example, if the runtime operates in
+a restricted environment with a limited set of capabilities.
+<code>capabilities</code> contains the following properties:</p>
+<ul>
+<li><strong><code>effective</code></strong> (array of strings, OPTIONAL) the <code>effective</code> field is an array of effective capabilities that are kept for the process.</li>
+<li><strong><code>bounding</code></strong> (array of strings, OPTIONAL) the <code>bounding</code> field is an array of bounding capabilities that are kept for the process.</li>
+<li><strong><code>inheritable</code></strong> (array of strings, OPTIONAL) the <code>inheritable</code> field is an array of inheritable capabilities that are kept for the process.</li>
+<li><strong><code>permitted</code></strong> (array of strings, OPTIONAL) the <code>permitted</code> field is an array of permitted capabilities that are kept for the process.</li>
+<li><strong><code>ambient</code></strong> (array of strings, OPTIONAL) the <code>ambient</code> field is an array of ambient capabilities that are kept for the process.</li>
+</ul>
+</li>
+<li>
+<p><strong><code>noNewPrivileges</code></strong> (bool, OPTIONAL) setting <code>noNewPrivileges</code> to true prevents the process from gaining additional privileges.
+As an example, the <a href="https://www.kernel.org/doc/Documentation/prctl/no_new_privs.txt"><code>no_new_privs</code></a> article in the kernel documentation has information on how this is achieved using a <code>prctl</code> system call on Linux.</p>
+</li>
+<li>
+<p><strong><code>oomScoreAdj</code></strong> <em>(int, OPTIONAL)</em> adjusts the oom-killer score in <code>[pid]/oom_score_adj</code> for the process's <code>[pid]</code> in a <a href="https://www.kernel.org/doc/Documentation/filesystems/proc.txt">proc pseudo-filesystem</a>.
+If <code>oomScoreAdj</code> is set, the runtime MUST set <code>oom_score_adj</code> to the given value.
+If <code>oomScoreAdj</code> is not set, the runtime MUST NOT change the value of <code>oom_score_adj</code>.</p>
+<p>This is a per-process setting, where as <a href="config-linux.html#memory"><code>disableOOMKiller</code></a> is scoped for a memory cgroup.
+For more information on how these two settings work together, see <a href="https://www.kernel.org/doc/Documentation/cgroup-v1/memory.txt">the memory cgroup documentation section 10. OOM Contol</a>.</p>
+</li>
+<li>
+<p><strong><code>selinuxLabel</code></strong> (string, OPTIONAL) specifies the SELinux label for the process.
+For more information about SELinux, see  <a href="http://selinuxproject.org/page/Main_Page">SELinux documentation</a>.</p>
+</li>
+</ul>
+<h3 id="user"><a class="header" href="#user"><a name="configUser" />User</a></h3>
+<p>The user for the process is a platform-specific structure that allows specific control over which user the process runs as.</p>
+<h4 id="posix-platform-user"><a class="header" href="#posix-platform-user"><a name="configPOSIXUser" />POSIX-platform User</a></h4>
+<p>For POSIX platforms the <code>user</code> structure has the following fields:</p>
+<ul>
+<li><strong><code>uid</code></strong> (int, REQUIRED) specifies the user ID in the <a href="glossary.html#container-namespace">container namespace</a>.</li>
+<li><strong><code>gid</code></strong> (int, REQUIRED) specifies the group ID in the <a href="glossary.html#container-namespace">container namespace</a>.</li>
+<li><strong><code>umask</code></strong> (int, OPTIONAL) specifies the [umask][umask_2] of the user. If unspecified, the umask should not be changed from the calling process' umask.</li>
+<li><strong><code>additionalGids</code></strong> (array of ints, OPTIONAL) specifies additional group IDs in the <a href="glossary.html#container-namespace">container namespace</a> to be added to the process.</li>
+</ul>
+<p><em>Note: symbolic name for uid and gid, such as uname and gname respectively, are left to upper levels to derive (i.e. <code>/etc/passwd</code> parsing, NSS, etc)</em></p>
+<h3 id="example-linux-1"><a class="header" href="#example-linux-1">Example (Linux)</a></h3>
+<pre><code class="language-json">&quot;process&quot;: {
+    &quot;terminal&quot;: true,
+    &quot;consoleSize&quot;: {
+        &quot;height&quot;: 25,
+        &quot;width&quot;: 80
+    },
+    &quot;user&quot;: {
+        &quot;uid&quot;: 1,
+        &quot;gid&quot;: 1,
+        &quot;umask&quot;: 63,
+        &quot;additionalGids&quot;: [5, 6]
+    },
+    &quot;env&quot;: [
+        &quot;PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin&quot;,
+        &quot;TERM=xterm&quot;
+    ],
+    &quot;cwd&quot;: &quot;/root&quot;,
+    &quot;args&quot;: [
+        &quot;sh&quot;
+    ],
+    &quot;apparmorProfile&quot;: &quot;acme_secure_profile&quot;,
+    &quot;selinuxLabel&quot;: &quot;system_u:system_r:svirt_lxc_net_t:s0:c124,c675&quot;,
+    &quot;noNewPrivileges&quot;: true,
+    &quot;capabilities&quot;: {
+        &quot;bounding&quot;: [
+            &quot;CAP_AUDIT_WRITE&quot;,
+            &quot;CAP_KILL&quot;,
+            &quot;CAP_NET_BIND_SERVICE&quot;
+        ],
+       &quot;permitted&quot;: [
+            &quot;CAP_AUDIT_WRITE&quot;,
+            &quot;CAP_KILL&quot;,
+            &quot;CAP_NET_BIND_SERVICE&quot;
+        ],
+       &quot;inheritable&quot;: [
+            &quot;CAP_AUDIT_WRITE&quot;,
+            &quot;CAP_KILL&quot;,
+            &quot;CAP_NET_BIND_SERVICE&quot;
+        ],
+        &quot;effective&quot;: [
+            &quot;CAP_AUDIT_WRITE&quot;,
+            &quot;CAP_KILL&quot;
+        ],
+        &quot;ambient&quot;: [
+            &quot;CAP_NET_BIND_SERVICE&quot;
+        ]
+    },
+    &quot;rlimits&quot;: [
+        {
+            &quot;type&quot;: &quot;RLIMIT_NOFILE&quot;,
+            &quot;hard&quot;: 1024,
+            &quot;soft&quot;: 1024
+        }
+    ]
+}
+</code></pre>
+<h3 id="example-solaris-1"><a class="header" href="#example-solaris-1">Example (Solaris)</a></h3>
+<pre><code class="language-json">&quot;process&quot;: {
+    &quot;terminal&quot;: true,
+    &quot;consoleSize&quot;: {
+        &quot;height&quot;: 25,
+        &quot;width&quot;: 80
+    },
+    &quot;user&quot;: {
+        &quot;uid&quot;: 1,
+        &quot;gid&quot;: 1,
+        &quot;umask&quot;: 7,
+        &quot;additionalGids&quot;: [2, 8]
+    },
+    &quot;env&quot;: [
+        &quot;PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin&quot;,
+        &quot;TERM=xterm&quot;
+    ],
+    &quot;cwd&quot;: &quot;/root&quot;,
+    &quot;args&quot;: [
+        &quot;/usr/bin/bash&quot;
+    ]
+}
+</code></pre>
+<h4 id="windows-user"><a class="header" href="#windows-user"><a name="configWindowsUser" />Windows User</a></h4>
+<p>For Windows based systems the user structure has the following fields:</p>
+<ul>
+<li><strong><code>username</code></strong> (string, OPTIONAL) specifies the user name for the process.</li>
+</ul>
+<h3 id="example-windows-2"><a class="header" href="#example-windows-2">Example (Windows)</a></h3>
+<pre><code class="language-json">&quot;process&quot;: {
+    &quot;terminal&quot;: true,
+    &quot;user&quot;: {
+        &quot;username&quot;: &quot;containeradministrator&quot;
+    },
+    &quot;env&quot;: [
+        &quot;VARIABLE=1&quot;
+    ],
+    &quot;cwd&quot;: &quot;c:\\foo&quot;,
+    &quot;args&quot;: [
+        &quot;someapp.exe&quot;,
+    ]
+}
+</code></pre>
+<h2 id="hostname"><a class="header" href="#hostname"><a name="configHostname" />Hostname</a></h2>
+<ul>
+<li><strong><code>hostname</code></strong> (string, OPTIONAL) specifies the container's hostname as seen by processes running inside the container.
+On Linux, for example, this will change the hostname in the <a href="glossary.html#container-namespace">container</a> <a href="http://man7.org/linux/man-pages/man7/namespaces.7.html">UTS namespace</a>.
+Depending on your <a href="config-linux.html#namespaces">namespace configuration</a>, the container UTS namespace may be the <a href="glossary.html#runtime-namespace">runtime</a> <a href="http://man7.org/linux/man-pages/man7/namespaces.7.html">UTS namespace</a>.</li>
+</ul>
+<h3 id="example-1"><a class="header" href="#example-1">Example</a></h3>
+<pre><code class="language-json">&quot;hostname&quot;: &quot;mrsdalloway&quot;
+</code></pre>
+<h2 id="platform-specific-configuration"><a class="header" href="#platform-specific-configuration"><a name="configPlatformSpecificConfiguration" />Platform-specific configuration</a></h2>
+<ul>
+<li><strong><code>linux</code></strong> (object, OPTIONAL) <a href="config-linux.html">Linux-specific configuration</a>.
+This MAY be set if the target platform of this spec is <code>linux</code>.</li>
+<li><strong><code>windows</code></strong> (object, OPTIONAL) <a href="config-windows.html">Windows-specific configuration</a>.
+This MUST be set if the target platform of this spec is <code>windows</code>.</li>
+<li><strong><code>solaris</code></strong> (object, OPTIONAL) <a href="config-solaris.html">Solaris-specific configuration</a>.
+This MAY be set if the target platform of this spec is <code>solaris</code>.</li>
+<li><strong><code>vm</code></strong> (object, OPTIONAL) <a href="config-vm.html">Virtual-machine-specific configuration</a>.
+This MAY be set if the target platform and architecture of this spec support hardware virtualization.</li>
+<li><strong><code>zos</code></strong> (object, OPTIONAL) <a href="config-zos.html">z/OS-specific configuration</a>.
+This MAY be set if the target platform of this spec is <code>zos</code>.</li>
+</ul>
+<h3 id="example-linux-2"><a class="header" href="#example-linux-2">Example (Linux)</a></h3>
+<pre><code class="language-json">{
+    &quot;linux&quot;: {
+        &quot;namespaces&quot;: [
+            {
+                &quot;type&quot;: &quot;pid&quot;
+            }
+        ]
+    }
+}
+</code></pre>
+<h2 id="posix-platform-hooks"><a class="header" href="#posix-platform-hooks"><a name="configHooks" />POSIX-platform Hooks</a></h2>
+<p>For POSIX platforms, the configuration structure supports <code>hooks</code> for configuring custom actions related to the <a href="runtime.html#lifecycle">lifecycle</a> of the container.</p>
+<ul>
+<li><strong><code>hooks</code></strong> (object, OPTIONAL) MAY contain any of the following properties:
+<ul>
+<li><strong><code>prestart</code></strong> (array of objects, OPTIONAL, <strong>DEPRECATED</strong>) is an array of <a href="config.html#prestart"><code>prestart</code> hooks</a>.
+<ul>
+<li>Entries in the array contain the following properties:
+<ul>
+<li><strong><code>path</code></strong> (string, REQUIRED) with similar semantics to <a href="http://pubs.opengroup.org/onlinepubs/9699919799/functions/exec.html">IEEE Std 1003.1-2008 <code>execv</code>'s <em>path</em></a>.
+This specification extends the IEEE standard in that <strong><code>path</code></strong> MUST be absolute.</li>
+<li><strong><code>args</code></strong> (array of strings, OPTIONAL) with the same semantics as <a href="http://pubs.opengroup.org/onlinepubs/9699919799/functions/exec.html">IEEE Std 1003.1-2008 <code>execv</code>'s <em>argv</em></a>.</li>
+<li><strong><code>env</code></strong> (array of strings, OPTIONAL) with the same semantics as <a href="http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap08.html#tag_08_01">IEEE Std 1003.1-2008's <code>environ</code></a>.</li>
+<li><strong><code>timeout</code></strong> (int, OPTIONAL) is the number of seconds before aborting the hook.
+If set, <code>timeout</code> MUST be greater than zero.</li>
+</ul>
+</li>
+<li>The value of <code>path</code> MUST resolve in the <a href="glossary.html#runtime-namespace">runtime namespace</a>.</li>
+<li>The <code>prestart</code> hooks MUST be executed in the <a href="glossary.html#runtime-namespace">runtime namespace</a>.</li>
+</ul>
+</li>
+<li><strong><code>createRuntime</code></strong> (array of objects, OPTIONAL) is an array of <a href="config.html#createRuntime-hooks"><code>createRuntime</code> hooks</a>.
+<ul>
+<li>Entries in the array contain the following properties (the entries are identical to the entries in the deprecated <code>prestart</code> hooks):
+<ul>
+<li><strong><code>path</code></strong> (string, REQUIRED) with similar semantics to <a href="http://pubs.opengroup.org/onlinepubs/9699919799/functions/exec.html">IEEE Std 1003.1-2008 <code>execv</code>'s <em>path</em></a>.
+This specification extends the IEEE standard in that <strong><code>path</code></strong> MUST be absolute.</li>
+<li><strong><code>args</code></strong> (array of strings, OPTIONAL) with the same semantics as <a href="http://pubs.opengroup.org/onlinepubs/9699919799/functions/exec.html">IEEE Std 1003.1-2008 <code>execv</code>'s <em>argv</em></a>.</li>
+<li><strong><code>env</code></strong> (array of strings, OPTIONAL) with the same semantics as <a href="http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap08.html#tag_08_01">IEEE Std 1003.1-2008's <code>environ</code></a>.</li>
+<li><strong><code>timeout</code></strong> (int, OPTIONAL) is the number of seconds before aborting the hook.
+If set, <code>timeout</code> MUST be greater than zero.</li>
+</ul>
+</li>
+<li>The value of <code>path</code> MUST resolve in the <a href="glossary.html#runtime-namespace">runtime namespace</a>.</li>
+<li>The <code>createRuntime</code> hooks MUST be executed in the <a href="glossary.html#runtime-namespace">runtime namespace</a>.</li>
+</ul>
+</li>
+<li><strong><code>createContainer</code></strong> (array of objects, OPTIONAL) is an array of <a href="config.html#createContainer-hooks"><code>createContainer</code> hooks</a>.
+<ul>
+<li>Entries in the array have the same schema as <code>createRuntime</code> entries.</li>
+<li>The value of <code>path</code> MUST resolve in the <a href="glossary.html#runtime-namespace">runtime namespace</a>.</li>
+<li>The <code>createContainer</code> hooks MUST be executed in the <a href="glossary.html#container-namespace">container namespace</a>.</li>
+</ul>
+</li>
+<li><strong><code>startContainer</code></strong> (array of objects, OPTIONAL) is an array of <a href="config.html#startContainer-hooks"><code>startContainer</code> hooks</a>.
+<ul>
+<li>Entries in the array have the same schema as <code>createRuntime</code> entries.</li>
+<li>The value of <code>path</code> MUST resolve in the <a href="glossary.html#container-namespace">container namespace</a>.</li>
+<li>The <code>startContainer</code> hooks MUST be executed in the <a href="glossary.html#container-namespace">container namespace</a>.</li>
+</ul>
+</li>
+<li><strong><code>poststart</code></strong> (array of objects, OPTIONAL) is an array of <a href="config.html#poststart"><code>poststart</code> hooks</a>.
+<ul>
+<li>Entries in the array have the same schema as <code>createRuntime</code> entries.</li>
+<li>The value of <code>path</code> MUST resolve in the <a href="glossary.html#runtime-namespace">runtime namespace</a>.</li>
+<li>The <code>poststart</code> hooks MUST be executed in the <a href="glossary.html#runtime-namespace">runtime namespace</a>.</li>
+</ul>
+</li>
+<li><strong><code>poststop</code></strong> (array of objects, OPTIONAL) is an array of <a href="config.html#poststop"><code>poststop</code> hooks</a>.
+<ul>
+<li>Entries in the array have the same schema as <code>createRuntime</code> entries.</li>
+<li>The value of <code>path</code> MUST resolve in the <a href="glossary.html#runtime-namespace">runtime namespace</a>.</li>
+<li>The <code>poststop</code> hooks MUST be executed in the <a href="glossary.html#runtime-namespace">runtime namespace</a>.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p>Hooks allow users to specify programs to run before or after various lifecycle events.
+Hooks MUST be called in the listed order.
+The <a href="runtime.html#state">state</a> of the container MUST be passed to hooks over stdin so that they may do work appropriate to the current state of the container.</p>
+<h3 id="prestart"><a class="header" href="#prestart"><a name="configHooksPrestart" />Prestart</a></h3>
+<p>The <code>prestart</code> hooks MUST be called after the <a href="runtime.html#start"><code>start</code></a> operation is called but <a href="runtime.html#lifecycle">before the user-specified program command is executed</a>.
+On Linux, for example, they are called after the container namespaces are created, so they provide an opportunity to customize the container (e.g. the network namespace could be specified in this hook).</p>
+<p>Note: <code>prestart</code> hooks were deprecated in favor of <code>createRuntime</code>, <code>createContainer</code> and <code>startContainer</code> hooks, which allow more granular hook control during the create and start phase.</p>
+<p>The <code>prestart</code> hooks' path MUST resolve in the <a href="glossary.html#runtime-namespace">runtime namespace</a>.
+The <code>prestart</code> hooks MUST be executed in the <a href="glossary.html#runtime-namespace">runtime namespace</a>.</p>
+<h3 id="createruntime-hooks"><a class="header" href="#createruntime-hooks"><a name="configHooksCreateRuntime" />CreateRuntime Hooks</a></h3>
+<p>The <code>createRuntime</code> hooks MUST be called as part of the <a href="runtime.html#create"><code>create</code></a> operation after the runtime environment has been created (according to the configuration in config.json) but before the <code>pivot_root</code> or any equivalent operation has been executed.</p>
+<p>The <code>createRuntime</code> hooks' path MUST resolve in the <a href="glossary.html#runtime-namespace">runtime namespace</a>.
+The <code>createRuntime</code> hooks MUST be executed in the <a href="glossary.html#runtime-namespace">runtime namespace</a>.</p>
+<p>On Linux, for example, they are called after the container namespaces are created, so they provide an opportunity to customize the container (e.g. the network namespace could be specified in this hook).</p>
+<p>The definition of <code>createRuntime</code> hooks is currently underspecified and hooks authors, should only expect from the runtime that the mount namespace have been created and the mount operations performed. Other operations such as cgroups and SELinux/AppArmor labels might not have been performed by the runtime.</p>
+<p>Note: <code>runc</code> originally implemented <code>prestart</code> hooks contrary to the spec, namely as part of the <code>create</code> operation (instead of during the <code>start</code> operation). This incorrect implementation actually corresponds to <code>createRuntime</code> hooks. For runtimes that implement the deprecated <code>prestart</code> hooks as <code>createRuntime</code> hooks, <code>createRuntime</code> hooks MUST be called after the <code>prestart</code> hooks.</p>
+<h3 id="createcontainer-hooks"><a class="header" href="#createcontainer-hooks"><a name="configHooksCreateContainer" />CreateContainer Hooks</a></h3>
+<p>The <code>createContainer</code> hooks MUST be called as part of the <a href="runtime.html#create"><code>create</code></a> operation after the runtime environment has been created (according to the configuration in config.json) but before the <code>pivot_root</code> or any equivalent operation has been executed.
+The <code>createContainer</code> hooks MUST be called after the <code>createRuntime</code> hooks.</p>
+<p>The <code>createContainer</code> hooks' path MUST resolve in the <a href="glossary.html#runtime-namespace">runtime namespace</a>.
+The <code>createContainer</code> hooks MUST be executed in the <a href="glossary.html#container-namespace">container namespace</a>.</p>
+<p>For example, on Linux this would happen before the <code>pivot_root</code> operation is executed but after the mount namespace was created and setup.</p>
+<p>The definition of <code>createContainer</code> hooks is currently underspecified and hooks authors, should only expect from the runtime that the mount namespace and different mounts will be setup. Other operations such as cgroups and SELinux/AppArmor labels might not have been performed by the runtime.</p>
+<h3 id="startcontainer-hooks"><a class="header" href="#startcontainer-hooks"><a name="configHooksStartContainer" />StartContainer Hooks</a></h3>
+<p>The <code>startContainer</code> hooks MUST be called <a href="runtime.html#lifecycle">before the user-specified process is executed</a> as part of the <a href="runtime.html#start"><code>start</code></a> operation.
+This hook can be used to execute some operations in the container, for example running the <code>ldconfig</code> binary on linux before the container process is spawned.</p>
+<p>The <code>startContainer</code> hooks' path MUST resolve in the <a href="glossary.html#container-namespace">container namespace</a>.
+The <code>startContainer</code> hooks MUST be executed in the <a href="glossary.html#container-namespace">container namespace</a>.</p>
+<h3 id="poststart"><a class="header" href="#poststart"><a name="configHooksPoststart" />Poststart</a></h3>
+<p>The <code>poststart</code> hooks MUST be called <a href="runtime.html#lifecycle">after the user-specified process is executed</a> but before the <a href="runtime.html#start"><code>start</code></a> operation returns.
+For example, this hook can notify the user that the container process is spawned.</p>
+<p>The <code>poststart</code> hooks' path MUST resolve in the <a href="glossary.html#runtime-namespace">runtime namespace</a>.
+The <code>poststart</code> hooks MUST be executed in the <a href="glossary.html#runtime-namespace">runtime namespace</a>.</p>
+<h3 id="poststop"><a class="header" href="#poststop"><a name="configHooksPoststop" />Poststop</a></h3>
+<p>The <code>poststop</code> hooks MUST be called <a href="runtime.html#lifecycle">after the container is deleted</a> but before the <a href="runtime.html#delete"><code>delete</code></a> operation returns.
+Cleanup or debugging functions are examples of such a hook.</p>
+<p>The <code>poststop</code> hooks' path MUST resolve in the <a href="glossary.html#runtime-namespace">runtime namespace</a>.
+The <code>poststop</code> hooks MUST be executed in the <a href="glossary.html#runtime-namespace">runtime namespace</a>.</p>
+<h3 id="summary"><a class="header" href="#summary">Summary</a></h3>
+<p>See the below table for a summary of hooks and when they are called:</p>
+<table><thead><tr><th>Name</th><th>Namespace</th><th>When</th></tr></thead><tbody>
+<tr><td><code>prestart</code> (Deprecated)</td><td>runtime</td><td>After the start  operation is called but before the user-specified program command is executed.</td></tr>
+<tr><td><code>createRuntime</code></td><td>runtime</td><td>During the create operation, after the runtime environment has been created and before the pivot root or any equivalent operation.</td></tr>
+<tr><td><code>createContainer</code></td><td>container</td><td>During the create operation, after the runtime environment has been created and before the pivot root or any equivalent operation.</td></tr>
+<tr><td><code>startContainer</code></td><td>container</td><td>After the start operation is called but before the user-specified program command is executed.</td></tr>
+<tr><td><code>poststart</code></td><td>runtime</td><td>After the user-specified process is executed but before the start operation returns.</td></tr>
+<tr><td><code>poststop</code></td><td>runtime</td><td>After the container is deleted but before the delete operation returns.</td></tr>
+</tbody></table>
+<h3 id="example-2"><a class="header" href="#example-2">Example</a></h3>
+<pre><code class="language-json">&quot;hooks&quot;: {
+    &quot;prestart&quot;: [
+        {
+            &quot;path&quot;: &quot;/usr/bin/fix-mounts&quot;,
+            &quot;args&quot;: [&quot;fix-mounts&quot;, &quot;arg1&quot;, &quot;arg2&quot;],
+            &quot;env&quot;:  [ &quot;key1=value1&quot;]
+        },
+        {
+            &quot;path&quot;: &quot;/usr/bin/setup-network&quot;
+        }
+    ],
+    &quot;createRuntime&quot;: [
+        {
+            &quot;path&quot;: &quot;/usr/bin/fix-mounts&quot;,
+            &quot;args&quot;: [&quot;fix-mounts&quot;, &quot;arg1&quot;, &quot;arg2&quot;],
+            &quot;env&quot;:  [ &quot;key1=value1&quot;]
+        },
+        {
+            &quot;path&quot;: &quot;/usr/bin/setup-network&quot;
+        }
+    ],
+    &quot;createContainer&quot;: [
+        {
+            &quot;path&quot;: &quot;/usr/bin/mount-hook&quot;,
+            &quot;args&quot;: [&quot;-mount&quot;, &quot;arg1&quot;, &quot;arg2&quot;],
+            &quot;env&quot;:  [ &quot;key1=value1&quot;]
+        }
+    ],
+    &quot;startContainer&quot;: [
+        {
+            &quot;path&quot;: &quot;/usr/bin/refresh-ldcache&quot;
+        }
+    ],
+    &quot;poststart&quot;: [
+        {
+            &quot;path&quot;: &quot;/usr/bin/notify-start&quot;,
+            &quot;timeout&quot;: 5
+        }
+    ],
+    &quot;poststop&quot;: [
+        {
+            &quot;path&quot;: &quot;/usr/sbin/cleanup.sh&quot;,
+            &quot;args&quot;: [&quot;cleanup.sh&quot;, &quot;-f&quot;]
+        }
+    ]
+}
+</code></pre>
+<h2 id="annotations"><a class="header" href="#annotations"><a name="configAnnotations" />Annotations</a></h2>
+<p><strong><code>annotations</code></strong> (object, OPTIONAL) contains arbitrary metadata for the container.
+This information MAY be structured or unstructured.
+Annotations MUST be a key-value map.
+If there are no annotations then this property MAY either be absent or an empty map.</p>
+<p>Keys MUST be strings.
+Keys MUST NOT be an empty string.
+Keys SHOULD be named using a reverse domain notation - e.g. <code>com.example.myKey</code>.
+Keys using the <code>org.opencontainers</code> namespace are reserved and MUST NOT be used by subsequent specifications.
+Runtimes MUST handle unknown annotation keys like any other <a href="config.html#extensibility">unknown property</a>.</p>
+<p>Values MUST be strings.
+Values MAY be an empty string.</p>
+<pre><code class="language-json">&quot;annotations&quot;: {
+    &quot;com.example.gpu-cores&quot;: &quot;2&quot;
+}
+</code></pre>
+<h2 id="extensibility"><a class="header" href="#extensibility"><a name="configExtensibility" />Extensibility</a></h2>
+<p>Runtimes MAY <a href="runtime.html#warnings">log</a> unknown properties but MUST otherwise ignore them.
+That includes not <a href="runtime.html#errors">generating errors</a> if they encounter an unknown property.</p>
+<h2 id="valid-values"><a class="header" href="#valid-values">Valid values</a></h2>
+<p>Runtimes MUST generate an error when invalid or unsupported values are encountered.
+Unless support for a valid value is explicitly required, runtimes MAY choose which subset of the valid values it will support.</p>
+<h2 id="configuration-schema-example"><a class="header" href="#configuration-schema-example">Configuration Schema Example</a></h2>
+<p>Here is a full example <code>config.json</code> for reference.</p>
+<pre><code class="language-json">{
+    &quot;ociVersion&quot;: &quot;1.0.1&quot;,
+    &quot;process&quot;: {
+        &quot;terminal&quot;: true,
+        &quot;user&quot;: {
+            &quot;uid&quot;: 1,
+            &quot;gid&quot;: 1,
+            &quot;additionalGids&quot;: [
+                5,
+                6
+            ]
+        },
+        &quot;args&quot;: [
+            &quot;sh&quot;
+        ],
+        &quot;env&quot;: [
+            &quot;PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin&quot;,
+            &quot;TERM=xterm&quot;
+        ],
+        &quot;cwd&quot;: &quot;/&quot;,
+        &quot;capabilities&quot;: {
+            &quot;bounding&quot;: [
+                &quot;CAP_AUDIT_WRITE&quot;,
+                &quot;CAP_KILL&quot;,
+                &quot;CAP_NET_BIND_SERVICE&quot;
+            ],
+            &quot;permitted&quot;: [
+                &quot;CAP_AUDIT_WRITE&quot;,
+                &quot;CAP_KILL&quot;,
+                &quot;CAP_NET_BIND_SERVICE&quot;
+            ],
+            &quot;inheritable&quot;: [
+                &quot;CAP_AUDIT_WRITE&quot;,
+                &quot;CAP_KILL&quot;,
+                &quot;CAP_NET_BIND_SERVICE&quot;
+            ],
+            &quot;effective&quot;: [
+                &quot;CAP_AUDIT_WRITE&quot;,
+                &quot;CAP_KILL&quot;
+            ],
+            &quot;ambient&quot;: [
+                &quot;CAP_NET_BIND_SERVICE&quot;
+            ]
+        },
+        &quot;rlimits&quot;: [
+            {
+                &quot;type&quot;: &quot;RLIMIT_CORE&quot;,
+                &quot;hard&quot;: 1024,
+                &quot;soft&quot;: 1024
+            },
+            {
+                &quot;type&quot;: &quot;RLIMIT_NOFILE&quot;,
+                &quot;hard&quot;: 1024,
+                &quot;soft&quot;: 1024
+            }
+        ],
+        &quot;apparmorProfile&quot;: &quot;acme_secure_profile&quot;,
+        &quot;oomScoreAdj&quot;: 100,
+        &quot;selinuxLabel&quot;: &quot;system_u:system_r:svirt_lxc_net_t:s0:c124,c675&quot;,
+        &quot;noNewPrivileges&quot;: true
+    },
+    &quot;root&quot;: {
+        &quot;path&quot;: &quot;rootfs&quot;,
+        &quot;readonly&quot;: true
+    },
+    &quot;hostname&quot;: &quot;slartibartfast&quot;,
+    &quot;mounts&quot;: [
+        {
+            &quot;destination&quot;: &quot;/proc&quot;,
+            &quot;type&quot;: &quot;proc&quot;,
+            &quot;source&quot;: &quot;proc&quot;
+        },
+        {
+            &quot;destination&quot;: &quot;/dev&quot;,
+            &quot;type&quot;: &quot;tmpfs&quot;,
+            &quot;source&quot;: &quot;tmpfs&quot;,
+            &quot;options&quot;: [
+                &quot;nosuid&quot;,
+                &quot;strictatime&quot;,
+                &quot;mode=755&quot;,
+                &quot;size=65536k&quot;
+            ]
+        },
+        {
+            &quot;destination&quot;: &quot;/dev/pts&quot;,
+            &quot;type&quot;: &quot;devpts&quot;,
+            &quot;source&quot;: &quot;devpts&quot;,
+            &quot;options&quot;: [
+                &quot;nosuid&quot;,
+                &quot;noexec&quot;,
+                &quot;newinstance&quot;,
+                &quot;ptmxmode=0666&quot;,
+                &quot;mode=0620&quot;,
+                &quot;gid=5&quot;
+            ]
+        },
+        {
+            &quot;destination&quot;: &quot;/dev/shm&quot;,
+            &quot;type&quot;: &quot;tmpfs&quot;,
+            &quot;source&quot;: &quot;shm&quot;,
+            &quot;options&quot;: [
+                &quot;nosuid&quot;,
+                &quot;noexec&quot;,
+                &quot;nodev&quot;,
+                &quot;mode=1777&quot;,
+                &quot;size=65536k&quot;
+            ]
+        },
+        {
+            &quot;destination&quot;: &quot;/dev/mqueue&quot;,
+            &quot;type&quot;: &quot;mqueue&quot;,
+            &quot;source&quot;: &quot;mqueue&quot;,
+            &quot;options&quot;: [
+                &quot;nosuid&quot;,
+                &quot;noexec&quot;,
+                &quot;nodev&quot;
+            ]
+        },
+        {
+            &quot;destination&quot;: &quot;/sys&quot;,
+            &quot;type&quot;: &quot;sysfs&quot;,
+            &quot;source&quot;: &quot;sysfs&quot;,
+            &quot;options&quot;: [
+                &quot;nosuid&quot;,
+                &quot;noexec&quot;,
+                &quot;nodev&quot;
+            ]
+        },
+        {
+            &quot;destination&quot;: &quot;/sys/fs/cgroup&quot;,
+            &quot;type&quot;: &quot;cgroup&quot;,
+            &quot;source&quot;: &quot;cgroup&quot;,
+            &quot;options&quot;: [
+                &quot;nosuid&quot;,
+                &quot;noexec&quot;,
+                &quot;nodev&quot;,
+                &quot;relatime&quot;,
+                &quot;ro&quot;
+            ]
+        }
+    ],
+    &quot;hooks&quot;: {
+        &quot;prestart&quot;: [
+            {
+                &quot;path&quot;: &quot;/usr/bin/fix-mounts&quot;,
+                &quot;args&quot;: [
+                    &quot;fix-mounts&quot;,
+                    &quot;arg1&quot;,
+                    &quot;arg2&quot;
+                ],
+                &quot;env&quot;: [
+                    &quot;key1=value1&quot;
+                ]
+            },
+            {
+                &quot;path&quot;: &quot;/usr/bin/setup-network&quot;
+            }
+        ],
+        &quot;poststart&quot;: [
+            {
+                &quot;path&quot;: &quot;/usr/bin/notify-start&quot;,
+                &quot;timeout&quot;: 5
+            }
+        ],
+        &quot;poststop&quot;: [
+            {
+                &quot;path&quot;: &quot;/usr/sbin/cleanup.sh&quot;,
+                &quot;args&quot;: [
+                    &quot;cleanup.sh&quot;,
+                    &quot;-f&quot;
+                ]
+            }
+        ]
+    },
+    &quot;linux&quot;: {
+        &quot;devices&quot;: [
+            {
+                &quot;path&quot;: &quot;/dev/fuse&quot;,
+                &quot;type&quot;: &quot;c&quot;,
+                &quot;major&quot;: 10,
+                &quot;minor&quot;: 229,
+                &quot;fileMode&quot;: 438,
+                &quot;uid&quot;: 0,
+                &quot;gid&quot;: 0
+            },
+            {
+                &quot;path&quot;: &quot;/dev/sda&quot;,
+                &quot;type&quot;: &quot;b&quot;,
+                &quot;major&quot;: 8,
+                &quot;minor&quot;: 0,
+                &quot;fileMode&quot;: 432,
+                &quot;uid&quot;: 0,
+                &quot;gid&quot;: 0
+            }
+        ],
+        &quot;uidMappings&quot;: [
+            {
+                &quot;containerID&quot;: 0,
+                &quot;hostID&quot;: 1000,
+                &quot;size&quot;: 32000
+            }
+        ],
+        &quot;gidMappings&quot;: [
+            {
+                &quot;containerID&quot;: 0,
+                &quot;hostID&quot;: 1000,
+                &quot;size&quot;: 32000
+            }
+        ],
+        &quot;sysctl&quot;: {
+            &quot;net.ipv4.ip_forward&quot;: &quot;1&quot;,
+            &quot;net.core.somaxconn&quot;: &quot;256&quot;
+        },
+        &quot;cgroupsPath&quot;: &quot;/myRuntime/myContainer&quot;,
+        &quot;resources&quot;: {
+            &quot;network&quot;: {
+                &quot;classID&quot;: 1048577,
+                &quot;priorities&quot;: [
+                    {
+                        &quot;name&quot;: &quot;eth0&quot;,
+                        &quot;priority&quot;: 500
+                    },
+                    {
+                        &quot;name&quot;: &quot;eth1&quot;,
+                        &quot;priority&quot;: 1000
+                    }
+                ]
+            },
+            &quot;pids&quot;: {
+                &quot;limit&quot;: 32771
+            },
+            &quot;hugepageLimits&quot;: [
+                {
+                    &quot;pageSize&quot;: &quot;2MB&quot;,
+                    &quot;limit&quot;: 9223372036854772000
+                },
+                {
+                    &quot;pageSize&quot;: &quot;64KB&quot;,
+                    &quot;limit&quot;: 1000000
+                }
+            ],
+            &quot;memory&quot;: {
+                &quot;limit&quot;: 536870912,
+                &quot;reservation&quot;: 536870912,
+                &quot;swap&quot;: 536870912,
+                &quot;kernel&quot;: -1,
+                &quot;kernelTCP&quot;: -1,
+                &quot;swappiness&quot;: 0,
+                &quot;disableOOMKiller&quot;: false
+            },
+            &quot;cpu&quot;: {
+                &quot;shares&quot;: 1024,
+                &quot;quota&quot;: 1000000,
+                &quot;period&quot;: 500000,
+                &quot;realtimeRuntime&quot;: 950000,
+                &quot;realtimePeriod&quot;: 1000000,
+                &quot;cpus&quot;: &quot;2-3&quot;,
+                &quot;mems&quot;: &quot;0-7&quot;
+            },
+            &quot;devices&quot;: [
+                {
+                    &quot;allow&quot;: false,
+                    &quot;access&quot;: &quot;rwm&quot;
+                },
+                {
+                    &quot;allow&quot;: true,
+                    &quot;type&quot;: &quot;c&quot;,
+                    &quot;major&quot;: 10,
+                    &quot;minor&quot;: 229,
+                    &quot;access&quot;: &quot;rw&quot;
+                },
+                {
+                    &quot;allow&quot;: true,
+                    &quot;type&quot;: &quot;b&quot;,
+                    &quot;major&quot;: 8,
+                    &quot;minor&quot;: 0,
+                    &quot;access&quot;: &quot;r&quot;
+                }
+            ],
+            &quot;blockIO&quot;: {
+                &quot;weight&quot;: 10,
+                &quot;leafWeight&quot;: 10,
+                &quot;weightDevice&quot;: [
+                    {
+                        &quot;major&quot;: 8,
+                        &quot;minor&quot;: 0,
+                        &quot;weight&quot;: 500,
+                        &quot;leafWeight&quot;: 300
+                    },
+                    {
+                        &quot;major&quot;: 8,
+                        &quot;minor&quot;: 16,
+                        &quot;weight&quot;: 500
+                    }
+                ],
+                &quot;throttleReadBpsDevice&quot;: [
+                    {
+                        &quot;major&quot;: 8,
+                        &quot;minor&quot;: 0,
+                        &quot;rate&quot;: 600
+                    }
+                ],
+                &quot;throttleWriteIOPSDevice&quot;: [
+                    {
+                        &quot;major&quot;: 8,
+                        &quot;minor&quot;: 16,
+                        &quot;rate&quot;: 300
+                    }
+                ]
+            }
+        },
+        &quot;rootfsPropagation&quot;: &quot;slave&quot;,
+        &quot;seccomp&quot;: {
+            &quot;defaultAction&quot;: &quot;SCMP_ACT_ALLOW&quot;,
+            &quot;architectures&quot;: [
+                &quot;SCMP_ARCH_X86&quot;,
+                &quot;SCMP_ARCH_X32&quot;
+            ],
+            &quot;syscalls&quot;: [
+                {
+                    &quot;names&quot;: [
+                        &quot;getcwd&quot;,
+                        &quot;chmod&quot;
+                    ],
+                    &quot;action&quot;: &quot;SCMP_ACT_ERRNO&quot;
+                }
+            ]
+        },
+        &quot;namespaces&quot;: [
+            {
+                &quot;type&quot;: &quot;pid&quot;
+            },
+            {
+                &quot;type&quot;: &quot;network&quot;
+            },
+            {
+                &quot;type&quot;: &quot;ipc&quot;
+            },
+            {
+                &quot;type&quot;: &quot;uts&quot;
+            },
+            {
+                &quot;type&quot;: &quot;mount&quot;
+            },
+            {
+                &quot;type&quot;: &quot;user&quot;
+            },
+            {
+                &quot;type&quot;: &quot;cgroup&quot;
+            }
+        ],
+        &quot;maskedPaths&quot;: [
+            &quot;/proc/kcore&quot;,
+            &quot;/proc/latency_stats&quot;,
+            &quot;/proc/timer_stats&quot;,
+            &quot;/proc/sched_debug&quot;
+        ],
+        &quot;readonlyPaths&quot;: [
+            &quot;/proc/asound&quot;,
+            &quot;/proc/bus&quot;,
+            &quot;/proc/fs&quot;,
+            &quot;/proc/irq&quot;,
+            &quot;/proc/sys&quot;,
+            &quot;/proc/sysrq-trigger&quot;
+        ],
+        &quot;mountLabel&quot;: &quot;system_u:object_r:svirt_sandbox_file_t:s0:c715,c811&quot;
+    },
+    &quot;annotations&quot;: {
+        &quot;com.example.key1&quot;: &quot;value1&quot;,
+        &quot;com.example.key2&quot;: &quot;value2&quot;
+    }
+}
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="linux-container-configuration"><a class="header" href="#linux-container-configuration"><a name="linuxContainerConfiguration" />Linux Container Configuration</a></h1>
+<p>This document describes the schema for the <a href="config.html#platform-specific-configuration">Linux-specific section</a> of the <a href="config.html">container configuration</a>.
+The Linux container specification uses various kernel features like namespaces, cgroups, capabilities, LSM, and filesystem jails to fulfill the spec.</p>
+<h2 id="default-filesystems"><a class="header" href="#default-filesystems"><a name="configLinuxDefaultFilesystems" />Default Filesystems</a></h2>
+<p>The Linux ABI includes both syscalls and several special file paths.
+Applications expecting a Linux environment will very likely expect these file paths to be set up correctly.</p>
+<p>The following filesystems SHOULD be made available in each container's filesystem:</p>
+<table><thead><tr><th>Path</th><th>Type</th></tr></thead><tbody>
+<tr><td>/proc</td><td><a href="https://www.kernel.org/doc/Documentation/filesystems/proc.txt">proc</a></td></tr>
+<tr><td>/sys</td><td><a href="https://www.kernel.org/doc/Documentation/filesystems/sysfs.txt">sysfs</a></td></tr>
+<tr><td>/dev/pts</td><td><a href="https://www.kernel.org/doc/Documentation/filesystems/devpts.txt">devpts</a></td></tr>
+<tr><td>/dev/shm</td><td><a href="https://www.kernel.org/doc/Documentation/filesystems/tmpfs.txt">tmpfs</a></td></tr>
+</tbody></table>
+<h2 id="namespaces"><a class="header" href="#namespaces"><a name="configLinuxNamespaces" />Namespaces</a></h2>
+<p>A namespace wraps a global system resource in an abstraction that makes it appear to the processes within the namespace that they have their own isolated instance of the global resource.
+Changes to the global resource are visible to other processes that are members of the namespace, but are invisible to other processes.
+For more information, see the <a href="http://man7.org/linux/man-pages/man7/namespaces.7.html">namespaces(7)</a> man page.</p>
+<p>Namespaces are specified as an array of entries inside the <code>namespaces</code> root field.
+The following parameters can be specified to set up namespaces:</p>
+<ul>
+<li>
+<p><strong><code>type</code></strong> <em>(string, REQUIRED)</em> - namespace type. The following namespace types SHOULD be supported:</p>
+<ul>
+<li><strong><code>pid</code></strong> processes inside the container will only be able to see other processes inside the same container or inside the same pid namespace.</li>
+<li><strong><code>network</code></strong> the container will have its own network stack.</li>
+<li><strong><code>mount</code></strong> the container will have an isolated mount table.</li>
+<li><strong><code>ipc</code></strong> processes inside the container will only be able to communicate to other processes inside the same container via system level IPC.</li>
+<li><strong><code>uts</code></strong> the container will be able to have its own hostname and domain name.</li>
+<li><strong><code>user</code></strong> the container will be able to remap user and group IDs from the host to local users and groups within the container.</li>
+<li><strong><code>cgroup</code></strong> the container will have an isolated view of the cgroup hierarchy.</li>
+</ul>
+</li>
+<li>
+<p><strong><code>path</code></strong> <em>(string, OPTIONAL)</em> - namespace file.
+This value MUST be an absolute path in the <a href="glossary.html#runtime-namespace">runtime mount namespace</a>.
+The runtime MUST place the container process in the namespace associated with that <code>path</code>.
+The runtime MUST <a href="runtime.html#errors">generate an error</a> if <code>path</code> is not associated with a namespace of type <code>type</code>.</p>
+<p>If <code>path</code> is not specified, the runtime MUST create a new <a href="glossary.html#container-namespace">container namespace</a> of type <code>type</code>.</p>
+</li>
+</ul>
+<p>If a namespace type is not specified in the <code>namespaces</code> array, the container MUST inherit the <a href="glossary.html#runtime-namespace">runtime namespace</a> of that type.
+If a <code>namespaces</code> field contains duplicated namespaces with same <code>type</code>, the runtime MUST <a href="runtime.html#errors">generate an error</a>.</p>
+<h3 id="example-3"><a class="header" href="#example-3">Example</a></h3>
+<pre><code class="language-json">&quot;namespaces&quot;: [
+    {
+        &quot;type&quot;: &quot;pid&quot;,
+        &quot;path&quot;: &quot;/proc/1234/ns/pid&quot;
+    },
+    {
+        &quot;type&quot;: &quot;network&quot;,
+        &quot;path&quot;: &quot;/var/run/netns/neta&quot;
+    },
+    {
+        &quot;type&quot;: &quot;mount&quot;
+    },
+    {
+        &quot;type&quot;: &quot;ipc&quot;
+    },
+    {
+        &quot;type&quot;: &quot;uts&quot;
+    },
+    {
+        &quot;type&quot;: &quot;user&quot;
+    },
+    {
+        &quot;type&quot;: &quot;cgroup&quot;
+    }
+]
+</code></pre>
+<h2 id="user-namespace-mappings"><a class="header" href="#user-namespace-mappings"><a name="configLinuxUserNamespaceMappings" />User namespace mappings</a></h2>
+<p><strong><code>uidMappings</code></strong> (array of objects, OPTIONAL) describes the user namespace uid mappings from the host to the container.
+<strong><code>gidMappings</code></strong> (array of objects, OPTIONAL) describes the user namespace gid mappings from the host to the container.</p>
+<p>Each entry has the following structure:</p>
+<ul>
+<li><strong><code>containerID</code></strong> <em>(uint32, REQUIRED)</em> - is the starting uid/gid in the container.</li>
+<li><strong><code>hostID</code></strong> <em>(uint32, REQUIRED)</em> - is the starting uid/gid on the host to be mapped to <em>containerID</em>.</li>
+<li><strong><code>size</code></strong> <em>(uint32, REQUIRED)</em> - is the number of ids to be mapped.</li>
+</ul>
+<p>The runtime SHOULD NOT modify the ownership of referenced filesystems to realize the mapping.
+Note that the number of mapping entries MAY be limited by the <a href="http://man7.org/linux/man-pages/man7/user_namespaces.7.html">kernel</a>.</p>
+<h3 id="example-4"><a class="header" href="#example-4">Example</a></h3>
+<pre><code class="language-json">&quot;uidMappings&quot;: [
+    {
+        &quot;containerID&quot;: 0,
+        &quot;hostID&quot;: 1000,
+        &quot;size&quot;: 32000
+    }
+],
+&quot;gidMappings&quot;: [
+    {
+        &quot;containerID&quot;: 0,
+        &quot;hostID&quot;: 1000,
+        &quot;size&quot;: 32000
+    }
+]
+</code></pre>
+<h2 id="devices"><a class="header" href="#devices"><a name="configLinuxDevices" />Devices</a></h2>
+<p><strong><code>devices</code></strong> (array of objects, OPTIONAL) lists devices that MUST be available in the container.
+The runtime MAY supply them however it likes (with <a href="http://man7.org/linux/man-pages/man2/mknod.2.html"><code>mknod</code></a>, by bind mounting from the runtime mount namespace, using symlinks, etc.).</p>
+<p>Each entry has the following structure:</p>
+<ul>
+<li><strong><code>type</code></strong> <em>(string, REQUIRED)</em> - type of device: <code>c</code>, <code>b</code>, <code>u</code> or <code>p</code>.
+More info in <a href="http://man7.org/linux/man-pages/man1/mknod.1.html">mknod(1)</a>.</li>
+<li><strong><code>path</code></strong> <em>(string, REQUIRED)</em> - full path to device inside container.
+If a <a href="http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap03.html#tag_03_164">file</a> already exists at <code>path</code> that does not match the requested device, the runtime MUST generate an error.</li>
+<li><strong><code>major, minor</code></strong> <em>(int64, REQUIRED unless <code>type</code> is <code>p</code>)</em> - <a href="https://www.kernel.org/doc/Documentation/admin-guide/devices.txt">major, minor numbers</a> for the device.</li>
+<li><strong><code>fileMode</code></strong> <em>(uint32, OPTIONAL)</em> - file mode for the device.
+You can also control access to devices <a href="config-linux.html#configLinuxDeviceAllowedlist">with cgroups</a>.</li>
+<li><strong><code>uid</code></strong> <em>(uint32, OPTIONAL)</em> - id of device owner in the <a href="glossary.html#container-namespace">container namespace</a>.</li>
+<li><strong><code>gid</code></strong> <em>(uint32, OPTIONAL)</em> - id of device group in the <a href="glossary.html#container-namespace">container namespace</a>.</li>
+</ul>
+<p>The same <code>type</code>, <code>major</code> and <code>minor</code> SHOULD NOT be used for multiple devices.</p>
+<h3 id="example-5"><a class="header" href="#example-5">Example</a></h3>
+<pre><code class="language-json">&quot;devices&quot;: [
+    {
+        &quot;path&quot;: &quot;/dev/fuse&quot;,
+        &quot;type&quot;: &quot;c&quot;,
+        &quot;major&quot;: 10,
+        &quot;minor&quot;: 229,
+        &quot;fileMode&quot;: 438,
+        &quot;uid&quot;: 0,
+        &quot;gid&quot;: 0
+    },
+    {
+        &quot;path&quot;: &quot;/dev/sda&quot;,
+        &quot;type&quot;: &quot;b&quot;,
+        &quot;major&quot;: 8,
+        &quot;minor&quot;: 0,
+        &quot;fileMode&quot;: 432,
+        &quot;uid&quot;: 0,
+        &quot;gid&quot;: 0
+    }
+]
+</code></pre>
+<h3 id="default-devices"><a class="header" href="#default-devices"><a name="configLinuxDefaultDevices" />Default Devices</a></h3>
+<p>In addition to any devices configured with this setting, the runtime MUST also supply:</p>
+<ul>
+<li><a href="http://man7.org/linux/man-pages/man4/null.4.html"><code>/dev/null</code></a></li>
+<li><a href="http://man7.org/linux/man-pages/man4/zero.4.html"><code>/dev/zero</code></a></li>
+<li><a href="http://man7.org/linux/man-pages/man4/full.4.html"><code>/dev/full</code></a></li>
+<li><a href="http://man7.org/linux/man-pages/man4/random.4.html"><code>/dev/random</code></a></li>
+<li><a href="http://man7.org/linux/man-pages/man4/random.4.html"><code>/dev/urandom</code></a></li>
+<li><a href="http://man7.org/linux/man-pages/man4/tty.4.html"><code>/dev/tty</code></a></li>
+<li><code>/dev/console</code> is set up if <a href="config.html#process"><code>terminal</code></a> is enabled in the config by bind mounting the pseudoterminal pty to <code>/dev/console</code>.</li>
+<li><a href="http://man7.org/linux/man-pages/man4/pts.4.html"><code>/dev/ptmx</code></a>.
+A <a href="https://www.kernel.org/doc/Documentation/filesystems/devpts.txt">bind-mount or symlink of the container's <code>/dev/pts/ptmx</code></a>.</li>
+</ul>
+<h2 id="control-groups"><a class="header" href="#control-groups"><a name="configLinuxControlGroups" />Control groups</a></h2>
+<p>Also known as cgroups, they are used to restrict resource usage for a container and handle device access.
+cgroups provide controls (through controllers) to restrict cpu, memory, IO, pids, network and RDMA resources for the container.
+For more information, see the <a href="https://www.kernel.org/doc/Documentation/cgroup-v1/cgroups.txt">kernel cgroups documentation</a>.</p>
+<p>A runtime MAY, during a particular <a href="runtime.html#operation">container operation</a>,
+such as <a href="runtime.html#create">create</a>, <a href="runtime.html#start">start</a>, or
+<a href="runtime.html#exec">exec</a>, check if the container cgroup is fit for purpose,
+and MUST <a href="runtime.html#errors">generate an error</a> if such a check fails.
+For example, a frozen cgroup or (for <a href="runtime.html#create">create</a> operation)
+a non-empty cgroup. The reason for this is that accepting such configurations
+could cause container operation outcomes that users may not anticipate or
+understand, such as operation on one container inadvertently affecting other
+containers.</p>
+<h3 id="cgroups-path"><a class="header" href="#cgroups-path"><a name="configLinuxCgroupsPath" />Cgroups Path</a></h3>
+<p><strong><code>cgroupsPath</code></strong> (string, OPTIONAL) path to the cgroups.
+It can be used to either control the cgroups hierarchy for containers or to run a new process in an existing container.</p>
+<p>The value of <code>cgroupsPath</code> MUST be either an absolute path or a relative path.</p>
+<ul>
+<li>In the case of an absolute path (starting with <code>/</code>), the runtime MUST take the path to be relative to the cgroups mount point.</li>
+<li>In the case of a relative path (not starting with <code>/</code>), the runtime MAY interpret the path relative to a runtime-determined location in the cgroups hierarchy.</li>
+</ul>
+<p>If the value is specified, the runtime MUST consistently attach to the same place in the cgroups hierarchy given the same value of <code>cgroupsPath</code>.
+If the value is not specified, the runtime MAY define the default cgroups path.
+Runtimes MAY consider certain <code>cgroupsPath</code> values to be invalid, and MUST generate an error if this is the case.</p>
+<p>Implementations of the Spec can choose to name cgroups in any manner.
+The Spec does not include naming schema for cgroups.
+The Spec does not support per-controller paths for the reasons discussed in the <a href="https://www.kernel.org/doc/Documentation/cgroup-v2.txt">cgroupv2 documentation</a>.
+The cgroups will be created if they don't exist.</p>
+<p>You can configure a container's cgroups via the <code>resources</code> field of the Linux configuration.
+Do not specify <code>resources</code> unless limits have to be updated.
+For example, to run a new process in an existing container without updating limits, <code>resources</code> need not be specified.</p>
+<p>Runtimes MAY attach the container process to additional cgroup controllers beyond those necessary to fulfill the <code>resources</code> settings.</p>
+<h3 id="cgroup-ownership"><a class="header" href="#cgroup-ownership">Cgroup ownership</a></h3>
+<p>Runtimes MAY, according to the following rules, change (or cause to
+be changed) the owner of the container's cgroup to the host uid that
+maps to the value of <code>process.user.uid</code> in the <a href="glossary.html#container-namespace">container
+namespace</a>; that is, the user that
+will execute the container process.</p>
+<p>Runtimes SHOULD NOT change the ownership of container cgroups when
+cgroups v1 is in use.  Cgroup delegation is not secure in cgroups
+v1.</p>
+<p>A runtime SHOULD NOT change the ownership of a container cgroup
+unless it will also create a new cgroup namespace for the container.
+Typically this occurs when the <code>linux.namespaces</code> array contains an
+object with <code>type</code> equal to <code>&quot;cgroup&quot;</code> and <code>path</code> unset.</p>
+<p>Runtimes SHOULD change the cgroup ownership if and only if the
+cgroup filesystem is to be mounted read/write; that is, when the
+configuration's <code>mounts</code> array contains an object where:</p>
+<ul>
+<li>The <code>source</code> field is equal to <code>&quot;cgroup&quot;</code></li>
+<li>The <code>destination</code> field is equal to <code>&quot;/sys/fs/cgroup&quot;</code></li>
+<li>The <code>options</code> field does not contain the value <code>&quot;ro&quot;</code></li>
+</ul>
+<p>If the configuration does not specify such a mount, the runtime
+SHOULD NOT change the cgroup ownership.</p>
+<p>A runtime that changes the cgroup ownership SHOULD only change the
+ownership of the container's cgroup directory and files within that
+directory that are listed in <code>/sys/kernel/cgroup/delegate</code> (see
+<code>cgroups(7)</code> for details about this file).  If the
+<code>/sys/kernel/cgroup/delegate</code> file does not exist, the runtime MUST
+fall back to using the following list of files:</p>
+<pre><code>cgroup.procs
+cgroup.subtree_control
+cgroup.threads
+</code></pre>
+<p>The runtime SHOULD NOT change the ownership of any other files.
+Changing other files may allow the container to elevate its own
+resource limits or perform other unwanted behaviour.</p>
+<h3 id="example-6"><a class="header" href="#example-6">Example</a></h3>
+<pre><code class="language-json">&quot;cgroupsPath&quot;: &quot;/myRuntime/myContainer&quot;,
+&quot;resources&quot;: {
+    &quot;memory&quot;: {
+    &quot;limit&quot;: 100000,
+    &quot;reservation&quot;: 200000
+    },
+    &quot;devices&quot;: [
+        {
+            &quot;allow&quot;: false,
+            &quot;access&quot;: &quot;rwm&quot;
+        }
+    ]
+}
+</code></pre>
+<h3 id="allowed-device-list"><a class="header" href="#allowed-device-list"><a name="configLinuxDeviceAllowedlist" />Allowed Device list</a></h3>
+<p><strong><code>devices</code></strong> (array of objects, OPTIONAL) configures the <a href="https://www.kernel.org/doc/Documentation/cgroup-v1/devices.txt">allowed device list</a>.
+The runtime MUST apply entries in the listed order.</p>
+<p>Each entry has the following structure:</p>
+<ul>
+<li><strong><code>allow</code></strong> <em>(boolean, REQUIRED)</em> - whether the entry is allowed or denied.</li>
+<li><strong><code>type</code></strong> <em>(string, OPTIONAL)</em> - type of device: <code>a</code> (all), <code>c</code> (char), or <code>b</code> (block).
+Unset values mean &quot;all&quot;, mapping to <code>a</code>.</li>
+<li><strong><code>major, minor</code></strong> <em>(int64, OPTIONAL)</em> - <a href="https://www.kernel.org/doc/Documentation/admin-guide/devices.txt">major, minor numbers</a> for the device.
+Unset values mean &quot;all&quot;, mapping to <a href="https://www.kernel.org/doc/Documentation/cgroup-v1/devices.txt"><code>*</code> in the filesystem API</a>.</li>
+<li><strong><code>access</code></strong> <em>(string, OPTIONAL)</em> - cgroup permissions for device.
+A composition of <code>r</code> (read), <code>w</code> (write), and <code>m</code> (mknod).</li>
+</ul>
+<h4 id="example-7"><a class="header" href="#example-7">Example</a></h4>
+<pre><code class="language-json">&quot;devices&quot;: [
+    {
+        &quot;allow&quot;: false,
+        &quot;access&quot;: &quot;rwm&quot;
+    },
+    {
+        &quot;allow&quot;: true,
+        &quot;type&quot;: &quot;c&quot;,
+        &quot;major&quot;: 10,
+        &quot;minor&quot;: 229,
+        &quot;access&quot;: &quot;rw&quot;
+    },
+    {
+        &quot;allow&quot;: true,
+        &quot;type&quot;: &quot;b&quot;,
+        &quot;major&quot;: 8,
+        &quot;minor&quot;: 0,
+        &quot;access&quot;: &quot;r&quot;
+    }
+]
+</code></pre>
+<h3 id="memory"><a class="header" href="#memory"><a name="configLinuxMemory" />Memory</a></h3>
+<p><strong><code>memory</code></strong> (object, OPTIONAL) represents the cgroup subsystem <code>memory</code> and it's used to set limits on the container's memory usage.
+For more information, see the kernel cgroups documentation about <a href="https://www.kernel.org/doc/Documentation/cgroup-v1/memory.txt">memory</a>.</p>
+<p>Values for memory specify the limit in bytes, or <code>-1</code> for unlimited memory.</p>
+<ul>
+<li><strong><code>limit</code></strong> <em>(int64, OPTIONAL)</em> - sets limit of memory usage</li>
+<li><strong><code>reservation</code></strong> <em>(int64, OPTIONAL)</em> - sets soft limit of memory usage</li>
+<li><strong><code>swap</code></strong> <em>(int64, OPTIONAL)</em> - sets limit of memory+Swap usage</li>
+<li><strong><code>kernel</code></strong> <em>(int64, OPTIONAL, NOT RECOMMENDED)</em> - sets hard limit for kernel memory</li>
+<li><strong><code>kernelTCP</code></strong> <em>(int64, OPTIONAL, NOT RECOMMENDED)</em> - sets hard limit for kernel TCP buffer memory</li>
+</ul>
+<p>The following properties do not specify memory limits, but are covered by the <code>memory</code> controller:</p>
+<ul>
+<li><strong><code>swappiness</code></strong> <em>(uint64, OPTIONAL)</em> - sets swappiness parameter of vmscan (See sysctl's vm.swappiness)
+The values are from 0 to 100. Higher means more swappy.</li>
+<li><strong><code>disableOOMKiller</code></strong> <em>(bool, OPTIONAL)</em> - enables or disables the OOM killer.
+If enabled (<code>false</code>), tasks that attempt to consume more memory than they are allowed are immediately killed by the OOM killer.
+The OOM killer is enabled by default in every cgroup using the <code>memory</code> subsystem.
+To disable it, specify a value of <code>true</code>.</li>
+<li><strong><code>useHierarchy</code></strong> <em>(bool, OPTIONAL)</em> - enables or disables hierarchical memory accounting.
+If enabled (<code>true</code>), child cgroups will share the memory limits of this cgroup.</li>
+</ul>
+<h4 id="example-8"><a class="header" href="#example-8">Example</a></h4>
+<pre><code class="language-json">&quot;memory&quot;: {
+    &quot;limit&quot;: 536870912,
+    &quot;reservation&quot;: 536870912,
+    &quot;swap&quot;: 536870912,
+    &quot;kernel&quot;: -1,
+    &quot;kernelTCP&quot;: -1,
+    &quot;swappiness&quot;: 0,
+    &quot;disableOOMKiller&quot;: false
+}
+</code></pre>
+<h3 id="cpu"><a class="header" href="#cpu"><a name="configLinuxCPU" />CPU</a></h3>
+<p><strong><code>cpu</code></strong> (object, OPTIONAL) represents the cgroup subsystems <code>cpu</code> and <code>cpusets</code>.
+For more information, see the kernel cgroups documentation about <a href="https://www.kernel.org/doc/Documentation/cgroup-v1/cpusets.txt">cpusets</a>.</p>
+<p>The following parameters can be specified to set up the controller:</p>
+<ul>
+<li><strong><code>shares</code></strong> <em>(uint64, OPTIONAL)</em> - specifies a relative share of CPU time available to the tasks in a cgroup</li>
+<li><strong><code>quota</code></strong> <em>(int64, OPTIONAL)</em> - specifies the total amount of time in microseconds for which all tasks in a cgroup can run during one period (as defined by <strong><code>period</code></strong> below)</li>
+<li><strong><code>period</code></strong> <em>(uint64, OPTIONAL)</em> - specifies a period of time in microseconds for how regularly a cgroup's access to CPU resources should be reallocated (CFS scheduler only)</li>
+<li><strong><code>realtimeRuntime</code></strong> <em>(int64, OPTIONAL)</em> - specifies a period of time in microseconds for the longest continuous period in which the tasks in a cgroup have access to CPU resources</li>
+<li><strong><code>realtimePeriod</code></strong> <em>(uint64, OPTIONAL)</em> - same as <strong><code>period</code></strong> but applies to realtime scheduler only</li>
+<li><strong><code>cpus</code></strong> <em>(string, OPTIONAL)</em> - list of CPUs the container will run in</li>
+<li><strong><code>mems</code></strong> <em>(string, OPTIONAL)</em> - list of Memory Nodes the container will run in</li>
+</ul>
+<h4 id="example-9"><a class="header" href="#example-9">Example</a></h4>
+<pre><code class="language-json">&quot;cpu&quot;: {
+    &quot;shares&quot;: 1024,
+    &quot;quota&quot;: 1000000,
+    &quot;period&quot;: 500000,
+    &quot;realtimeRuntime&quot;: 950000,
+    &quot;realtimePeriod&quot;: 1000000,
+    &quot;cpus&quot;: &quot;2-3&quot;,
+    &quot;mems&quot;: &quot;0-7&quot;
+}
+</code></pre>
+<h3 id="block-io"><a class="header" href="#block-io"><a name="configLinuxBlockIO" />Block IO</a></h3>
+<p><strong><code>blockIO</code></strong> (object, OPTIONAL) represents the cgroup subsystem <code>blkio</code> which implements the block IO controller.
+For more information, see the kernel cgroups documentation about <a href="https://www.kernel.org/doc/Documentation/cgroup-v1/blkio-controller.txt">blkio</a>.</p>
+<p>The following parameters can be specified to set up the controller:</p>
+<ul>
+<li>
+<p><strong><code>weight</code></strong> <em>(uint16, OPTIONAL)</em> - specifies per-cgroup weight. This is default weight of the group on all devices until and unless overridden by per-device rules.</p>
+</li>
+<li>
+<p><strong><code>leafWeight</code></strong> <em>(uint16, OPTIONAL)</em> - equivalents of <code>weight</code> for the purpose of deciding how much weight tasks in the given cgroup has while competing with the cgroup's child cgroups.</p>
+</li>
+<li>
+<p><strong><code>weightDevice</code></strong> <em>(array of objects, OPTIONAL)</em> - an array of per-device bandwidth weights.
+Each entry has the following structure:</p>
+<ul>
+<li><strong><code>major, minor</code></strong> <em>(int64, REQUIRED)</em> - major, minor numbers for device.
+For more information, see the <a href="http://man7.org/linux/man-pages/man1/mknod.1.html">mknod(1)</a> man page.</li>
+<li><strong><code>weight</code></strong> <em>(uint16, OPTIONAL)</em> - bandwidth weight for the device.</li>
+<li><strong><code>leafWeight</code></strong> <em>(uint16, OPTIONAL)</em> - bandwidth weight for the device while competing with the cgroup's child cgroups, CFQ scheduler only</li>
+</ul>
+<p>You MUST specify at least one of <code>weight</code> or <code>leafWeight</code> in a given entry, and MAY specify both.</p>
+</li>
+<li>
+<p><strong><code>throttleReadBpsDevice</code></strong>, <strong><code>throttleWriteBpsDevice</code></strong> <em>(array of objects, OPTIONAL)</em> - an array of per-device bandwidth rate limits.
+Each entry has the following structure:</p>
+<ul>
+<li><strong><code>major, minor</code></strong> <em>(int64, REQUIRED)</em> - major, minor numbers for device.
+For more information, see the <a href="http://man7.org/linux/man-pages/man1/mknod.1.html">mknod(1)</a> man page.</li>
+<li><strong><code>rate</code></strong> <em>(uint64, REQUIRED)</em> - bandwidth rate limit in bytes per second for the device</li>
+</ul>
+</li>
+<li>
+<p><strong><code>throttleReadIOPSDevice</code></strong>, <strong><code>throttleWriteIOPSDevice</code></strong> <em>(array of objects, OPTIONAL)</em> - an array of per-device IO rate limits.
+Each entry has the following structure:</p>
+<ul>
+<li><strong><code>major, minor</code></strong> <em>(int64, REQUIRED)</em> - major, minor numbers for device.
+For more information, see the <a href="http://man7.org/linux/man-pages/man1/mknod.1.html">mknod(1)</a> man page.</li>
+<li><strong><code>rate</code></strong> <em>(uint64, REQUIRED)</em> - IO rate limit for the device</li>
+</ul>
+</li>
+</ul>
+<h4 id="example-10"><a class="header" href="#example-10">Example</a></h4>
+<pre><code class="language-json">&quot;blockIO&quot;: {
+    &quot;weight&quot;: 10,
+    &quot;leafWeight&quot;: 10,
+    &quot;weightDevice&quot;: [
+        {
+            &quot;major&quot;: 8,
+            &quot;minor&quot;: 0,
+            &quot;weight&quot;: 500,
+            &quot;leafWeight&quot;: 300
+        },
+        {
+            &quot;major&quot;: 8,
+            &quot;minor&quot;: 16,
+            &quot;weight&quot;: 500
+        }
+    ],
+    &quot;throttleReadBpsDevice&quot;: [
+        {
+            &quot;major&quot;: 8,
+            &quot;minor&quot;: 0,
+            &quot;rate&quot;: 600
+        }
+    ],
+    &quot;throttleWriteIOPSDevice&quot;: [
+        {
+            &quot;major&quot;: 8,
+            &quot;minor&quot;: 16,
+            &quot;rate&quot;: 300
+        }
+    ]
+}
+</code></pre>
+<h3 id="huge-page-limits"><a class="header" href="#huge-page-limits"><a name="configLinuxHugePageLimits" />Huge page limits</a></h3>
+<p><strong><code>hugepageLimits</code></strong> (array of objects, OPTIONAL) represents the <code>hugetlb</code> controller which allows to limit the
+HugeTLB usage per control group and enforces the controller limit during page fault.
+For more information, see the kernel cgroups documentation about <a href="https://www.kernel.org/doc/Documentation/cgroup-v1/hugetlb.txt">HugeTLB</a>.</p>
+<p>Each entry has the following structure:</p>
+<ul>
+<li><strong><code>pageSize</code></strong> <em>(string, REQUIRED)</em> - hugepage size
+The value has the format <code>&lt;size&gt;&lt;unit-prefix&gt;B</code> (64KB, 2MB, 1GB), and must match the <code>&lt;hugepagesize&gt;</code> of the
+corresponding control file found in <code>/sys/fs/cgroup/hugetlb/hugetlb.&lt;hugepagesize&gt;.limit_in_bytes</code>.
+Values of <code>&lt;unit-prefix&gt;</code> are intended to be parsed using base 1024 (&quot;1KB&quot; = 1024, &quot;1MB&quot; = 1048576, etc).</li>
+<li><strong><code>limit</code></strong> <em>(uint64, REQUIRED)</em> - limit in bytes of <em>hugepagesize</em> HugeTLB usage</li>
+</ul>
+<h4 id="example-11"><a class="header" href="#example-11">Example</a></h4>
+<pre><code class="language-json">&quot;hugepageLimits&quot;: [
+    {
+        &quot;pageSize&quot;: &quot;2MB&quot;,
+        &quot;limit&quot;: 209715200
+    },
+    {
+        &quot;pageSize&quot;: &quot;64KB&quot;,
+        &quot;limit&quot;: 1000000
+    }
+]
+</code></pre>
+<h3 id="network"><a class="header" href="#network"><a name="configLinuxNetwork" />Network</a></h3>
+<p><strong><code>network</code></strong> (object, OPTIONAL) represents the cgroup subsystems <code>net_cls</code> and <code>net_prio</code>.
+For more information, see the kernel cgroups documentations about <a href="https://www.kernel.org/doc/Documentation/cgroup-v1/net_cls.txt">net_cls cgroup</a> and <a href="https://www.kernel.org/doc/Documentation/cgroup-v1/net_prio.txt">net_prio cgroup</a>.</p>
+<p>The following parameters can be specified to set up the controller:</p>
+<ul>
+<li><strong><code>classID</code></strong> <em>(uint32, OPTIONAL)</em> - is the network class identifier the cgroup's network packets will be tagged with</li>
+<li><strong><code>priorities</code></strong> <em>(array of objects, OPTIONAL)</em> - specifies a list of objects of the priorities assigned to traffic originating from processes in the group and egressing the system on various interfaces.
+The following parameters can be specified per-priority:
+<ul>
+<li><strong><code>name</code></strong> <em>(string, REQUIRED)</em> - interface name in <a href="glossary.html#runtime-namespace">runtime network namespace</a></li>
+<li><strong><code>priority</code></strong> <em>(uint32, REQUIRED)</em> - priority applied to the interface</li>
+</ul>
+</li>
+</ul>
+<h4 id="example-12"><a class="header" href="#example-12">Example</a></h4>
+<pre><code class="language-json">&quot;network&quot;: {
+    &quot;classID&quot;: 1048577,
+    &quot;priorities&quot;: [
+        {
+            &quot;name&quot;: &quot;eth0&quot;,
+            &quot;priority&quot;: 500
+        },
+        {
+            &quot;name&quot;: &quot;eth1&quot;,
+            &quot;priority&quot;: 1000
+        }
+    ]
+}
+</code></pre>
+<h3 id="pids"><a class="header" href="#pids"><a name="configLinuxPIDS" />PIDs</a></h3>
+<p><strong><code>pids</code></strong> (object, OPTIONAL) represents the cgroup subsystem <code>pids</code>.
+For more information, see the kernel cgroups documentation about <a href="https://www.kernel.org/doc/Documentation/cgroup-v1/pids.txt">pids</a>.</p>
+<p>The following parameters can be specified to set up the controller:</p>
+<ul>
+<li><strong><code>limit</code></strong> <em>(int64, REQUIRED)</em> - specifies the maximum number of tasks in the cgroup</li>
+</ul>
+<h4 id="example-13"><a class="header" href="#example-13">Example</a></h4>
+<pre><code class="language-json">&quot;pids&quot;: {
+    &quot;limit&quot;: 32771
+}
+</code></pre>
+<h3 id="rdma"><a class="header" href="#rdma"><a name="configLinuxRDMA" />RDMA</a></h3>
+<p><strong><code>rdma</code></strong> (object, OPTIONAL) represents the cgroup subsystem <code>rdma</code>.
+For more information, see the kernel cgroups documentation about <a href="https://www.kernel.org/doc/Documentation/cgroup-v1/rdma.txt">rdma</a>.</p>
+<p>The name of the device to limit is the entry key.
+Entry values are objects with the following properties:</p>
+<ul>
+<li><strong><code>hcaHandles</code></strong> <em>(uint32, OPTIONAL)</em> - specifies the maximum number of hca_handles in the cgroup</li>
+<li><strong><code>hcaObjects</code></strong> <em>(uint32, OPTIONAL)</em> - specifies the maximum number of hca_objects in the cgroup</li>
+</ul>
+<p>You MUST specify at least one of the <code>hcaHandles</code> or <code>hcaObjects</code> in a given entry, and MAY specify both.</p>
+<h4 id="example-14"><a class="header" href="#example-14">Example</a></h4>
+<pre><code class="language-json">&quot;rdma&quot;: {
+    &quot;mlx5_1&quot;: {
+        &quot;hcaHandles&quot;: 3,
+        &quot;hcaObjects&quot;: 10000
+    },
+    &quot;mlx4_0&quot;: {
+        &quot;hcaObjects&quot;: 1000
+    },
+    &quot;rxe3&quot;: {
+        &quot;hcaObjects&quot;: 10000
+    }
+}
+</code></pre>
+<h2 id="unified"><a class="header" href="#unified"><a name="configLinuxUnified" />Unified</a></h2>
+<p><strong><code>unified</code></strong> (object, OPTIONAL) allows cgroup v2 parameters to be to be set and modified for the container.</p>
+<p>Each key in the map refers to a file in the cgroup unified hierarchy.</p>
+<p>The OCI runtime MUST ensure that the needed cgroup controllers are enabled for the cgroup.</p>
+<p>Configuration unknown to the runtime MUST still be written to the relevant file.</p>
+<p>The runtime MUST generate an error when the configuration refers to a cgroup controller that is not present or that cannot be enabled.</p>
+<h3 id="example-15"><a class="header" href="#example-15">Example</a></h3>
+<pre><code class="language-json">&quot;unified&quot;: {
+    &quot;io.max&quot;: &quot;259:0 rbps=2097152 wiops=120\n253:0 rbps=2097152 wiops=120&quot;,
+    &quot;hugetlb.1GB.max&quot;: &quot;1073741824&quot;
+}
+</code></pre>
+<p>If a controller is enabled on the cgroup v2 hierarchy but the configuration is provided for the cgroup v1 equivalent controller, the runtime MAY attempt a conversion.</p>
+<p>If the conversion is not possible the runtime MUST generate an error.</p>
+<h2 id="intelrdt"><a class="header" href="#intelrdt"><a name="configLinuxIntelRdt" />IntelRdt</a></h2>
+<p><strong><code>intelRdt</code></strong> (object, OPTIONAL) represents the <a href="https://www.kernel.org/doc/Documentation/x86/intel_rdt_ui.txt">Intel Resource Director Technology</a>.
+If <code>intelRdt</code> is set, the runtime MUST write the container process ID to the <code>tasks</code> file in a proper sub-directory in a mounted <code>resctrl</code> pseudo-filesystem. That sub-directory name is specified by <code>closID</code> parameter.
+If no mounted <code>resctrl</code> pseudo-filesystem is available in the <a href="glossary.html#runtime-namespace">runtime mount namespace</a>, the runtime MUST <a href="runtime.html#errors">generate an error</a>.</p>
+<p>If <code>intelRdt</code> is not set, the runtime MUST NOT manipulate any <code>resctrl</code> pseudo-filesystems.</p>
+<p>The following parameters can be specified for the container:</p>
+<ul>
+<li>
+<p><strong><code>closID</code></strong> <em>(string, OPTIONAL)</em> - specifies the identity for RDT Class of Service (CLOS).</p>
+</li>
+<li>
+<p><strong><code>l3CacheSchema</code></strong> <em>(string, OPTIONAL)</em> - specifies the schema for L3 cache id and capacity bitmask (CBM).
+The value SHOULD start with <code>L3:</code> and SHOULD NOT contain newlines.</p>
+</li>
+<li>
+<p><strong><code>memBwSchema</code></strong> <em>(string, OPTIONAL)</em> - specifies the schema of memory bandwidth per L3 cache id.
+The value MUST start with <code>MB:</code> and MUST NOT contain newlines.</p>
+</li>
+</ul>
+<p>The following rules on parameters MUST be applied:</p>
+<ul>
+<li>
+<p>If both <code>l3CacheSchema</code> and <code>memBwSchema</code> are set, runtimes MUST write the combined value to the <code>schemata</code> file in that sub-directory discussed in <code>closID</code>.</p>
+</li>
+<li>
+<p>If <code>l3CacheSchema</code> contains a line beginning with <code>MB:</code>, the value written to <code>schemata</code> file MUST be the non-<code>MB:</code> line(s) from <code>l3CacheSchema</code> and the line from <code>memBWSchema</code>.</p>
+</li>
+<li>
+<p>If either <code>l3CacheSchema</code> or <code>memBwSchema</code> is set, runtimes MUST write the value to the <code>schemata</code> file in the that sub-directory discussed in <code>closID</code>.</p>
+</li>
+<li>
+<p>If neither <code>l3CacheSchema</code> nor <code>memBwSchema</code> is set, runtimes MUST NOT write to <code>schemata</code> files in any <code>resctrl</code> pseudo-filesystems.</p>
+</li>
+<li>
+<p>If <code>closID</code> is not set, runtimes MUST use the container ID from <a href="runtime.html#start"><code>start</code></a> and create the <code>&lt;container-id&gt;</code> directory.</p>
+</li>
+<li>
+<p>If <code>closID</code> is set, <code>l3CacheSchema</code> and/or <code>memBwSchema</code> is set</p>
+<ul>
+<li>if <code>closID</code> directory in a mounted <code>resctrl</code> pseudo-filesystem doesn't exist, the runtimes MUST create it.</li>
+<li>if <code>closID</code> directory in a mounted <code>resctrl</code> pseudo-filesystem exists, runtimes MUST compare <code>l3CacheSchema</code> and/or <code>memBwSchema</code> value with <code>schemata</code> file, and <a href="runtime.html#errors">generate an error</a> if doesn't match.</li>
+</ul>
+</li>
+<li>
+<p>If <code>closID</code> is set, and neither of <code>l3CacheSchema</code> and <code>memBwSchema</code> are set, runtime MUST check if corresponding pre-configured directory <code>closID</code> is present in mounted <code>resctrl</code>. If such pre-configured directory <code>closID</code> exists, runtime MUST assign container to this <code>closID</code> and <a href="runtime.html#errors">generate an error</a> if directory does not exist.</p>
+</li>
+<li>
+<p><strong><code>enableCMT</code></strong> <em>(boolean, OPTIONAL)</em> - specifies if Intel RDT CMT should be enabled:</p>
+<ul>
+<li>CMT (Cache Monitoring Technology) supports monitoring of the last-level cache (LLC) occupancy
+for the container.</li>
+</ul>
+</li>
+<li>
+<p><strong><code>enableMBM</code></strong> <em>(boolean, OPTIONAL)</em> - specifies if Intel RDT MBM should be enabled:</p>
+<ul>
+<li>MBM (Memory Bandwidth Monitoring) supports monitoring of total and local memory bandwidth
+for the container.</li>
+</ul>
+</li>
+</ul>
+<h3 id="example-16"><a class="header" href="#example-16">Example</a></h3>
+<p>Consider a two-socket machine with two L3 caches where the default CBM is 0x7ff and the max CBM length is 11 bits,
+and minimum memory bandwidth of 10% with a memory bandwidth granularity of 10%.</p>
+<p>Tasks inside the container only have access to the &quot;upper&quot; 7/11 of L3 cache on socket 0 and the &quot;lower&quot; 5/11 L3 cache on socket 1,
+and may use a maximum memory bandwidth of 20% on socket 0 and 70% on socket 1.</p>
+<pre><code class="language-json">&quot;linux&quot;: {
+    &quot;intelRdt&quot;: {
+        &quot;closID&quot;: &quot;guaranteed_group&quot;,
+        &quot;l3CacheSchema&quot;: &quot;L3:0=7f0;1=1f&quot;,
+        &quot;memBwSchema&quot;: &quot;MB:0=20;1=70&quot;
+    }
+}
+</code></pre>
+<h2 id="sysctl"><a class="header" href="#sysctl"><a name="configLinuxSysctl" />Sysctl</a></h2>
+<p><strong><code>sysctl</code></strong> (object, OPTIONAL) allows kernel parameters to be modified at runtime for the container.
+For more information, see the <a href="http://man7.org/linux/man-pages/man8/sysctl.8.html">sysctl(8)</a> man page.</p>
+<h3 id="example-17"><a class="header" href="#example-17">Example</a></h3>
+<pre><code class="language-json">&quot;sysctl&quot;: {
+    &quot;net.ipv4.ip_forward&quot;: &quot;1&quot;,
+    &quot;net.core.somaxconn&quot;: &quot;256&quot;
+}
+</code></pre>
+<h2 id="seccomp"><a class="header" href="#seccomp"><a name="configLinuxSeccomp" />Seccomp</a></h2>
+<p>Seccomp provides application sandboxing mechanism in the Linux kernel.
+Seccomp configuration allows one to configure actions to take for matched syscalls and furthermore also allows matching on values passed as arguments to syscalls.
+For more information about Seccomp, see <a href="https://www.kernel.org/doc/Documentation/prctl/seccomp_filter.txt">Seccomp</a> kernel documentation.
+The actions, architectures, and operators are strings that match the definitions in seccomp.h from <a href="https://github.com/seccomp/libseccomp">libseccomp</a> and are translated to corresponding values.</p>
+<p><strong><code>seccomp</code></strong> (object, OPTIONAL)</p>
+<p>The following parameters can be specified to set up seccomp:</p>
+<ul>
+<li>
+<p><strong><code>defaultAction</code></strong> <em>(string, REQUIRED)</em> - the default action for seccomp. Allowed values are the same as <code>syscalls[].action</code>.</p>
+</li>
+<li>
+<p><strong><code>defaultErrnoRet</code></strong> <em>(uint, OPTIONAL)</em> - the errno return code to use.
+Some actions like <code>SCMP_ACT_ERRNO</code> and <code>SCMP_ACT_TRACE</code> allow to specify the errno code to return.
+When the action doesn't support an errno, the runtime MUST print and error and fail.
+If not specified then its default value is <code>EPERM</code>.</p>
+</li>
+<li>
+<p><strong><code>architectures</code></strong> <em>(array of strings, OPTIONAL)</em> - the architecture used for system calls.
+A valid list of constants as of libseccomp v2.5.0 is shown below.</p>
+<ul>
+<li><code>SCMP_ARCH_X86</code></li>
+<li><code>SCMP_ARCH_X86_64</code></li>
+<li><code>SCMP_ARCH_X32</code></li>
+<li><code>SCMP_ARCH_ARM</code></li>
+<li><code>SCMP_ARCH_AARCH64</code></li>
+<li><code>SCMP_ARCH_MIPS</code></li>
+<li><code>SCMP_ARCH_MIPS64</code></li>
+<li><code>SCMP_ARCH_MIPS64N32</code></li>
+<li><code>SCMP_ARCH_MIPSEL</code></li>
+<li><code>SCMP_ARCH_MIPSEL64</code></li>
+<li><code>SCMP_ARCH_MIPSEL64N32</code></li>
+<li><code>SCMP_ARCH_PPC</code></li>
+<li><code>SCMP_ARCH_PPC64</code></li>
+<li><code>SCMP_ARCH_PPC64LE</code></li>
+<li><code>SCMP_ARCH_S390</code></li>
+<li><code>SCMP_ARCH_S390X</code></li>
+<li><code>SCMP_ARCH_PARISC</code></li>
+<li><code>SCMP_ARCH_PARISC64</code></li>
+<li><code>SCMP_ARCH_RISCV64</code></li>
+</ul>
+</li>
+<li>
+<p><strong><code>flags</code></strong> <em>(array of strings, OPTIONAL)</em> - list of flags to use with seccomp(2).</p>
+<p>A valid list of constants is shown below.</p>
+<ul>
+<li><code>SECCOMP_FILTER_FLAG_TSYNC</code></li>
+<li><code>SECCOMP_FILTER_FLAG_LOG</code></li>
+<li><code>SECCOMP_FILTER_FLAG_SPEC_ALLOW</code></li>
+</ul>
+</li>
+<li>
+<p><strong><code>listenerPath</code></strong> <em>(string, OPTIONAL)</em> - specifies the path of UNIX domain socket over which the runtime will send the <a href="config-linux.html#containerprocessstate">container process state</a> data structure when the <code>SCMP_ACT_NOTIFY</code> action is used.
+This socket MUST use <code>AF_UNIX</code> domain and <code>SOCK_STREAM</code> type.
+The runtime MUST send exactly one <a href="config-linux.html#containerprocessstate">container process state</a> per connection.
+The connection MUST NOT be reused and it MUST be closed after sending a seccomp state.
+If sending to this socket fails, the runtime MUST <a href="runtime.html#errors">generate an error</a>.
+If the <code>SCMP_ACT_NOTIFY</code> action is not used this value is ignored.</p>
+<p>The runtime sends the following file descriptors using <code>SCM_RIGHTS</code> and set their names in the <code>fds</code> array of the <a href="config-linux.html#containerprocessstate">container process state</a>:</p>
+<ul>
+<li><strong><code>seccompFd</code></strong> (string, REQUIRED) is the seccomp file descriptor returned by the seccomp syscall.</li>
+</ul>
+</li>
+<li>
+<p><strong><code>listenerMetadata</code></strong> <em>(string, OPTIONAL)</em> - specifies an opaque data to pass to the seccomp agent.
+This string will be sent as the <code>metadata</code> field in the <a href="config-linux.html#containerprocessstate">container process state</a>.
+This field MUST NOT be set if <code>listenerPath</code> is not set.</p>
+</li>
+<li>
+<p><strong><code>syscalls</code></strong> <em>(array of objects, OPTIONAL)</em> - match a syscall in seccomp.
+While this property is OPTIONAL, some values of <code>defaultAction</code> are not useful without <code>syscalls</code> entries.
+For example, if <code>defaultAction</code> is <code>SCMP_ACT_KILL</code> and <code>syscalls</code> is empty or unset, the kernel will kill the container process on its first syscall.
+Each entry has the following structure:</p>
+<ul>
+<li>
+<p><strong><code>names</code></strong> <em>(array of strings, REQUIRED)</em> - the names of the syscalls.
+<code>names</code> MUST contain at least one entry.</p>
+</li>
+<li>
+<p><strong><code>action</code></strong> <em>(string, REQUIRED)</em> - the action for seccomp rules.
+A valid list of constants as of libseccomp v2.5.0 is shown below.</p>
+<ul>
+<li><code>SCMP_ACT_KILL</code></li>
+<li><code>SCMP_ACT_KILL_PROCESS</code></li>
+<li><code>SCMP_ACT_KILL_THREAD</code></li>
+<li><code>SCMP_ACT_TRAP</code></li>
+<li><code>SCMP_ACT_ERRNO</code></li>
+<li><code>SCMP_ACT_TRACE</code></li>
+<li><code>SCMP_ACT_ALLOW</code></li>
+<li><code>SCMP_ACT_LOG</code></li>
+<li><code>SCMP_ACT_NOTIFY</code></li>
+</ul>
+</li>
+<li>
+<p><strong><code>errnoRet</code></strong> <em>(uint, OPTIONAL)</em> - the errno return code to use.
+Some actions like <code>SCMP_ACT_ERRNO</code> and <code>SCMP_ACT_TRACE</code> allow to specify the errno code to return.
+When the action doesn't support an errno, the runtime MUST print and error and fail.
+If not specified its default value is <code>EPERM</code>.</p>
+</li>
+<li>
+<p><strong><code>args</code></strong> <em>(array of objects, OPTIONAL)</em> - the specific syscall in seccomp.
+Each entry has the following structure:</p>
+<ul>
+<li>
+<p><strong><code>index</code></strong> <em>(uint, REQUIRED)</em> - the index for syscall arguments in seccomp.</p>
+</li>
+<li>
+<p><strong><code>value</code></strong> <em>(uint64, REQUIRED)</em> - the value for syscall arguments in seccomp.</p>
+</li>
+<li>
+<p><strong><code>valueTwo</code></strong> <em>(uint64, OPTIONAL)</em> - the value for syscall arguments in seccomp.</p>
+</li>
+<li>
+<p><strong><code>op</code></strong> <em>(string, REQUIRED)</em> - the operator for syscall arguments in seccomp.
+A valid list of constants as of libseccomp v2.3.2 is shown below.</p>
+<ul>
+<li><code>SCMP_CMP_NE</code></li>
+<li><code>SCMP_CMP_LT</code></li>
+<li><code>SCMP_CMP_LE</code></li>
+<li><code>SCMP_CMP_EQ</code></li>
+<li><code>SCMP_CMP_GE</code></li>
+<li><code>SCMP_CMP_GT</code></li>
+<li><code>SCMP_CMP_MASKED_EQ</code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="example-18"><a class="header" href="#example-18">Example</a></h3>
+<pre><code class="language-json">&quot;seccomp&quot;: {
+    &quot;defaultAction&quot;: &quot;SCMP_ACT_ALLOW&quot;,
+    &quot;architectures&quot;: [
+        &quot;SCMP_ARCH_X86&quot;,
+        &quot;SCMP_ARCH_X32&quot;
+    ],
+    &quot;syscalls&quot;: [
+        {
+            &quot;names&quot;: [
+                &quot;getcwd&quot;,
+                &quot;chmod&quot;
+            ],
+            &quot;action&quot;: &quot;SCMP_ACT_ERRNO&quot;
+        }
+    ]
+}
+</code></pre>
+<h3 id="the-container-process-state"><a class="header" href="#the-container-process-state"><a name="containerprocessstate" />The Container Process State</a></h3>
+<p>The container process state is a data structure passed via a UNIX socket.
+The container runtime MUST send the container process state over the UNIX socket as regular payload serialized in JSON and file descriptors MUST be sent using <code>SCM_RIGHTS</code>.
+The container runtime MAY use several <code>sendmsg(2)</code> calls to send the aforementioned data.
+If more than one <code>sendmsg(2)</code> is used, the file descriptors MUST be sent only in the first call.</p>
+<p>The container process state includes the following properties:</p>
+<ul>
+<li><strong><code>ociVersion</code></strong> (string, REQUIRED) is version of the Open Container Initiative Runtime Specification with which the container process state complies.</li>
+<li><strong><code>fds</code></strong> (array, OPTIONAL) is a string array containing the names of the file descriptors passed.
+The index of the name in this array corresponds to index of the file descriptors in the <code>SCM_RIGHTS</code> array.</li>
+<li><strong><code>pid</code></strong> (int, REQUIRED) is the container process ID, as seen by the runtime.</li>
+<li><strong><code>metadata</code></strong> (string, OPTIONAL) opaque metadata.</li>
+<li><strong><code>state</code></strong> (<a href="runtime.html#state">state</a>, REQUIRED) is the state of the container.</li>
+</ul>
+<p>Example sending a single <code>seccompFD</code> file descriptor in the <code>SCM_RIGHTS</code> array:</p>
+<pre><code class="language-json">{
+    &quot;ociVersion&quot;: &quot;0.2.0&quot;,
+    &quot;fds&quot;: [
+        &quot;seccompFd&quot;
+    ],
+    &quot;pid&quot;: 4422,
+    &quot;metadata&quot;: &quot;MKNOD=/dev/null,/dev/net/tun;BPF_MAP_TYPES=hash,array&quot;,
+    &quot;state&quot;: {
+        &quot;ociVersion&quot;: &quot;0.2.0&quot;,
+        &quot;id&quot;: &quot;oci-container1&quot;,
+        &quot;status&quot;: &quot;creating&quot;,
+        &quot;pid&quot;: 4422,
+        &quot;bundle&quot;: &quot;/containers/redis&quot;,
+        &quot;annotations&quot;: {
+            &quot;myKey&quot;: &quot;myValue&quot;
+        }
+    }
+}
+</code></pre>
+<h2 id="rootfs-mount-propagation"><a class="header" href="#rootfs-mount-propagation"><a name="configLinuxRootfsMountPropagation" />Rootfs Mount Propagation</a></h2>
+<p><strong><code>rootfsPropagation</code></strong> (string, OPTIONAL) sets the rootfs's mount propagation.
+Its value is either <code>shared</code>, <code>slave</code>, <code>private</code> or <code>unbindable</code>.
+It's worth noting that a peer group is defined as a group of VFS mounts that propagate events to each other.
+A nested container is defined as a container launched inside an existing container.</p>
+<ul>
+<li><strong><code>shared</code></strong>: the rootfs mount belongs to a new peer group.
+This means that further mounts (e.g. nested containers) will also belong to that peer group and will propagate events to the rootfs.
+Note this does not mean that it's shared with the host.</li>
+<li><strong><code>slave</code></strong>: the rootfs mount receives propagation events from the host (e.g. if something is mounted on the host it will also appear in the container) but not the other way around.</li>
+<li><strong><code>private</code></strong>: the rootfs mount doesn't receive mount propagation events from the host and further mounts in nested containers will be isolated from the host and from the rootfs (even if the nested container <code>rootfsPropagation</code> option is shared).</li>
+<li><strong><code>unbindable</code></strong>: the rootfs mount is a private mount that cannot be bind-mounted.</li>
+</ul>
+<p>The <a href="https://www.kernel.org/doc/Documentation/filesystems/sharedsubtree.txt">Shared Subtrees</a> article in the kernel documentation has more information about mount propagation.</p>
+<h3 id="example-19"><a class="header" href="#example-19">Example</a></h3>
+<pre><code class="language-json">&quot;rootfsPropagation&quot;: &quot;slave&quot;,
+</code></pre>
+<h2 id="masked-paths"><a class="header" href="#masked-paths"><a name="configLinuxMaskedPaths" />Masked Paths</a></h2>
+<p><strong><code>maskedPaths</code></strong> (array of strings, OPTIONAL) will mask over the provided paths inside the container so that they cannot be read.
+The values MUST be absolute paths in the <a href="glossary.html#container_namespace">container namespace</a>.</p>
+<h3 id="example-20"><a class="header" href="#example-20">Example</a></h3>
+<pre><code class="language-json">&quot;maskedPaths&quot;: [
+    &quot;/proc/kcore&quot;
+]
+</code></pre>
+<h2 id="readonly-paths"><a class="header" href="#readonly-paths"><a name="configLinuxReadonlyPaths" />Readonly Paths</a></h2>
+<p><strong><code>readonlyPaths</code></strong> (array of strings, OPTIONAL) will set the provided paths as readonly inside the container.
+The values MUST be absolute paths in the <a href="glossary.html#container-namespace">container namespace</a>.</p>
+<h3 id="example-21"><a class="header" href="#example-21">Example</a></h3>
+<pre><code class="language-json">&quot;readonlyPaths&quot;: [
+    &quot;/proc/sys&quot;
+]
+</code></pre>
+<h2 id="mount-label"><a class="header" href="#mount-label"><a name="configLinuxMountLabel" />Mount Label</a></h2>
+<p><strong><code>mountLabel</code></strong> (string, OPTIONAL) will set the Selinux context for the mounts in the container.</p>
+<h3 id="example-22"><a class="header" href="#example-22">Example</a></h3>
+<pre><code class="language-json">&quot;mountLabel&quot;: &quot;system_u:object_r:svirt_sandbox_file_t:s0:c715,c811&quot;
+</code></pre>
+<h2 id="personality"><a class="header" href="#personality"><a name="configLinuxPersonality" />Personality</a></h2>
+<p><strong><code>personality</code></strong> (object, OPTIONAL) sets the Linux execution personality. For more information
+see the <a href="http://man7.org/linux/man-pages/man2/personality.2.html">personality</a> syscall documentation. As most of the options are
+obsolete and rarely used, and some reduce security, the currently supported set is a small
+subset of the available options.</p>
+<ul>
+<li>
+<p><strong><code>domain</code></strong> <em>(string, REQUIRED)</em> - the execution domain.
+The valid list of constants is shown below. <code>LINUX32</code> will set the <code>uname</code> system call to show
+a 32 bit CPU type, such as <code>i686</code>.</p>
+<ul>
+<li><code>LINUX</code></li>
+<li><code>LINUX32</code></li>
+</ul>
+</li>
+<li>
+<p><strong><code>flags</code></strong> <em>(array of strings, OPTIONAL)</em> - the additional flags to apply.
+Currently no flag values are supported.</p>
+</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="solaris-application-container-configuration"><a class="header" href="#solaris-application-container-configuration"><a name="solarisApplicationContainerConfiguration" />Solaris Application Container Configuration</a></h1>
+<p>Solaris application containers can be configured using the following properties, all of the below properties have mappings to properties specified under <a href="http://docs.oracle.com/cd/E86824_01/html/E54764/zonecfg-1m.html">zonecfg(1M)</a> man page, except milestone.</p>
+<h2 id="milestone"><a class="header" href="#milestone"><a name="configSolarisMilestone" />milestone</a></h2>
+<p>The SMF(Service Management Facility) FMRI which should go to &quot;online&quot; state before we start the desired process within the container.</p>
+<p><strong><code>milestone</code></strong> <em>(string, OPTIONAL)</em></p>
+<h3 id="example-23"><a class="header" href="#example-23">Example</a></h3>
+<pre><code class="language-json">&quot;milestone&quot;: &quot;svc:/milestone/container:default&quot;
+</code></pre>
+<h2 id="limitpriv"><a class="header" href="#limitpriv"><a name="configSolarisLimitpriv" />limitpriv</a></h2>
+<p>The maximum set of privileges any process in this container can obtain.
+The property should consist of a comma-separated privilege set specification as described in <a href="http://docs.oracle.com/cd/E86824_01/html/E54766/priv-str-to-set-3c.html">priv_str_to_set(3C)</a> man page for the respective release of Solaris.</p>
+<p><strong><code>limitpriv</code></strong> <em>(string, OPTIONAL)</em></p>
+<h3 id="example-24"><a class="header" href="#example-24">Example</a></h3>
+<pre><code class="language-json">&quot;limitpriv&quot;: &quot;default&quot;
+</code></pre>
+<h2 id="maxshmmemory"><a class="header" href="#maxshmmemory"><a name="configSolarisMaxShmMemory" />maxShmMemory</a></h2>
+<p>The maximum amount of shared memory allowed for this application container.
+A scale (K, M, G, T) can be applied to the value for each of these numbers (for example, 1M is one megabyte).
+Mapped to <code>max-shm-memory</code> in <a href="http://docs.oracle.com/cd/E86824_01/html/E54764/zonecfg-1m.html">zonecfg(1M)</a> man page.</p>
+<p><strong><code>maxShmMemory</code></strong> <em>(string, OPTIONAL)</em></p>
+<h3 id="example-25"><a class="header" href="#example-25">Example</a></h3>
+<pre><code class="language-json">&quot;maxShmMemory&quot;: &quot;512m&quot;
+</code></pre>
+<h2 id="cappedcpu"><a class="header" href="#cappedcpu"><a name="configSolarisCappedCpu" />cappedCPU</a></h2>
+<p>Sets a limit on the amount of CPU time that can be used by a container.
+The unit used translates to the percentage of a single CPU that can be used by all user threads in a container, expressed as a fraction (for example, .75) or a mixed number (whole number and fraction, for example, 1.25).
+An ncpu value of 1 means 100% of a CPU, a value of 1.25 means 125%, .75 mean 75%, and so forth.
+When projects within a capped container have their own caps, the minimum value takes precedence.
+cappedCPU is mapped to <code>capped-cpu</code> in <a href="http://docs.oracle.com/cd/E86824_01/html/E54764/zonecfg-1m.html">zonecfg(1M)</a> man page.</p>
+<ul>
+<li><strong><code>ncpus</code></strong> <em>(string, OPTIONAL)</em></li>
+</ul>
+<h3 id="example-26"><a class="header" href="#example-26">Example</a></h3>
+<pre><code class="language-json">&quot;cappedCPU&quot;: {
+    &quot;ncpus&quot;: &quot;8&quot;
+}
+</code></pre>
+<h2 id="cappedmemory"><a class="header" href="#cappedmemory"><a name="configSolarisCappedMemory" />cappedMemory</a></h2>
+<p>The physical and swap caps on the memory that can be used by this application container.
+A scale (K, M, G, T) can be applied to the value for each of these numbers (for example, 1M is one megabyte).
+cappedMemory is mapped to <code>capped-memory</code> in <a href="http://docs.oracle.com/cd/E86824_01/html/E54764/zonecfg-1m.html">zonecfg(1M)</a> man page.</p>
+<ul>
+<li><strong><code>physical</code></strong> <em>(string, OPTIONAL)</em></li>
+<li><strong><code>swap</code></strong> <em>(string, OPTIONAL)</em></li>
+</ul>
+<h3 id="example-27"><a class="header" href="#example-27">Example</a></h3>
+<pre><code class="language-json">&quot;cappedMemory&quot;: {
+    &quot;physical&quot;: &quot;512m&quot;,
+    &quot;swap&quot;: &quot;512m&quot;
+}
+</code></pre>
+<h2 id="network-1"><a class="header" href="#network-1"><a name="configSolarisNetwork" />Network</a></h2>
+<h3 id="automatic-network-anet"><a class="header" href="#automatic-network-anet"><a name="configSolarisAutomaticNetwork" />Automatic Network (anet)</a></h3>
+<p>anet is specified as an array that is used to set up networking for Solaris application containers.
+The anet resource represents the automatic creation of a network resource for an application container.
+The zones administration daemon, zoneadmd, is the primary process for managing the container's virtual platform.
+One of the daemon's responsibilities is creation and teardown of the networks for the container.
+For more information on the daemon see the <a href="http://docs.oracle.com/cd/E86824_01/html/E54764/zoneadmd-1m.html">zoneadmd(1M)</a> man page.
+When such a container is started, a temporary VNIC(Virtual NIC) is automatically created for the container.
+The VNIC is deleted when the container is torn down.
+The following properties can be used to set up automatic networks.
+For additional information on properties, check the <a href="http://docs.oracle.com/cd/E86824_01/html/E54764/zonecfg-1m.html">zonecfg(1M)</a> man page for the respective release of Solaris.</p>
+<ul>
+<li><strong><code>linkname</code></strong> <em>(string, OPTIONAL)</em> Specify a name for the automatically created VNIC datalink.</li>
+<li><strong><code>lowerLink</code></strong> <em>(string, OPTIONAL)</em> Specify the link over which the VNIC will be created.
+Mapped to <code>lower-link</code> in the <a href="http://docs.oracle.com/cd/E86824_01/html/E54764/zonecfg-1m.html">zonecfg(1M)</a> man page.</li>
+<li><strong><code>allowedAddress</code></strong> <em>(string, OPTIONAL)</em> The set of IP addresses that the container can use might be constrained by specifying the <code>allowedAddress</code> property.
+If <code>allowedAddress</code> has not been specified, then they can use any IP address on the associated physical interface for the network resource.
+Otherwise, when <code>allowedAddress</code> is specified, the container cannot use IP addresses that are not in the <code>allowedAddress</code> list for the physical address.
+Mapped to <code>allowed-address</code> in the <a href="http://docs.oracle.com/cd/E86824_01/html/E54764/zonecfg-1m.html">zonecfg(1M)</a> man page.</li>
+<li><strong><code>configureAllowedAddress</code></strong> <em>(string, OPTIONAL)</em> If <code>configureAllowedAddress</code> is set to true, the addresses specified by <code>allowedAddress</code> are automatically configured on the interface each time the container starts.
+When it is set to false, the <code>allowedAddress</code> will not be configured on container start.
+Mapped to <code>configure-allowed-address</code> in the <a href="http://docs.oracle.com/cd/E86824_01/html/E54764/zonecfg-1m.html">zonecfg(1M)</a> man page.</li>
+<li><strong><code>defrouter</code></strong> <em>(string, OPTIONAL)</em> The value for the OPTIONAL default router.</li>
+<li><strong><code>macAddress</code></strong> <em>(string, OPTIONAL)</em> Set the VNIC's MAC addresses based on the specified value or keyword.
+If not a keyword, it is interpreted as a unicast MAC address.
+For a list of the supported keywords please refer to the <a href="http://docs.oracle.com/cd/E86824_01/html/E54764/zonecfg-1m.html">zonecfg(1M)</a> man page of the respective Solaris release.
+Mapped to <code>mac-address</code> in the <a href="http://docs.oracle.com/cd/E86824_01/html/E54764/zonecfg-1m.html">zonecfg(1M)</a> man page.</li>
+<li><strong><code>linkProtection</code></strong> <em>(string, OPTIONAL)</em> Enables one or more types of link protection using comma-separated values.
+See the protection property in dladm(8) for supported values in respective release of Solaris.
+Mapped to <code>link-protection</code> in the <a href="http://docs.oracle.com/cd/E86824_01/html/E54764/zonecfg-1m.html">zonecfg(1M)</a> man page.</li>
+</ul>
+<h4 id="example-28"><a class="header" href="#example-28">Example</a></h4>
+<pre><code class="language-json">&quot;anet&quot;: [
+    {
+        &quot;allowedAddress&quot;: &quot;172.17.0.2/16&quot;,
+        &quot;configureAllowedAddress&quot;: &quot;true&quot;,
+        &quot;defrouter&quot;: &quot;172.17.0.1/16&quot;,
+        &quot;linkProtection&quot;: &quot;mac-nospoof, ip-nospoof&quot;,
+        &quot;linkname&quot;: &quot;net0&quot;,
+        &quot;lowerLink&quot;: &quot;net2&quot;,
+        &quot;macAddress&quot;: &quot;02:42:f8:52:c7:16&quot;
+    }
+]
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="windows-specific-container-configuration"><a class="header" href="#windows-specific-container-configuration"><a name="windowsSpecificContainerConfiguration" />Windows-specific Container Configuration</a></h1>
+<p>This document describes the schema for the <a href="config.html#platform-specific-configuration">Windows-specific section</a> of the <a href="config.html">container configuration</a>.
+The Windows container specification uses APIs provided by the Windows Host Compute Service (HCS) to fulfill the spec.</p>
+<h2 id="layerfolders"><a class="header" href="#layerfolders"><a name="configWindowsLayerFolders" />LayerFolders</a></h2>
+<p><strong><code>layerFolders</code></strong> (array of strings, REQUIRED) specifies a list of layer folders the container image relies on. The list is ordered from topmost layer to base layer with the last entry being the scratch.
+<code>layerFolders</code> MUST contain at least one entry.</p>
+<h3 id="example-29"><a class="header" href="#example-29">Example</a></h3>
+<pre><code class="language-json">&quot;windows&quot;: {
+    &quot;layerFolders&quot;: [
+        &quot;C:\\Layers\\layer2&quot;,
+        &quot;C:\\Layers\\layer1&quot;,
+        &quot;C:\\Layers\\layer-base&quot;,
+        &quot;C:\\scratch&quot;,
+    ]
+}
+</code></pre>
+<h2 id="devices-1"><a class="header" href="#devices-1"><a name="configWindowsDevices" />Devices</a></h2>
+<p><strong><code>devices</code></strong> (array of objects, OPTIONAL) lists devices that MUST be available in the container.</p>
+<p>Each entry has the following structure:</p>
+<ul>
+<li><strong><code>id</code></strong> <em>(string, REQUIRED)</em> - specifies the device which the runtime MUST make available in the container.</li>
+<li><strong><code>idType</code></strong> <em>(string, REQUIRED)</em> - tells the runtime how to interpret <code>id</code>. Today, Windows only supports a value of <code>class</code>, which identifies <code>id</code> as a <a href="https://docs.microsoft.com/en-us/windows-hardware/drivers/install/overview-of-device-interface-classes">device interface class GUID</a>.</li>
+</ul>
+<h3 id="example-30"><a class="header" href="#example-30">Example</a></h3>
+<pre><code class="language-json">&quot;windows&quot;: {
+    &quot;devices&quot;: [
+        {
+            &quot;id&quot;: &quot;24E552D7-6523-47F7-A647-D3465BF1F5CA&quot;,
+            &quot;idType&quot;: &quot;class&quot;
+        },
+        {
+            &quot;id&quot;: &quot;5175d334-c371-4806-b3ba-71fd53c9258d&quot;,
+            &quot;idType&quot;: &quot;class&quot;
+        }
+    ]
+}
+</code></pre>
+<h2 id="resources"><a class="header" href="#resources"><a name="configWindowsResources" />Resources</a></h2>
+<p>You can configure a container's resource limits via the OPTIONAL <code>resources</code> field of the Windows configuration.</p>
+<h3 id="memory-1"><a class="header" href="#memory-1"><a name="configWindowsMemory" />Memory</a></h3>
+<p><code>memory</code> is an OPTIONAL configuration for the container's memory usage.</p>
+<p>The following parameters can be specified:</p>
+<ul>
+<li><strong><code>limit</code></strong> <em>(uint64, OPTIONAL)</em> - sets limit of memory usage in bytes.</li>
+</ul>
+<h4 id="example-31"><a class="header" href="#example-31">Example</a></h4>
+<pre><code class="language-json">&quot;windows&quot;: {
+    &quot;resources&quot;: {
+        &quot;memory&quot;: {
+            &quot;limit&quot;: 2097152
+        }
+    }
+}
+</code></pre>
+<h3 id="cpu-1"><a class="header" href="#cpu-1"><a name="configWindowsCpu" />CPU</a></h3>
+<p><code>cpu</code> is an OPTIONAL configuration for the container's CPU usage.</p>
+<p>The following parameters can be specified:</p>
+<ul>
+<li><strong><code>count</code></strong> <em>(uint64, OPTIONAL)</em> - specifies the number of CPUs available to the container.</li>
+<li><strong><code>shares</code></strong> <em>(uint16, OPTIONAL)</em> - specifies the relative weight to other containers with CPU shares.</li>
+<li><strong><code>maximum</code></strong> <em>(uint16, OPTIONAL)</em> - specifies the portion of processor cycles that this container can use as a percentage times 100.</li>
+</ul>
+<h4 id="example-32"><a class="header" href="#example-32">Example</a></h4>
+<pre><code class="language-json">&quot;windows&quot;: {
+    &quot;resources&quot;: {
+        &quot;cpu&quot;: {
+            &quot;maximum&quot;: 5000
+        }
+    }
+}
+</code></pre>
+<h3 id="storage"><a class="header" href="#storage"><a name="configWindowsStorage" />Storage</a></h3>
+<p><code>storage</code> is an OPTIONAL configuration for the container's storage usage.</p>
+<p>The following parameters can be specified:</p>
+<ul>
+<li><strong><code>iops</code></strong> <em>(uint64, OPTIONAL)</em> - specifies the maximum IO operations per second for the system drive of the container.</li>
+<li><strong><code>bps</code></strong> <em>(uint64, OPTIONAL)</em> - specifies the maximum bytes per second for the system drive of the container.</li>
+<li><strong><code>sandboxSize</code></strong> <em>(uint64, OPTIONAL)</em> - specifies the minimum size of the system drive in bytes.</li>
+</ul>
+<h4 id="example-33"><a class="header" href="#example-33">Example</a></h4>
+<pre><code class="language-json">&quot;windows&quot;: {
+    &quot;resources&quot;: {
+        &quot;storage&quot;: {
+            &quot;iops&quot;: 50
+        }
+    }
+}
+</code></pre>
+<h2 id="network-2"><a class="header" href="#network-2"><a name="configWindowsNetwork" />Network</a></h2>
+<p>You can configure a container's networking options via the OPTIONAL <code>network</code> field of the Windows configuration.</p>
+<p>The following parameters can be specified:</p>
+<ul>
+<li><strong><code>endpointList</code></strong> <em>(array of strings, OPTIONAL)</em> - list of HNS (Host Network Service) endpoints that the container should connect to.</li>
+<li><strong><code>allowUnqualifiedDNSQuery</code></strong> <em>(bool, OPTIONAL)</em> - specifies if unqualified DNS name resolution is allowed.</li>
+<li><strong><code>DNSSearchList</code></strong> <em>(array of strings, OPTIONAL)</em> - comma separated list of DNS suffixes to use for name resolution.</li>
+<li><strong><code>networkSharedContainerName</code></strong> <em>(string, OPTIONAL)</em> - name (ID) of the container that we will share with the network stack.</li>
+<li><strong><code>networkNamespace</code></strong> <em>(string, OPTIONAL)</em> - name (ID) of the network namespace that will be used for the container. If a network namespace is specified no other parameter must be specified.</li>
+</ul>
+<h3 id="example-34"><a class="header" href="#example-34">Example</a></h3>
+<pre><code class="language-json">&quot;windows&quot;: {
+    &quot;network&quot;: {
+        &quot;endpointList&quot;: [
+            &quot;7a010682-17e0-4455-a838-02e5d9655fe6&quot;
+        ],
+        &quot;allowUnqualifiedDNSQuery&quot;: true,
+        &quot;DNSSearchList&quot;: [
+            &quot;a.com&quot;,
+            &quot;b.com&quot;
+        ],
+        &quot;networkSharedContainerName&quot;: &quot;containerName&quot;,
+        &quot;networkNamespace&quot;: &quot;168f3daf-efc6-4377-b20a-2c86764ba892&quot;
+    }
+}
+</code></pre>
+<h2 id="credential-spec"><a class="header" href="#credential-spec"><a name="configWindowsCredentialSpec" />Credential Spec</a></h2>
+<p>You can configure a container's group Managed Service Account (gMSA) via the OPTIONAL <code>credentialSpec</code> field of the Windows configuration.
+The <code>credentialSpec</code> is a JSON object whose properties are implementation-defined.
+For more information about gMSAs, see <a href="https://aka.ms/windowscontainers/manage-serviceaccounts">Active Directory Service Accounts for Windows Containers</a>.
+For more information about tooling to generate a gMSA, see <a href="https://aka.ms/windowscontainers/credentialspec-tools">Deployment Overview</a>.</p>
+<h2 id="servicing"><a class="header" href="#servicing"><a name="configWindowsServicing" />Servicing</a></h2>
+<p>When a container terminates, the Host Compute Service indicates if a Windows update servicing operation is pending.
+You can indicate that a container should be started in a mode to apply pending servicing operations via the OPTIONAL <code>servicing</code> field of the Windows configuration.</p>
+<h3 id="example-35"><a class="header" href="#example-35">Example</a></h3>
+<pre><code class="language-json">&quot;windows&quot;: {
+    &quot;servicing&quot;: true
+}
+</code></pre>
+<h2 id="ignoreflushesduringboot"><a class="header" href="#ignoreflushesduringboot"><a name="configWindowsIgnoreFlushesDuringBoot" />IgnoreFlushesDuringBoot</a></h2>
+<p>You can indicate that a container should be started in a mode where disk flushes are not performed during container boot via the OPTIONAL <code>ignoreFlushesDuringBoot</code> field of the Windows configuration.</p>
+<h3 id="example-36"><a class="header" href="#example-36">Example</a></h3>
+<pre><code class="language-json">&quot;windows&quot;: {
+    &quot;ignoreFlushesDuringBoot&quot;: true
+}
+</code></pre>
+<h2 id="hyperv"><a class="header" href="#hyperv"><a name="configWindowsHyperV" />HyperV</a></h2>
+<p><code>hyperv</code> is an OPTIONAL field of the Windows configuration.
+If present, the container MUST be run with Hyper-V isolation.
+If omitted, the container MUST be run as a Windows Server container.</p>
+<p>The following parameters can be specified:</p>
+<ul>
+<li><strong><code>utilityVMPath</code></strong> <em>(string, OPTIONAL)</em> - specifies the path to the image used for the utility VM.
+This would be specified if using a base image which does not contain a utility VM image.
+If not supplied, the runtime will search the container filesystem layers from the bottom-most layer upwards, until it locates &quot;UtilityVM&quot;, and default to that path.</li>
+</ul>
+<h3 id="example-37"><a class="header" href="#example-37">Example</a></h3>
+<pre><code class="language-json">&quot;windows&quot;: {
+    &quot;hyperv&quot;: {
+        &quot;utilityVMPath&quot;: &quot;C:\\path\\to\\utilityvm&quot;
+    }
+}
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="virtual-machine-specific-container-configuration"><a class="header" href="#virtual-machine-specific-container-configuration"><a name="VirtualMachineSpecificContainerConfiguration" /> Virtual-machine-specific Container Configuration</a></h1>
+<p>This section describes the schema for the <a href="config.html#platform-specific-configuration">virtual-machine-specific section</a> of the <a href="config.html">container configuration</a>.
+The virtual-machine container specification provides additional configuration for the hypervisor, kernel, and image.</p>
+<h2 id="hypervisor-object"><a class="header" href="#hypervisor-object"><a name="HypervisorObject" /> Hypervisor Object</a></h2>
+<p><strong><code>hypervisor</code></strong> (object, OPTIONAL) specifies details of the hypervisor that manages the container virtual machine.</p>
+<ul>
+<li><strong><code>path</code></strong> (string, REQUIRED) path to the hypervisor binary that manages the container virtual machine.
+This value MUST be an absolute path in the <a href="glossary.html#runtime-namespace">runtime mount namespace</a>.</li>
+<li><strong><code>parameters</code></strong> (array of strings, OPTIONAL) specifies an array of parameters to pass to the hypervisor.</li>
+</ul>
+<h3 id="example-38"><a class="header" href="#example-38">Example</a></h3>
+<pre><code class="language-json">    &quot;hypervisor&quot;: {
+        &quot;path&quot;: &quot;/path/to/vmm&quot;,
+        &quot;parameters&quot;: [&quot;opts1=foo&quot;, &quot;opts2=bar&quot;]
+    }
+</code></pre>
+<h2 id="kernel-object"><a class="header" href="#kernel-object"><a name="KernelObject" /> Kernel Object</a></h2>
+<p><strong><code>kernel</code></strong> (object, REQUIRED) specifies details of the kernel to boot the container virtual machine with.</p>
+<ul>
+<li><strong><code>path</code></strong> (string, REQUIRED) path to the kernel used to boot the container virtual machine.
+This value MUST be an absolute path in the <a href="glossary.html#runtime-namespace">runtime mount namespace</a>.</li>
+<li><strong><code>parameters</code></strong> (array of strings, OPTIONAL) specifies an array of parameters to pass to the kernel.</li>
+<li><strong><code>initrd</code></strong> (string, OPTIONAL) path to an initial ramdisk to be used by the container virtual machine.
+This value MUST be an absolute path in the <a href="glossary.html#runtime-namespace">runtime mount namespace</a>.</li>
+</ul>
+<h3 id="example-39"><a class="header" href="#example-39">Example</a></h3>
+<pre><code class="language-json">    &quot;kernel&quot;: {
+        &quot;path&quot;: &quot;/path/to/vmlinuz&quot;,
+        &quot;parameters&quot;: [&quot;foo=bar&quot;, &quot;hello world&quot;],
+        &quot;initrd&quot;: &quot;/path/to/initrd.img&quot;
+    }
+</code></pre>
+<h2 id="image-object"><a class="header" href="#image-object"><a name="ImageObject" /> Image Object</a></h2>
+<p><strong><code>image</code></strong> (object, OPTIONAL) specifies details of the image that contains the root filesystem for the container virtual machine.</p>
+<ul>
+<li><strong><code>path</code></strong> (string, REQUIRED) path to the container virtual machine root image.
+This value MUST be an absolute path in the <a href="glossary.html#runtime-namespace">runtime mount namespace</a>.</li>
+<li><strong><code>format</code></strong> (string, REQUIRED) format of the container virtual machine root image. Commonly supported formats are:
+<ul>
+<li><strong><code>raw</code></strong> <a href="https://en.wikipedia.org/wiki/IMG_(file_format)">raw disk image format</a>. Unset values for <code>format</code> will default to that format.</li>
+<li><strong><code>qcow2</code></strong> <a href="https://git.qemu.org/?p=qemu.git;a=blob_plain;f=docs/interop/qcow2.txt;hb=HEAD">QEMU image format</a>.</li>
+<li><strong><code>vdi</code></strong> <a href="https://forensicswiki.org/wiki/Virtual_Disk_Image_(VDI)">VirtualBox 1.1 compatible image format</a>.</li>
+<li><strong><code>vmdk</code></strong> <a href="http://www.vmware.com/app/vmdk/?src=vmdk">VMware compatible image format</a>.</li>
+<li><strong><code>vhd</code></strong> <a href="https://github.com/libyal/libvhdi/blob/master/documentation/Virtual%20Hard%20Disk%20(VHD)%20image%20format.asciidoc">Virtual Hard Disk image format</a>.</li>
+</ul>
+</li>
+</ul>
+<p>This image contains the root filesystem that the virtual machine <strong><code>kernel</code></strong> will boot into, not to be confused with the container root filesystem itself. The latter, as specified by <strong><code>path</code></strong> from the <a href="config.html#Root-Configuration">Root Configuration</a> section, will be mounted inside the virtual machine at a location chosen by the virtual-machine-based runtime.</p>
+<h3 id="example-40"><a class="header" href="#example-40">Example</a></h3>
+<pre><code class="language-json">    &quot;image&quot;: {
+        &quot;path&quot;: &quot;/path/to/vm/rootfs.img&quot;,
+	&quot;format&quot;: &quot;raw&quot;
+    }
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div><p><em>This document is a work in progress.</em></p>
+<h1 id="zos-container-configuration"><a class="header" href="#zos-container-configuration"><a name="ZOSContainerConfiguration" />z/OS Container Configuration</a></h1>
+<p>This document describes the schema for the <a href="config.html#platform-specific-configuration">z/OS-specific section</a> of the <a href="config.html">container configuration</a>.</p>
+<h2 id="devices-2"><a class="header" href="#devices-2"><a name="configZOSDevices" />Devices</a></h2>
+<p><strong><code>devices</code></strong> (array of objects, OPTIONAL) lists devices that MUST be available in the container.
+The runtime MAY supply them however it likes.</p>
+<p>Each entry has the following structure:</p>
+<ul>
+<li><strong><code>type</code></strong> <em>(string, REQUIRED)</em> - type of device: <code>c</code>, <code>b</code>, <code>u</code> or <code>p</code>.</li>
+<li><strong><code>path</code></strong> <em>(string, REQUIRED)</em> - full path to device inside container.
+If a file already exists at <code>path</code> that does not match the requested device, the runtime MUST generate an error.</li>
+<li><strong><code>major, minor</code></strong> <em>(int64, REQUIRED unless <code>type</code> is <code>p</code>)</em> - major, minor numbers for the device.</li>
+<li><strong><code>fileMode</code></strong> <em>(uint32, OPTIONAL)</em> - file mode for the device.</li>
+</ul>
+<p>The same <code>type</code>, <code>major</code> and <code>minor</code> SHOULD NOT be used for multiple devices.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="glossary"><a class="header" href="#glossary"><a name="glossary" />Glossary</a></h1>
+<h2 id="bundle"><a class="header" href="#bundle"><a name="glossaryBundle" />Bundle</a></h2>
+<p>A <a href="bundle.html">directory structure</a> that is written ahead of time, distributed, and used to seed the runtime for creating a <a href="glossary.html#container">container</a> and launching a process within it.</p>
+<h2 id="configuration-1"><a class="header" href="#configuration-1"><a name="glossaryConfiguration" />Configuration</a></h2>
+<p>The <a href="config.html"><code>config.json</code></a> file in a <a href="glossary.html#bundle">bundle</a> which defines the intended <a href="glossary.html#container">container</a> and container process.</p>
+<h2 id="container"><a class="header" href="#container"><a name="glossaryContainer" />Container</a></h2>
+<p>An environment for executing processes with configurable isolation and resource limitations.
+For example, namespaces, resource limits, and mounts are all part of the container environment.</p>
+<h2 id="container-namespace"><a class="header" href="#container-namespace"><a name="glossaryContainerNamespace" />Container namespace</a></h2>
+<p>On Linux,the <a href="http://man7.org/linux/man-pages/man7/namespaces.7.html">namespaces</a> in which the <a href="config.html#process">configured process</a> executes.</p>
+<h2 id="json"><a class="header" href="#json"><a name="glossaryJson" />JSON</a></h2>
+<p>All configuration <a href="https://tools.ietf.org/html/rfc8259">JSON</a> MUST be encoded in <a href="http://www.unicode.org/versions/Unicode8.0.0/ch03.pdf">UTF-8</a>.
+JSON objects MUST NOT include duplicate names.
+The order of entries in JSON objects is not significant.</p>
+<h2 id="runtime"><a class="header" href="#runtime"><a name="glossaryRuntime" />Runtime</a></h2>
+<p>An implementation of this specification.
+It reads the <a href="glossary.html#configuration">configuration files</a> from a <a href="glossary.html#bundle">bundle</a>, uses that information to create a <a href="glossary.html#container">container</a>, launches a process inside the container, and performs other <a href="runtime.html">lifecycle actions</a>.</p>
+<h2 id="runtime-namespace"><a class="header" href="#runtime-namespace"><a name="glossaryRuntimeNamespace" />Runtime namespace</a></h2>
+<p>On Linux, the namespaces from which new <a href="glossary.html#container-namespace">container namespaces</a> are <a href="config-linux.html#namespaces">created</a> and from which some configured resources are accessed.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="implementations"><a class="header" href="#implementations"><a name="implementations" />Implementations</a></h1>
+<p>The following sections link to associated projects, some of which are maintained by the OCI and some of which are maintained by external organizations.
+If you know of any associated projects that are not listed here, please file a pull request adding a link to that project.</p>
+<h2 id="runtime-container"><a class="header" href="#runtime-container"><a name="implementationsRuntimeContainer" />Runtime (Container)</a></h2>
+<ul>
+<li><a href="https://github.com/alibaba/inclavare-containers">alibaba/inclavare-containers</a> - Enclave OCI runtime for confidential computing</li>
+<li><a href="https://github.com/containers/crun">containers/crun</a> - Runtime implementation in C</li>
+<li><a href="https://github.com/containers/youki">containers/youki</a> - Runtime implementation in Rust</li>
+<li><a href="https://github.com/opencontainers/runc">opencontainers/runc</a> - Reference implementation of OCI runtime</li>
+<li><a href="https://github.com/projectatomic/bwrap-oci">projectatomic/bwrap-oci</a> - Convert the OCI spec file to a command line for <a href="https://github.com/projectatomic/bubblewrap">bubblewrap</a></li>
+</ul>
+<h2 id="runtime-virtual-machine"><a class="header" href="#runtime-virtual-machine"><a name="implementationsRuntimeVirtualMachine" />Runtime (Virtual Machine)</a></h2>
+<ul>
+<li><a href="https://github.com/clearcontainers/runtime">clearcontainers/runtime</a> - Hypervisor-based OCI runtime utilising <a href="https://github.com/containers/virtcontainers">virtcontainers</a> by Intel®.</li>
+<li><a href="https://github.com/google/gvisor">google/gvisor</a> - gVisor is a user-space kernel, contains runsc to run sandboxed containers.</li>
+<li><a href="https://github.com/hyperhq/runv">hyperhq/runv</a> - Hypervisor-based runtime for OCI</li>
+<li><a href="https://github.com/kata-containers/runtime">kata-containers/runtime</a> - Hypervisor-based OCI runtime combining technology from <a href="https://github.com/clearcontainers/runtime">clearcontainers/runtime</a> and <a href="https://github.com/hyperhq/runv">hyperhq/runv</a>.</li>
+</ul>
+<h2 id="testing--tools"><a class="header" href="#testing--tools"><a name="implementationsTestingTools" />Testing &amp; Tools</a></h2>
+<ul>
+<li><a href="https://github.com/huawei-openlab/oct">huawei-openlab/oct</a> - Open Container Testing framework for OCI configuration and runtime</li>
+<li><a href="https://github.com/kunalkushwaha/octool">kunalkushwaha/octool</a> - A config linter and validator.</li>
+<li><a href="https://github.com/opencontainers/runtime-tools">opencontainers/runtime-tools</a> - A config generator and runtime/bundle testing framework.</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="style-and-conventions"><a class="header" href="#style-and-conventions"><a name="styleAndConventions" />Style and conventions</a></h1>
+<h2 id="one-sentence-per-line"><a class="header" href="#one-sentence-per-line"><a name="styleOneSentence" />One sentence per line</a></h2>
+<p>To keep consistency throughout the Markdown files in the Open Container spec all files should be formatted one sentence per line.
+This fixes two things: it makes diffing easier with git and it resolves fights about line wrapping length.
+For example, this paragraph will span three lines in the Markdown source.</p>
+<h2 id="traditionally-hex-settings-should-use-json-integers-not-json-strings"><a class="header" href="#traditionally-hex-settings-should-use-json-integers-not-json-strings"><a name="styleHex" />Traditionally hex settings should use JSON integers, not JSON strings</a></h2>
+<p>For example, <a href="config-linux.html#network"><code>&quot;classID&quot;: 1048577</code></a> instead of <code>&quot;classID&quot;: &quot;0x100001&quot;</code>.
+The config JSON isn't enough of a UI to be worth jumping through string &lt;-&gt; integer hoops to support an 0x… form (<a href="https://github.com/opencontainers/runtime-spec/pull/267#r48360013">source</a>).</p>
+<h2 id="constant-names-should-keep-redundant-prefixes"><a class="header" href="#constant-names-should-keep-redundant-prefixes"><a name="styleConstantNames" />Constant names should keep redundant prefixes</a></h2>
+<p>For example, <code>CAP_KILL</code> instead of <code>KILL</code> in <a href="config.html#process"><strong><code>process.capabilities</code></strong></a>.
+The redundancy reduction from removing the namespacing prefix is not useful enough to be worth trimming the upstream identifier (<a href="https://github.com/opencontainers/runtime-spec/pull/159#issuecomment-138728337">source</a>).</p>
+<h2 id="optional-settings-should-not-have-pointer-go-types"><a class="header" href="#optional-settings-should-not-have-pointer-go-types"><a name="styleOptionalSettings" />Optional settings should not have pointer Go types</a></h2>
+<p>Because in many cases the Go default for the type is a no-op in the spec (sources <a href="https://github.com/opencontainers/runtime-spec/pull/653#issue-200439192">here</a>, <a href="https://github.com/opencontainers/runtime-spec/pull/316#r50782982">here</a>, and <a href="https://github.com/opencontainers/runtime-spec/pull/290#r50296396">here</a>).
+The exceptions are entries where we need to distinguish between “not set” and “set to the Go default for that type” (<a href="https://github.com/opencontainers/runtime-spec/pull/317#r50932706">source</a>), and this decision should be made on a per-setting case.</p>
+<h2 id="links"><a class="header" href="#links">Links</a></h2>
+<p>Internal links should be <a href="https://help.github.com/articles/basic-writing-and-formatting-syntax/#relative-links">relative links</a> when linking to content within the repository.
+Internal links should be used inline.</p>
+<p>External links should be collected at the bottom of a markdown file and used as referenced links.
+See 'Referenced Links' in this <a href="https://en.support.wordpress.com/markdown-quick-reference">markdown quick reference</a>.
+The use of referenced links in the markdown body helps to keep files clean and organized.
+This also facilitates updates of external link targets on a per-file basis.</p>
+<p>Referenced links should be kept in two alphabetically sorted sets, a general reference section followed by a man page section.
+To keep Pandoc happy, duplicate naming of links within pages listed in the Makefile's <code>DOC_FILES</code> variable should be avoided by appending an <code>_N</code> to the link tagname, where <code>N</code> is some number not currently in use.
+The organization and style of an existing reference section should be maintained unless it violates these style guidelines.</p>
+<p>An exception to these rules is when a URL is needed contextually, for example when showing an explicit link to the reader.</p>
+<h2 id="examples"><a class="header" href="#examples">Examples</a></h2>
+<h3 id="anchoring"><a class="header" href="#anchoring"><a name="styleAnchoring" />Anchoring</a></h3>
+<p>For any given section that provides a notable example, it is ideal to have it denoted with <a href="https://help.github.com/articles/basic-writing-and-formatting-syntax/#headings">markdown headers</a>.
+The level of header should be such that it is a subheader of the header it is an example of.</p>
+<h4 id="example-41"><a class="header" href="#example-41">Example</a></h4>
+<pre><code class="language-markdown">## Some Topic
+
+### Some Subheader
+
+#### Further Subheader
+
+##### Example
+
+To use Further Subheader, ...
+
+### Example
+
+To use Some Topic, ...
+
+</code></pre>
+<h3 id="content"><a class="header" href="#content"><a name="styleContent" />Content</a></h3>
+<p>Where necessary, the values in the example can be empty or unset, but accommodate with comments regarding this intention.</p>
+<p>Where feasible, the content and values used in an example should convey the fullest use of the data structures concerned.
+Most commonly onlookers will intend to copy-and-paste a &quot;working example&quot;.
+If the intention of the example is to be a fully utilized example, rather than a copy-and-paste example, perhaps add a comment as such.</p>
+<pre><code class="language-markdown">### Example
+</code></pre>
+<pre><code class="language-json">{
+    &quot;foo&quot;: null,
+    &quot;bar&quot;: &quot;&quot;
+}
+</code></pre>
+<p><strong>vs.</strong></p>
+<pre><code class="language-markdown">### Example
+
+Following is a fully populated example (not necessarily for copy/paste use)
+</code></pre>
+<pre><code class="language-json">{
+    &quot;foo&quot;: [
+        1,
+        2,
+        3
+    ],
+    &quot;bar&quot;: &quot;waffles&quot;,
+    &quot;bif&quot;: {
+        &quot;baz&quot;: &quot;potatoes&quot;
+    }
+}
+</code></pre>
+<h3 id="links-1"><a class="header" href="#links-1">Links</a></h3>
+<p>The following is an example of different types of links.
+This is shown as a complete markdown file, where the referenced links are at the bottom.</p>
+<pre><code class="language-markdown">The specification repository's [glossary](glossary.md) is where readers can find definitions of commonly used terms.
+
+Readers may click through to the [Open Containers namespace][open-containers] on [GitHub][github].
+
+The URL for the Open Containers link above is: https://github.com/opencontainers
+
+
+[github]: https://github.com
+[open-containers]: https://github.com/opencontainers
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="project-governance"><a class="header" href="#project-governance">Project governance</a></h1>
+<p>The <a href="https://www.opencontainers.org/about/governance">OCI charter</a> §5.b.viii tasks an OCI Project's maintainers (listed in the repository's MAINTAINERS file and sometimes referred to as &quot;the TDC&quot;, <a href="https://www.opencontainers.org/about/governance">§5.e</a>) with:</p>
+<blockquote>
+<p>Creating, maintaining and enforcing governance guidelines for the TDC, approved by the maintainers, and which shall be posted visibly for the TDC.</p>
+</blockquote>
+<p>This section describes generic rules and procedures for fulfilling that mandate.</p>
+<h2 id="proposing-a-motion"><a class="header" href="#proposing-a-motion">Proposing a motion</a></h2>
+<p>A maintainer SHOULD propose a motion on the dev@opencontainers.org mailing list (except <a href="GOVERNANCE.html#security-issues">security issues</a>) with another maintainer as a co-sponsor.</p>
+<h2 id="voting"><a class="header" href="#voting">Voting</a></h2>
+<p>Voting on a proposed motion SHOULD happen on the dev@opencontainers.org mailing list (except <a href="GOVERNANCE.html#security-issues">security issues</a>) with maintainers posting LGTM or REJECT.
+Maintainers MAY also explicitly not vote by posting ABSTAIN (which is useful to revert a previous vote).
+Maintainers MAY post multiple times (e.g. as they revise their position based on feedback), but only their final post counts in the tally.
+A proposed motion is adopted if two-thirds of votes cast, a quorum having voted, are in favor of the release.</p>
+<p>Voting SHOULD remain open for a week to collect feedback from the wider community and allow the maintainers to digest the proposed motion.
+Under exceptional conditions (e.g. non-major security fix releases) proposals which reach quorum with unanimous support MAY be adopted earlier.</p>
+<p>A maintainer MAY choose to reply with REJECT.
+A maintainer posting a REJECT MUST include a list of concerns or links to written documentation for those concerns (e.g. GitHub issues or mailing-list threads).
+The maintainers SHOULD try to resolve the concerns and wait for the rejecting maintainer to change their opinion to LGTM.
+However, a motion MAY be adopted with REJECTs, as outlined in the previous paragraphs.</p>
+<h2 id="quorum"><a class="header" href="#quorum">Quorum</a></h2>
+<p>A quorum is established when at least two-thirds of maintainers have voted.</p>
+<p>For projects that are not specifications, a <a href="GOVERNANCE.html#release-approval">motion to release</a> MAY be adopted if the tally is at least three LGTMs and no REJECTs, even if three votes does not meet the usual two-thirds quorum.</p>
+<h2 id="security-issues"><a class="header" href="#security-issues">Security issues</a></h2>
+<p>Motions with sensitive security implications MUST be proposed on the security@opencontainers.org mailing list instead of dev@opencontainers.org, but should otherwise follow the standard <a href="GOVERNANCE.html#proposing-a-motion">proposal</a> process.
+The security@opencontainers.org mailing list includes all members of the TOB.
+The TOB will contact the project maintainers and provide a channel for discussing and voting on the motion, but voting will otherwise follow the standard <a href="GOVERNANCE.html#voting">voting</a> and <a href="GOVERNANCE.html#quorum">quorum</a> rules.
+The TOB and project maintainers will work together to notify affected parties before making an adopted motion public.</p>
+<h2 id="amendments"><a class="header" href="#amendments">Amendments</a></h2>
+<p>The <a href="GOVERNANCE.html#project-governance">project governance</a> rules and procedures MAY be amended or replaced using the procedures themselves.
+The MAINTAINERS of this project governance document is the total set of MAINTAINERS from all Open Containers projects (runC, runtime-spec, and image-spec).</p>
+<h2 id="subject-templates"><a class="header" href="#subject-templates">Subject templates</a></h2>
+<p>Maintainers are busy and get lots of email.
+To make project proposals recognizable, proposed motions SHOULD use the following subject templates.</p>
+<h3 id="proposing-a-motion-1"><a class="header" href="#proposing-a-motion-1">Proposing a motion</a></h3>
+<blockquote>
+<p>[{project} VOTE]: {motion description} (closes {end of voting window})</p>
+</blockquote>
+<p>For example:</p>
+<blockquote>
+<p>[runtime-spec VOTE]: Tag 0647920 as 1.0.0-rc (closes 2016-06-03 20:00 UTC)</p>
+</blockquote>
+<h3 id="tallying-results"><a class="header" href="#tallying-results">Tallying results</a></h3>
+<p>After voting closes, a maintainer SHOULD post a tally to the motion thread with a subject template like:</p>
+<blockquote>
+<p>[{project} {status}]: {motion description} (+{LGTMs} -{REJECTs} #{ABSTAINs})</p>
+</blockquote>
+<p>Where <code>{status}</code> is either <code>adopted</code> or <code>rejected</code>.
+For example:</p>
+<blockquote>
+<p>[runtime-spec adopted]: Tag 0647920 as 1.0.0-rc (+6 -0 #3)</p>
+</blockquote>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="releases"><a class="header" href="#releases">Releases</a></h1>
+<p>The release process hopes to encourage early, consistent consensus-building during project development.
+The mechanisms used are regular community communication on the mailing list about progress, scheduled meetings for issue resolution and release triage, and regularly paced and communicated releases.
+Releases are proposed and adopted or rejected using the usual <a href="GOVERNANCE.html">project governance</a> rules and procedures.</p>
+<p>An anti-pattern that we want to avoid is heavy development or discussions &quot;late cycle&quot; around major releases.
+We want to build a community that is involved and communicates consistently through all releases instead of relying on &quot;silent periods&quot; as a judge of stability.</p>
+<h2 id="parallel-releases"><a class="header" href="#parallel-releases">Parallel releases</a></h2>
+<p>A single project MAY consider several motions to release in parallel.
+However each motion to release after the initial 0.1.0 MUST be based on a previous release that has already landed.</p>
+<p>For example, runtime-spec maintainers may propose a v1.0.0-rc2 on the 1st of the month and a v0.9.1 bugfix on the 2nd of the month.
+They may not propose a v1.0.0-rc3 until the v1.0.0-rc2 is accepted (on the 7th if the vote initiated on the 1st passes).</p>
+<h2 id="specifications"><a class="header" href="#specifications">Specifications</a></h2>
+<p>The OCI maintains three categories of projects: specifications, applications, and conformance-testing tools.
+However, specification releases have special restrictions in the <a href="https://www.opencontainers.org/about/governance">OCI charter</a>:</p>
+<ul>
+<li>They are the target of backwards compatibility (§7.g), and</li>
+<li>They are subject to the OFWa patent grant (§8.d and e).</li>
+</ul>
+<p>To avoid unfortunate side effects (onerous backwards compatibility requirements or Member resignations), the following additional procedures apply to specification releases:</p>
+<h3 id="planning-a-release"><a class="header" href="#planning-a-release">Planning a release</a></h3>
+<p>Every OCI specification project SHOULD hold meetings that involve maintainers reviewing pull requests, debating outstanding issues, and planning releases.
+This meeting MUST be advertised on the project README and MAY happen on a phone call, video conference, or on IRC.
+Maintainers MUST send updates to the dev@opencontainers.org with results of these meetings.</p>
+<p>Before the specification reaches v1.0.0, the meetings SHOULD be weekly.
+Once a specification has reached v1.0.0, the maintainers may alter the cadence, but a meeting MUST be held within four weeks of the previous meeting.</p>
+<p>The release plans, corresponding milestones and estimated due dates MUST be published on GitHub (e.g. https://github.com/opencontainers/runtime-spec/milestones).
+GitHub milestones and issues are only used for community organization and all releases MUST follow the <a href="GOVERNANCE.html">project governance</a> rules and procedures.</p>
+<h3 id="timelines"><a class="header" href="#timelines">Timelines</a></h3>
+<p>Specifications have a variety of different timelines in their lifecycle.</p>
+<ul>
+<li>Pre-v1.0.0 specifications SHOULD release on a monthly cadence to garner feedback.</li>
+<li>Major specification releases MUST release at least three release candidates spaced a minimum of one week apart.
+This means a major release like a v1.0.0 or v2.0.0 release will take 1 month at minimum: one week for rc1, one week for rc2, one week for rc3, and one week for the major release itself.
+Maintainers SHOULD strive to make zero breaking changes during this cycle of release candidates and SHOULD restart the three-candidate count when a breaking change is introduced.
+For example if a breaking change is introduced in v1.0.0-rc2 then the series would end with v1.0.0-rc4 and v1.0.0.</li>
+<li>Minor and patch releases SHOULD be made on an as-needed basis.</li>
+</ul>
+<h2 id="checklist"><a class="header" href="#checklist">Checklist</a></h2>
+<p>Releases usually follow a few steps:</p>
+<ul>
+<li><input disabled="" type="checkbox"/>
+prepare a pull-request for the release
+<ul>
+<li><input disabled="" type="checkbox"/>
+a commit updating <code>./ChangeLog</code>
+<ul>
+<li><input disabled="" type="checkbox"/>
+<code>git log --oneline --no-merges --decorate --name-status v1.0.1..HEAD | vim -</code></li>
+<li><input disabled="" type="checkbox"/>
+<code>:% s/(pr\/\(\d*\))\(.*\)/\2 (#\1)/</code> to move the PR to the end of line and match previous formatting</li>
+<li><input disabled="" type="checkbox"/>
+review <code>(^M|^A|^D)</code> for impact of the commit</li>
+<li><input disabled="" type="checkbox"/>
+group commits to <code>Additions:</code>, <code>Minor fixes and documentation:</code>, <code>Breaking changes:</code></li>
+<li><input disabled="" type="checkbox"/>
+delete the <code>(^M|^A|^D)</code> lines, <code>:%!grep -vE '(^M|^A|^D)'</code></li>
+<li><input disabled="" type="checkbox"/>
+merge multi-commit PRs (so each line has a <code>(#num)</code> suffix)</li>
+<li><input disabled="" type="checkbox"/>
+drop hash and indent, <code>:'&lt;,'&gt; s/^\w*  /^I* /</code></li>
+</ul>
+</li>
+<li><input disabled="" type="checkbox"/>
+a commit bumping <code>./specs-go/version.go</code> to next version and empty the <code>VersionDev</code> variable</li>
+<li><input disabled="" type="checkbox"/>
+a commit adding back the &quot;-dev&quot; to <code>VersionDev</code></li>
+</ul>
+</li>
+<li><input disabled="" type="checkbox"/>
+send email to dev@opencontainers.org
+<ul>
+<li><input disabled="" type="checkbox"/>
+copy the exact commit hash for bumping the version from the pull-request (since master always stays as &quot;-dev&quot;)</li>
+<li><input disabled="" type="checkbox"/>
+count the PRs since last release (that this version is tracking, in the cases of multiple branching), like <code>git log --pretty=oneline --no-merges --decorate $priorTag..$versionBumpCommit  | grep \(pr\/ | wc -l</code></li>
+<li><input disabled="" type="checkbox"/>
+get the date for a week from now, like <code>TZ=UTC date --date='next week'</code></li>
+<li><input disabled="" type="checkbox"/>
+OPTIONAL find a cute animal gif to attach to the email, and subsequently the release description</li>
+<li><input disabled="" type="checkbox"/>
+subject line like <code>[runtime-spec VOTE] tag $versionBumpCommit as $version (closes $dateWeekFromNowUTC)</code></li>
+<li><input disabled="" type="checkbox"/>
+email body like</li>
+</ul>
+</li>
+</ul>
+<pre><code>Hey everyone,
+
+There have been $numPRs PRs merged since $priorTag release (https://github.com/opencontainers/runtime-spec/compare/$priorTag...$versionBumpCommit).
+
+$linkToPullRequest
+
+Please respond LGTM or REJECT (with reasoning).
+
+$sig
+</code></pre>
+<ul>
+<li><input disabled="" type="checkbox"/>
+edit/update the pull-request to link to the VOTE thread, from https://groups.google.com/a/opencontainers.org/forum/#!forum/dev</li>
+<li><input disabled="" type="checkbox"/>
+a week later, if the vote passes, merge the PR
+<ul>
+<li><input disabled="" type="checkbox"/>
+<code>git tag -s $version $versionBumpCommit</code></li>
+<li><input disabled="" type="checkbox"/>
+<code>git push --tags</code></li>
+</ul>
+</li>
+<li><input disabled="" type="checkbox"/>
+produce release documents
+<ul>
+<li><input disabled="" type="checkbox"/>
+git checkout the release tag, like <code>git checkout $version</code></li>
+<li><input disabled="" type="checkbox"/>
+<code>make docs</code></li>
+<li><input disabled="" type="checkbox"/>
+rename the output PDF and HTML file to include version, like `mv output/oci-runtime-spec.pdf output/oci-runtime-spec-$version.pdf``</li>
+<li><input disabled="" type="checkbox"/>
+attach these docs to the release on https://github.com/opencontainers/runtime-spec/releases</li>
+<li><input disabled="" type="checkbox"/>
+link to the the VOTE thread and include the passing vote count</li>
+<li><input disabled="" type="checkbox"/>
+link to the pull request that merged the release</li>
+</ul>
+</li>
+</ul>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+            </nav>
+
+        </div>
+
+        <script type="text/javascript">
+            window.playground_copyable = true;
+        </script>
+        <script src="elasticlunr.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="mark.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="searcher.js" type="text/javascript" charset="utf-8"></script>
+        <script src="clipboard.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="highlight.js" type="text/javascript" charset="utf-8"></script>
+        <script src="book.js" type="text/javascript" charset="utf-8"></script>
+
+        <!-- Custom JS scripts -->
+        <script type="text/javascript">
+        window.addEventListener('load', function() {
+            window.setTimeout(window.print, 100);
+        });
+        </script>
+    </body>
+</html>

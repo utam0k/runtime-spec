@@ -1,0 +1,998 @@
+<!DOCTYPE HTML>
+<html lang="en" class="sidebar-visible no-js light">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Linux Container Configuration - OCI Runtime Specification</title>
+        <!-- Custom HTML head -->
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+        <link rel="icon" href="favicon.svg">
+        <link rel="shortcut icon" href="favicon.png">
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        <link rel="stylesheet" href="css/print.css" media="print">
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="fonts/fonts.css">
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="highlight.css">
+        <link rel="stylesheet" href="tomorrow-night.css">
+        <link rel="stylesheet" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+    </head>
+    <body>
+        <!-- Provide site root to javascript -->
+        <script type="text/javascript">
+            var path_to_root = "";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script type="text/javascript">
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script type="text/javascript">
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('no-js')
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add('js');
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script type="text/javascript">
+            var html = document.querySelector('html');
+            var sidebar = 'hidden';
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            }
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="spec.html">Open Container Initiative Runtime Specification</a></li><li class="chapter-item expanded "><a href="principles.html"><strong aria-hidden="true">1.</strong> The 5 principles of Standard Containers</a></li><li class="chapter-item expanded "><a href="bundle.html"><strong aria-hidden="true">2.</strong> Filesystem Bundle</a></li><li class="chapter-item expanded "><a href="runtime.html"><strong aria-hidden="true">3.</strong> Runtime and Lifecycle</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="runtime-linux.html"><strong aria-hidden="true">3.1.</strong> Linux Runtime</a></li></ol></li><li class="chapter-item expanded "><a href="config.html"><strong aria-hidden="true">4.</strong> Configuration</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="config-linux.html" class="active"><strong aria-hidden="true">4.1.</strong> Linux Container Configuration</a></li><li class="chapter-item expanded "><a href="config-solaris.html"><strong aria-hidden="true">4.2.</strong> Solaris Application Container Configuration</a></li><li class="chapter-item expanded "><a href="config-windows.html"><strong aria-hidden="true">4.3.</strong> Windows-specific Container Configuration</a></li><li class="chapter-item expanded "><a href="config-vm.html"><strong aria-hidden="true">4.4.</strong> Virtual-machine-specific Container Configuration</a></li><li class="chapter-item expanded "><a href="config-zos.html"><strong aria-hidden="true">4.5.</strong> z/OS Container Configuration</a></li></ol></li><li class="chapter-item expanded "><a href="glossary.html"><strong aria-hidden="true">5.</strong> Glossary</a></li><li class="chapter-item expanded "><a href="implementations.html"><strong aria-hidden="true">6.</strong> Implementations</a></li><li class="chapter-item expanded "><a href="style.html"><strong aria-hidden="true">7.</strong> Style and conventions</a></li><li class="chapter-item expanded "><a href="GOVERNANCE.html"><strong aria-hidden="true">8.</strong> Project governance</a></li><li class="chapter-item expanded "><a href="RELEASES.html"><strong aria-hidden="true">9.</strong> Releases</a></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky bordered">
+                    <div class="left-buttons">
+                        <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </button>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light (default)</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">OCI Runtime Specification</h1>
+
+                    <div class="right-buttons">
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script type="text/javascript">
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="linux-container-configuration"><a class="header" href="#linux-container-configuration"><a name="linuxContainerConfiguration" />Linux Container Configuration</a></h1>
+<p>This document describes the schema for the <a href="config.html#platform-specific-configuration">Linux-specific section</a> of the <a href="config.html">container configuration</a>.
+The Linux container specification uses various kernel features like namespaces, cgroups, capabilities, LSM, and filesystem jails to fulfill the spec.</p>
+<h2 id="default-filesystems"><a class="header" href="#default-filesystems"><a name="configLinuxDefaultFilesystems" />Default Filesystems</a></h2>
+<p>The Linux ABI includes both syscalls and several special file paths.
+Applications expecting a Linux environment will very likely expect these file paths to be set up correctly.</p>
+<p>The following filesystems SHOULD be made available in each container's filesystem:</p>
+<table><thead><tr><th>Path</th><th>Type</th></tr></thead><tbody>
+<tr><td>/proc</td><td><a href="https://www.kernel.org/doc/Documentation/filesystems/proc.txt">proc</a></td></tr>
+<tr><td>/sys</td><td><a href="https://www.kernel.org/doc/Documentation/filesystems/sysfs.txt">sysfs</a></td></tr>
+<tr><td>/dev/pts</td><td><a href="https://www.kernel.org/doc/Documentation/filesystems/devpts.txt">devpts</a></td></tr>
+<tr><td>/dev/shm</td><td><a href="https://www.kernel.org/doc/Documentation/filesystems/tmpfs.txt">tmpfs</a></td></tr>
+</tbody></table>
+<h2 id="namespaces"><a class="header" href="#namespaces"><a name="configLinuxNamespaces" />Namespaces</a></h2>
+<p>A namespace wraps a global system resource in an abstraction that makes it appear to the processes within the namespace that they have their own isolated instance of the global resource.
+Changes to the global resource are visible to other processes that are members of the namespace, but are invisible to other processes.
+For more information, see the <a href="http://man7.org/linux/man-pages/man7/namespaces.7.html">namespaces(7)</a> man page.</p>
+<p>Namespaces are specified as an array of entries inside the <code>namespaces</code> root field.
+The following parameters can be specified to set up namespaces:</p>
+<ul>
+<li>
+<p><strong><code>type</code></strong> <em>(string, REQUIRED)</em> - namespace type. The following namespace types SHOULD be supported:</p>
+<ul>
+<li><strong><code>pid</code></strong> processes inside the container will only be able to see other processes inside the same container or inside the same pid namespace.</li>
+<li><strong><code>network</code></strong> the container will have its own network stack.</li>
+<li><strong><code>mount</code></strong> the container will have an isolated mount table.</li>
+<li><strong><code>ipc</code></strong> processes inside the container will only be able to communicate to other processes inside the same container via system level IPC.</li>
+<li><strong><code>uts</code></strong> the container will be able to have its own hostname and domain name.</li>
+<li><strong><code>user</code></strong> the container will be able to remap user and group IDs from the host to local users and groups within the container.</li>
+<li><strong><code>cgroup</code></strong> the container will have an isolated view of the cgroup hierarchy.</li>
+</ul>
+</li>
+<li>
+<p><strong><code>path</code></strong> <em>(string, OPTIONAL)</em> - namespace file.
+This value MUST be an absolute path in the <a href="glossary.html#runtime-namespace">runtime mount namespace</a>.
+The runtime MUST place the container process in the namespace associated with that <code>path</code>.
+The runtime MUST <a href="runtime.html#errors">generate an error</a> if <code>path</code> is not associated with a namespace of type <code>type</code>.</p>
+<p>If <code>path</code> is not specified, the runtime MUST create a new <a href="glossary.html#container-namespace">container namespace</a> of type <code>type</code>.</p>
+</li>
+</ul>
+<p>If a namespace type is not specified in the <code>namespaces</code> array, the container MUST inherit the <a href="glossary.html#runtime-namespace">runtime namespace</a> of that type.
+If a <code>namespaces</code> field contains duplicated namespaces with same <code>type</code>, the runtime MUST <a href="runtime.html#errors">generate an error</a>.</p>
+<h3 id="example"><a class="header" href="#example">Example</a></h3>
+<pre><code class="language-json">&quot;namespaces&quot;: [
+    {
+        &quot;type&quot;: &quot;pid&quot;,
+        &quot;path&quot;: &quot;/proc/1234/ns/pid&quot;
+    },
+    {
+        &quot;type&quot;: &quot;network&quot;,
+        &quot;path&quot;: &quot;/var/run/netns/neta&quot;
+    },
+    {
+        &quot;type&quot;: &quot;mount&quot;
+    },
+    {
+        &quot;type&quot;: &quot;ipc&quot;
+    },
+    {
+        &quot;type&quot;: &quot;uts&quot;
+    },
+    {
+        &quot;type&quot;: &quot;user&quot;
+    },
+    {
+        &quot;type&quot;: &quot;cgroup&quot;
+    }
+]
+</code></pre>
+<h2 id="user-namespace-mappings"><a class="header" href="#user-namespace-mappings"><a name="configLinuxUserNamespaceMappings" />User namespace mappings</a></h2>
+<p><strong><code>uidMappings</code></strong> (array of objects, OPTIONAL) describes the user namespace uid mappings from the host to the container.
+<strong><code>gidMappings</code></strong> (array of objects, OPTIONAL) describes the user namespace gid mappings from the host to the container.</p>
+<p>Each entry has the following structure:</p>
+<ul>
+<li><strong><code>containerID</code></strong> <em>(uint32, REQUIRED)</em> - is the starting uid/gid in the container.</li>
+<li><strong><code>hostID</code></strong> <em>(uint32, REQUIRED)</em> - is the starting uid/gid on the host to be mapped to <em>containerID</em>.</li>
+<li><strong><code>size</code></strong> <em>(uint32, REQUIRED)</em> - is the number of ids to be mapped.</li>
+</ul>
+<p>The runtime SHOULD NOT modify the ownership of referenced filesystems to realize the mapping.
+Note that the number of mapping entries MAY be limited by the <a href="http://man7.org/linux/man-pages/man7/user_namespaces.7.html">kernel</a>.</p>
+<h3 id="example-1"><a class="header" href="#example-1">Example</a></h3>
+<pre><code class="language-json">&quot;uidMappings&quot;: [
+    {
+        &quot;containerID&quot;: 0,
+        &quot;hostID&quot;: 1000,
+        &quot;size&quot;: 32000
+    }
+],
+&quot;gidMappings&quot;: [
+    {
+        &quot;containerID&quot;: 0,
+        &quot;hostID&quot;: 1000,
+        &quot;size&quot;: 32000
+    }
+]
+</code></pre>
+<h2 id="devices"><a class="header" href="#devices"><a name="configLinuxDevices" />Devices</a></h2>
+<p><strong><code>devices</code></strong> (array of objects, OPTIONAL) lists devices that MUST be available in the container.
+The runtime MAY supply them however it likes (with <a href="http://man7.org/linux/man-pages/man2/mknod.2.html"><code>mknod</code></a>, by bind mounting from the runtime mount namespace, using symlinks, etc.).</p>
+<p>Each entry has the following structure:</p>
+<ul>
+<li><strong><code>type</code></strong> <em>(string, REQUIRED)</em> - type of device: <code>c</code>, <code>b</code>, <code>u</code> or <code>p</code>.
+More info in <a href="http://man7.org/linux/man-pages/man1/mknod.1.html">mknod(1)</a>.</li>
+<li><strong><code>path</code></strong> <em>(string, REQUIRED)</em> - full path to device inside container.
+If a <a href="http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap03.html#tag_03_164">file</a> already exists at <code>path</code> that does not match the requested device, the runtime MUST generate an error.</li>
+<li><strong><code>major, minor</code></strong> <em>(int64, REQUIRED unless <code>type</code> is <code>p</code>)</em> - <a href="https://www.kernel.org/doc/Documentation/admin-guide/devices.txt">major, minor numbers</a> for the device.</li>
+<li><strong><code>fileMode</code></strong> <em>(uint32, OPTIONAL)</em> - file mode for the device.
+You can also control access to devices <a href="#configLinuxDeviceAllowedlist">with cgroups</a>.</li>
+<li><strong><code>uid</code></strong> <em>(uint32, OPTIONAL)</em> - id of device owner in the <a href="glossary.html#container-namespace">container namespace</a>.</li>
+<li><strong><code>gid</code></strong> <em>(uint32, OPTIONAL)</em> - id of device group in the <a href="glossary.html#container-namespace">container namespace</a>.</li>
+</ul>
+<p>The same <code>type</code>, <code>major</code> and <code>minor</code> SHOULD NOT be used for multiple devices.</p>
+<h3 id="example-2"><a class="header" href="#example-2">Example</a></h3>
+<pre><code class="language-json">&quot;devices&quot;: [
+    {
+        &quot;path&quot;: &quot;/dev/fuse&quot;,
+        &quot;type&quot;: &quot;c&quot;,
+        &quot;major&quot;: 10,
+        &quot;minor&quot;: 229,
+        &quot;fileMode&quot;: 438,
+        &quot;uid&quot;: 0,
+        &quot;gid&quot;: 0
+    },
+    {
+        &quot;path&quot;: &quot;/dev/sda&quot;,
+        &quot;type&quot;: &quot;b&quot;,
+        &quot;major&quot;: 8,
+        &quot;minor&quot;: 0,
+        &quot;fileMode&quot;: 432,
+        &quot;uid&quot;: 0,
+        &quot;gid&quot;: 0
+    }
+]
+</code></pre>
+<h3 id="default-devices"><a class="header" href="#default-devices"><a name="configLinuxDefaultDevices" />Default Devices</a></h3>
+<p>In addition to any devices configured with this setting, the runtime MUST also supply:</p>
+<ul>
+<li><a href="http://man7.org/linux/man-pages/man4/null.4.html"><code>/dev/null</code></a></li>
+<li><a href="http://man7.org/linux/man-pages/man4/zero.4.html"><code>/dev/zero</code></a></li>
+<li><a href="http://man7.org/linux/man-pages/man4/full.4.html"><code>/dev/full</code></a></li>
+<li><a href="http://man7.org/linux/man-pages/man4/random.4.html"><code>/dev/random</code></a></li>
+<li><a href="http://man7.org/linux/man-pages/man4/random.4.html"><code>/dev/urandom</code></a></li>
+<li><a href="http://man7.org/linux/man-pages/man4/tty.4.html"><code>/dev/tty</code></a></li>
+<li><code>/dev/console</code> is set up if <a href="config.html#process"><code>terminal</code></a> is enabled in the config by bind mounting the pseudoterminal pty to <code>/dev/console</code>.</li>
+<li><a href="http://man7.org/linux/man-pages/man4/pts.4.html"><code>/dev/ptmx</code></a>.
+A <a href="https://www.kernel.org/doc/Documentation/filesystems/devpts.txt">bind-mount or symlink of the container's <code>/dev/pts/ptmx</code></a>.</li>
+</ul>
+<h2 id="control-groups"><a class="header" href="#control-groups"><a name="configLinuxControlGroups" />Control groups</a></h2>
+<p>Also known as cgroups, they are used to restrict resource usage for a container and handle device access.
+cgroups provide controls (through controllers) to restrict cpu, memory, IO, pids, network and RDMA resources for the container.
+For more information, see the <a href="https://www.kernel.org/doc/Documentation/cgroup-v1/cgroups.txt">kernel cgroups documentation</a>.</p>
+<p>A runtime MAY, during a particular <a href="runtime.html#operation">container operation</a>,
+such as <a href="runtime.html#create">create</a>, <a href="runtime.html#start">start</a>, or
+<a href="runtime.html#exec">exec</a>, check if the container cgroup is fit for purpose,
+and MUST <a href="runtime.html#errors">generate an error</a> if such a check fails.
+For example, a frozen cgroup or (for <a href="runtime.html#create">create</a> operation)
+a non-empty cgroup. The reason for this is that accepting such configurations
+could cause container operation outcomes that users may not anticipate or
+understand, such as operation on one container inadvertently affecting other
+containers.</p>
+<h3 id="cgroups-path"><a class="header" href="#cgroups-path"><a name="configLinuxCgroupsPath" />Cgroups Path</a></h3>
+<p><strong><code>cgroupsPath</code></strong> (string, OPTIONAL) path to the cgroups.
+It can be used to either control the cgroups hierarchy for containers or to run a new process in an existing container.</p>
+<p>The value of <code>cgroupsPath</code> MUST be either an absolute path or a relative path.</p>
+<ul>
+<li>In the case of an absolute path (starting with <code>/</code>), the runtime MUST take the path to be relative to the cgroups mount point.</li>
+<li>In the case of a relative path (not starting with <code>/</code>), the runtime MAY interpret the path relative to a runtime-determined location in the cgroups hierarchy.</li>
+</ul>
+<p>If the value is specified, the runtime MUST consistently attach to the same place in the cgroups hierarchy given the same value of <code>cgroupsPath</code>.
+If the value is not specified, the runtime MAY define the default cgroups path.
+Runtimes MAY consider certain <code>cgroupsPath</code> values to be invalid, and MUST generate an error if this is the case.</p>
+<p>Implementations of the Spec can choose to name cgroups in any manner.
+The Spec does not include naming schema for cgroups.
+The Spec does not support per-controller paths for the reasons discussed in the <a href="https://www.kernel.org/doc/Documentation/cgroup-v2.txt">cgroupv2 documentation</a>.
+The cgroups will be created if they don't exist.</p>
+<p>You can configure a container's cgroups via the <code>resources</code> field of the Linux configuration.
+Do not specify <code>resources</code> unless limits have to be updated.
+For example, to run a new process in an existing container without updating limits, <code>resources</code> need not be specified.</p>
+<p>Runtimes MAY attach the container process to additional cgroup controllers beyond those necessary to fulfill the <code>resources</code> settings.</p>
+<h3 id="cgroup-ownership"><a class="header" href="#cgroup-ownership">Cgroup ownership</a></h3>
+<p>Runtimes MAY, according to the following rules, change (or cause to
+be changed) the owner of the container's cgroup to the host uid that
+maps to the value of <code>process.user.uid</code> in the <a href="glossary.html#container-namespace">container
+namespace</a>; that is, the user that
+will execute the container process.</p>
+<p>Runtimes SHOULD NOT change the ownership of container cgroups when
+cgroups v1 is in use.  Cgroup delegation is not secure in cgroups
+v1.</p>
+<p>A runtime SHOULD NOT change the ownership of a container cgroup
+unless it will also create a new cgroup namespace for the container.
+Typically this occurs when the <code>linux.namespaces</code> array contains an
+object with <code>type</code> equal to <code>&quot;cgroup&quot;</code> and <code>path</code> unset.</p>
+<p>Runtimes SHOULD change the cgroup ownership if and only if the
+cgroup filesystem is to be mounted read/write; that is, when the
+configuration's <code>mounts</code> array contains an object where:</p>
+<ul>
+<li>The <code>source</code> field is equal to <code>&quot;cgroup&quot;</code></li>
+<li>The <code>destination</code> field is equal to <code>&quot;/sys/fs/cgroup&quot;</code></li>
+<li>The <code>options</code> field does not contain the value <code>&quot;ro&quot;</code></li>
+</ul>
+<p>If the configuration does not specify such a mount, the runtime
+SHOULD NOT change the cgroup ownership.</p>
+<p>A runtime that changes the cgroup ownership SHOULD only change the
+ownership of the container's cgroup directory and files within that
+directory that are listed in <code>/sys/kernel/cgroup/delegate</code> (see
+<code>cgroups(7)</code> for details about this file).  If the
+<code>/sys/kernel/cgroup/delegate</code> file does not exist, the runtime MUST
+fall back to using the following list of files:</p>
+<pre><code>cgroup.procs
+cgroup.subtree_control
+cgroup.threads
+</code></pre>
+<p>The runtime SHOULD NOT change the ownership of any other files.
+Changing other files may allow the container to elevate its own
+resource limits or perform other unwanted behaviour.</p>
+<h3 id="example-3"><a class="header" href="#example-3">Example</a></h3>
+<pre><code class="language-json">&quot;cgroupsPath&quot;: &quot;/myRuntime/myContainer&quot;,
+&quot;resources&quot;: {
+    &quot;memory&quot;: {
+    &quot;limit&quot;: 100000,
+    &quot;reservation&quot;: 200000
+    },
+    &quot;devices&quot;: [
+        {
+            &quot;allow&quot;: false,
+            &quot;access&quot;: &quot;rwm&quot;
+        }
+    ]
+}
+</code></pre>
+<h3 id="allowed-device-list"><a class="header" href="#allowed-device-list"><a name="configLinuxDeviceAllowedlist" />Allowed Device list</a></h3>
+<p><strong><code>devices</code></strong> (array of objects, OPTIONAL) configures the <a href="https://www.kernel.org/doc/Documentation/cgroup-v1/devices.txt">allowed device list</a>.
+The runtime MUST apply entries in the listed order.</p>
+<p>Each entry has the following structure:</p>
+<ul>
+<li><strong><code>allow</code></strong> <em>(boolean, REQUIRED)</em> - whether the entry is allowed or denied.</li>
+<li><strong><code>type</code></strong> <em>(string, OPTIONAL)</em> - type of device: <code>a</code> (all), <code>c</code> (char), or <code>b</code> (block).
+Unset values mean &quot;all&quot;, mapping to <code>a</code>.</li>
+<li><strong><code>major, minor</code></strong> <em>(int64, OPTIONAL)</em> - <a href="https://www.kernel.org/doc/Documentation/admin-guide/devices.txt">major, minor numbers</a> for the device.
+Unset values mean &quot;all&quot;, mapping to <a href="https://www.kernel.org/doc/Documentation/cgroup-v1/devices.txt"><code>*</code> in the filesystem API</a>.</li>
+<li><strong><code>access</code></strong> <em>(string, OPTIONAL)</em> - cgroup permissions for device.
+A composition of <code>r</code> (read), <code>w</code> (write), and <code>m</code> (mknod).</li>
+</ul>
+<h4 id="example-4"><a class="header" href="#example-4">Example</a></h4>
+<pre><code class="language-json">&quot;devices&quot;: [
+    {
+        &quot;allow&quot;: false,
+        &quot;access&quot;: &quot;rwm&quot;
+    },
+    {
+        &quot;allow&quot;: true,
+        &quot;type&quot;: &quot;c&quot;,
+        &quot;major&quot;: 10,
+        &quot;minor&quot;: 229,
+        &quot;access&quot;: &quot;rw&quot;
+    },
+    {
+        &quot;allow&quot;: true,
+        &quot;type&quot;: &quot;b&quot;,
+        &quot;major&quot;: 8,
+        &quot;minor&quot;: 0,
+        &quot;access&quot;: &quot;r&quot;
+    }
+]
+</code></pre>
+<h3 id="memory"><a class="header" href="#memory"><a name="configLinuxMemory" />Memory</a></h3>
+<p><strong><code>memory</code></strong> (object, OPTIONAL) represents the cgroup subsystem <code>memory</code> and it's used to set limits on the container's memory usage.
+For more information, see the kernel cgroups documentation about <a href="https://www.kernel.org/doc/Documentation/cgroup-v1/memory.txt">memory</a>.</p>
+<p>Values for memory specify the limit in bytes, or <code>-1</code> for unlimited memory.</p>
+<ul>
+<li><strong><code>limit</code></strong> <em>(int64, OPTIONAL)</em> - sets limit of memory usage</li>
+<li><strong><code>reservation</code></strong> <em>(int64, OPTIONAL)</em> - sets soft limit of memory usage</li>
+<li><strong><code>swap</code></strong> <em>(int64, OPTIONAL)</em> - sets limit of memory+Swap usage</li>
+<li><strong><code>kernel</code></strong> <em>(int64, OPTIONAL, NOT RECOMMENDED)</em> - sets hard limit for kernel memory</li>
+<li><strong><code>kernelTCP</code></strong> <em>(int64, OPTIONAL, NOT RECOMMENDED)</em> - sets hard limit for kernel TCP buffer memory</li>
+</ul>
+<p>The following properties do not specify memory limits, but are covered by the <code>memory</code> controller:</p>
+<ul>
+<li><strong><code>swappiness</code></strong> <em>(uint64, OPTIONAL)</em> - sets swappiness parameter of vmscan (See sysctl's vm.swappiness)
+The values are from 0 to 100. Higher means more swappy.</li>
+<li><strong><code>disableOOMKiller</code></strong> <em>(bool, OPTIONAL)</em> - enables or disables the OOM killer.
+If enabled (<code>false</code>), tasks that attempt to consume more memory than they are allowed are immediately killed by the OOM killer.
+The OOM killer is enabled by default in every cgroup using the <code>memory</code> subsystem.
+To disable it, specify a value of <code>true</code>.</li>
+<li><strong><code>useHierarchy</code></strong> <em>(bool, OPTIONAL)</em> - enables or disables hierarchical memory accounting.
+If enabled (<code>true</code>), child cgroups will share the memory limits of this cgroup.</li>
+</ul>
+<h4 id="example-5"><a class="header" href="#example-5">Example</a></h4>
+<pre><code class="language-json">&quot;memory&quot;: {
+    &quot;limit&quot;: 536870912,
+    &quot;reservation&quot;: 536870912,
+    &quot;swap&quot;: 536870912,
+    &quot;kernel&quot;: -1,
+    &quot;kernelTCP&quot;: -1,
+    &quot;swappiness&quot;: 0,
+    &quot;disableOOMKiller&quot;: false
+}
+</code></pre>
+<h3 id="cpu"><a class="header" href="#cpu"><a name="configLinuxCPU" />CPU</a></h3>
+<p><strong><code>cpu</code></strong> (object, OPTIONAL) represents the cgroup subsystems <code>cpu</code> and <code>cpusets</code>.
+For more information, see the kernel cgroups documentation about <a href="https://www.kernel.org/doc/Documentation/cgroup-v1/cpusets.txt">cpusets</a>.</p>
+<p>The following parameters can be specified to set up the controller:</p>
+<ul>
+<li><strong><code>shares</code></strong> <em>(uint64, OPTIONAL)</em> - specifies a relative share of CPU time available to the tasks in a cgroup</li>
+<li><strong><code>quota</code></strong> <em>(int64, OPTIONAL)</em> - specifies the total amount of time in microseconds for which all tasks in a cgroup can run during one period (as defined by <strong><code>period</code></strong> below)</li>
+<li><strong><code>period</code></strong> <em>(uint64, OPTIONAL)</em> - specifies a period of time in microseconds for how regularly a cgroup's access to CPU resources should be reallocated (CFS scheduler only)</li>
+<li><strong><code>realtimeRuntime</code></strong> <em>(int64, OPTIONAL)</em> - specifies a period of time in microseconds for the longest continuous period in which the tasks in a cgroup have access to CPU resources</li>
+<li><strong><code>realtimePeriod</code></strong> <em>(uint64, OPTIONAL)</em> - same as <strong><code>period</code></strong> but applies to realtime scheduler only</li>
+<li><strong><code>cpus</code></strong> <em>(string, OPTIONAL)</em> - list of CPUs the container will run in</li>
+<li><strong><code>mems</code></strong> <em>(string, OPTIONAL)</em> - list of Memory Nodes the container will run in</li>
+</ul>
+<h4 id="example-6"><a class="header" href="#example-6">Example</a></h4>
+<pre><code class="language-json">&quot;cpu&quot;: {
+    &quot;shares&quot;: 1024,
+    &quot;quota&quot;: 1000000,
+    &quot;period&quot;: 500000,
+    &quot;realtimeRuntime&quot;: 950000,
+    &quot;realtimePeriod&quot;: 1000000,
+    &quot;cpus&quot;: &quot;2-3&quot;,
+    &quot;mems&quot;: &quot;0-7&quot;
+}
+</code></pre>
+<h3 id="block-io"><a class="header" href="#block-io"><a name="configLinuxBlockIO" />Block IO</a></h3>
+<p><strong><code>blockIO</code></strong> (object, OPTIONAL) represents the cgroup subsystem <code>blkio</code> which implements the block IO controller.
+For more information, see the kernel cgroups documentation about <a href="https://www.kernel.org/doc/Documentation/cgroup-v1/blkio-controller.txt">blkio</a>.</p>
+<p>The following parameters can be specified to set up the controller:</p>
+<ul>
+<li>
+<p><strong><code>weight</code></strong> <em>(uint16, OPTIONAL)</em> - specifies per-cgroup weight. This is default weight of the group on all devices until and unless overridden by per-device rules.</p>
+</li>
+<li>
+<p><strong><code>leafWeight</code></strong> <em>(uint16, OPTIONAL)</em> - equivalents of <code>weight</code> for the purpose of deciding how much weight tasks in the given cgroup has while competing with the cgroup's child cgroups.</p>
+</li>
+<li>
+<p><strong><code>weightDevice</code></strong> <em>(array of objects, OPTIONAL)</em> - an array of per-device bandwidth weights.
+Each entry has the following structure:</p>
+<ul>
+<li><strong><code>major, minor</code></strong> <em>(int64, REQUIRED)</em> - major, minor numbers for device.
+For more information, see the <a href="http://man7.org/linux/man-pages/man1/mknod.1.html">mknod(1)</a> man page.</li>
+<li><strong><code>weight</code></strong> <em>(uint16, OPTIONAL)</em> - bandwidth weight for the device.</li>
+<li><strong><code>leafWeight</code></strong> <em>(uint16, OPTIONAL)</em> - bandwidth weight for the device while competing with the cgroup's child cgroups, CFQ scheduler only</li>
+</ul>
+<p>You MUST specify at least one of <code>weight</code> or <code>leafWeight</code> in a given entry, and MAY specify both.</p>
+</li>
+<li>
+<p><strong><code>throttleReadBpsDevice</code></strong>, <strong><code>throttleWriteBpsDevice</code></strong> <em>(array of objects, OPTIONAL)</em> - an array of per-device bandwidth rate limits.
+Each entry has the following structure:</p>
+<ul>
+<li><strong><code>major, minor</code></strong> <em>(int64, REQUIRED)</em> - major, minor numbers for device.
+For more information, see the <a href="http://man7.org/linux/man-pages/man1/mknod.1.html">mknod(1)</a> man page.</li>
+<li><strong><code>rate</code></strong> <em>(uint64, REQUIRED)</em> - bandwidth rate limit in bytes per second for the device</li>
+</ul>
+</li>
+<li>
+<p><strong><code>throttleReadIOPSDevice</code></strong>, <strong><code>throttleWriteIOPSDevice</code></strong> <em>(array of objects, OPTIONAL)</em> - an array of per-device IO rate limits.
+Each entry has the following structure:</p>
+<ul>
+<li><strong><code>major, minor</code></strong> <em>(int64, REQUIRED)</em> - major, minor numbers for device.
+For more information, see the <a href="http://man7.org/linux/man-pages/man1/mknod.1.html">mknod(1)</a> man page.</li>
+<li><strong><code>rate</code></strong> <em>(uint64, REQUIRED)</em> - IO rate limit for the device</li>
+</ul>
+</li>
+</ul>
+<h4 id="example-7"><a class="header" href="#example-7">Example</a></h4>
+<pre><code class="language-json">&quot;blockIO&quot;: {
+    &quot;weight&quot;: 10,
+    &quot;leafWeight&quot;: 10,
+    &quot;weightDevice&quot;: [
+        {
+            &quot;major&quot;: 8,
+            &quot;minor&quot;: 0,
+            &quot;weight&quot;: 500,
+            &quot;leafWeight&quot;: 300
+        },
+        {
+            &quot;major&quot;: 8,
+            &quot;minor&quot;: 16,
+            &quot;weight&quot;: 500
+        }
+    ],
+    &quot;throttleReadBpsDevice&quot;: [
+        {
+            &quot;major&quot;: 8,
+            &quot;minor&quot;: 0,
+            &quot;rate&quot;: 600
+        }
+    ],
+    &quot;throttleWriteIOPSDevice&quot;: [
+        {
+            &quot;major&quot;: 8,
+            &quot;minor&quot;: 16,
+            &quot;rate&quot;: 300
+        }
+    ]
+}
+</code></pre>
+<h3 id="huge-page-limits"><a class="header" href="#huge-page-limits"><a name="configLinuxHugePageLimits" />Huge page limits</a></h3>
+<p><strong><code>hugepageLimits</code></strong> (array of objects, OPTIONAL) represents the <code>hugetlb</code> controller which allows to limit the
+HugeTLB usage per control group and enforces the controller limit during page fault.
+For more information, see the kernel cgroups documentation about <a href="https://www.kernel.org/doc/Documentation/cgroup-v1/hugetlb.txt">HugeTLB</a>.</p>
+<p>Each entry has the following structure:</p>
+<ul>
+<li><strong><code>pageSize</code></strong> <em>(string, REQUIRED)</em> - hugepage size
+The value has the format <code>&lt;size&gt;&lt;unit-prefix&gt;B</code> (64KB, 2MB, 1GB), and must match the <code>&lt;hugepagesize&gt;</code> of the
+corresponding control file found in <code>/sys/fs/cgroup/hugetlb/hugetlb.&lt;hugepagesize&gt;.limit_in_bytes</code>.
+Values of <code>&lt;unit-prefix&gt;</code> are intended to be parsed using base 1024 (&quot;1KB&quot; = 1024, &quot;1MB&quot; = 1048576, etc).</li>
+<li><strong><code>limit</code></strong> <em>(uint64, REQUIRED)</em> - limit in bytes of <em>hugepagesize</em> HugeTLB usage</li>
+</ul>
+<h4 id="example-8"><a class="header" href="#example-8">Example</a></h4>
+<pre><code class="language-json">&quot;hugepageLimits&quot;: [
+    {
+        &quot;pageSize&quot;: &quot;2MB&quot;,
+        &quot;limit&quot;: 209715200
+    },
+    {
+        &quot;pageSize&quot;: &quot;64KB&quot;,
+        &quot;limit&quot;: 1000000
+    }
+]
+</code></pre>
+<h3 id="network"><a class="header" href="#network"><a name="configLinuxNetwork" />Network</a></h3>
+<p><strong><code>network</code></strong> (object, OPTIONAL) represents the cgroup subsystems <code>net_cls</code> and <code>net_prio</code>.
+For more information, see the kernel cgroups documentations about <a href="https://www.kernel.org/doc/Documentation/cgroup-v1/net_cls.txt">net_cls cgroup</a> and <a href="https://www.kernel.org/doc/Documentation/cgroup-v1/net_prio.txt">net_prio cgroup</a>.</p>
+<p>The following parameters can be specified to set up the controller:</p>
+<ul>
+<li><strong><code>classID</code></strong> <em>(uint32, OPTIONAL)</em> - is the network class identifier the cgroup's network packets will be tagged with</li>
+<li><strong><code>priorities</code></strong> <em>(array of objects, OPTIONAL)</em> - specifies a list of objects of the priorities assigned to traffic originating from processes in the group and egressing the system on various interfaces.
+The following parameters can be specified per-priority:
+<ul>
+<li><strong><code>name</code></strong> <em>(string, REQUIRED)</em> - interface name in <a href="glossary.html#runtime-namespace">runtime network namespace</a></li>
+<li><strong><code>priority</code></strong> <em>(uint32, REQUIRED)</em> - priority applied to the interface</li>
+</ul>
+</li>
+</ul>
+<h4 id="example-9"><a class="header" href="#example-9">Example</a></h4>
+<pre><code class="language-json">&quot;network&quot;: {
+    &quot;classID&quot;: 1048577,
+    &quot;priorities&quot;: [
+        {
+            &quot;name&quot;: &quot;eth0&quot;,
+            &quot;priority&quot;: 500
+        },
+        {
+            &quot;name&quot;: &quot;eth1&quot;,
+            &quot;priority&quot;: 1000
+        }
+    ]
+}
+</code></pre>
+<h3 id="pids"><a class="header" href="#pids"><a name="configLinuxPIDS" />PIDs</a></h3>
+<p><strong><code>pids</code></strong> (object, OPTIONAL) represents the cgroup subsystem <code>pids</code>.
+For more information, see the kernel cgroups documentation about <a href="https://www.kernel.org/doc/Documentation/cgroup-v1/pids.txt">pids</a>.</p>
+<p>The following parameters can be specified to set up the controller:</p>
+<ul>
+<li><strong><code>limit</code></strong> <em>(int64, REQUIRED)</em> - specifies the maximum number of tasks in the cgroup</li>
+</ul>
+<h4 id="example-10"><a class="header" href="#example-10">Example</a></h4>
+<pre><code class="language-json">&quot;pids&quot;: {
+    &quot;limit&quot;: 32771
+}
+</code></pre>
+<h3 id="rdma"><a class="header" href="#rdma"><a name="configLinuxRDMA" />RDMA</a></h3>
+<p><strong><code>rdma</code></strong> (object, OPTIONAL) represents the cgroup subsystem <code>rdma</code>.
+For more information, see the kernel cgroups documentation about <a href="https://www.kernel.org/doc/Documentation/cgroup-v1/rdma.txt">rdma</a>.</p>
+<p>The name of the device to limit is the entry key.
+Entry values are objects with the following properties:</p>
+<ul>
+<li><strong><code>hcaHandles</code></strong> <em>(uint32, OPTIONAL)</em> - specifies the maximum number of hca_handles in the cgroup</li>
+<li><strong><code>hcaObjects</code></strong> <em>(uint32, OPTIONAL)</em> - specifies the maximum number of hca_objects in the cgroup</li>
+</ul>
+<p>You MUST specify at least one of the <code>hcaHandles</code> or <code>hcaObjects</code> in a given entry, and MAY specify both.</p>
+<h4 id="example-11"><a class="header" href="#example-11">Example</a></h4>
+<pre><code class="language-json">&quot;rdma&quot;: {
+    &quot;mlx5_1&quot;: {
+        &quot;hcaHandles&quot;: 3,
+        &quot;hcaObjects&quot;: 10000
+    },
+    &quot;mlx4_0&quot;: {
+        &quot;hcaObjects&quot;: 1000
+    },
+    &quot;rxe3&quot;: {
+        &quot;hcaObjects&quot;: 10000
+    }
+}
+</code></pre>
+<h2 id="unified"><a class="header" href="#unified"><a name="configLinuxUnified" />Unified</a></h2>
+<p><strong><code>unified</code></strong> (object, OPTIONAL) allows cgroup v2 parameters to be to be set and modified for the container.</p>
+<p>Each key in the map refers to a file in the cgroup unified hierarchy.</p>
+<p>The OCI runtime MUST ensure that the needed cgroup controllers are enabled for the cgroup.</p>
+<p>Configuration unknown to the runtime MUST still be written to the relevant file.</p>
+<p>The runtime MUST generate an error when the configuration refers to a cgroup controller that is not present or that cannot be enabled.</p>
+<h3 id="example-12"><a class="header" href="#example-12">Example</a></h3>
+<pre><code class="language-json">&quot;unified&quot;: {
+    &quot;io.max&quot;: &quot;259:0 rbps=2097152 wiops=120\n253:0 rbps=2097152 wiops=120&quot;,
+    &quot;hugetlb.1GB.max&quot;: &quot;1073741824&quot;
+}
+</code></pre>
+<p>If a controller is enabled on the cgroup v2 hierarchy but the configuration is provided for the cgroup v1 equivalent controller, the runtime MAY attempt a conversion.</p>
+<p>If the conversion is not possible the runtime MUST generate an error.</p>
+<h2 id="intelrdt"><a class="header" href="#intelrdt"><a name="configLinuxIntelRdt" />IntelRdt</a></h2>
+<p><strong><code>intelRdt</code></strong> (object, OPTIONAL) represents the <a href="https://www.kernel.org/doc/Documentation/x86/intel_rdt_ui.txt">Intel Resource Director Technology</a>.
+If <code>intelRdt</code> is set, the runtime MUST write the container process ID to the <code>tasks</code> file in a proper sub-directory in a mounted <code>resctrl</code> pseudo-filesystem. That sub-directory name is specified by <code>closID</code> parameter.
+If no mounted <code>resctrl</code> pseudo-filesystem is available in the <a href="glossary.html#runtime-namespace">runtime mount namespace</a>, the runtime MUST <a href="runtime.html#errors">generate an error</a>.</p>
+<p>If <code>intelRdt</code> is not set, the runtime MUST NOT manipulate any <code>resctrl</code> pseudo-filesystems.</p>
+<p>The following parameters can be specified for the container:</p>
+<ul>
+<li>
+<p><strong><code>closID</code></strong> <em>(string, OPTIONAL)</em> - specifies the identity for RDT Class of Service (CLOS).</p>
+</li>
+<li>
+<p><strong><code>l3CacheSchema</code></strong> <em>(string, OPTIONAL)</em> - specifies the schema for L3 cache id and capacity bitmask (CBM).
+The value SHOULD start with <code>L3:</code> and SHOULD NOT contain newlines.</p>
+</li>
+<li>
+<p><strong><code>memBwSchema</code></strong> <em>(string, OPTIONAL)</em> - specifies the schema of memory bandwidth per L3 cache id.
+The value MUST start with <code>MB:</code> and MUST NOT contain newlines.</p>
+</li>
+</ul>
+<p>The following rules on parameters MUST be applied:</p>
+<ul>
+<li>
+<p>If both <code>l3CacheSchema</code> and <code>memBwSchema</code> are set, runtimes MUST write the combined value to the <code>schemata</code> file in that sub-directory discussed in <code>closID</code>.</p>
+</li>
+<li>
+<p>If <code>l3CacheSchema</code> contains a line beginning with <code>MB:</code>, the value written to <code>schemata</code> file MUST be the non-<code>MB:</code> line(s) from <code>l3CacheSchema</code> and the line from <code>memBWSchema</code>.</p>
+</li>
+<li>
+<p>If either <code>l3CacheSchema</code> or <code>memBwSchema</code> is set, runtimes MUST write the value to the <code>schemata</code> file in the that sub-directory discussed in <code>closID</code>.</p>
+</li>
+<li>
+<p>If neither <code>l3CacheSchema</code> nor <code>memBwSchema</code> is set, runtimes MUST NOT write to <code>schemata</code> files in any <code>resctrl</code> pseudo-filesystems.</p>
+</li>
+<li>
+<p>If <code>closID</code> is not set, runtimes MUST use the container ID from <a href="runtime.html#start"><code>start</code></a> and create the <code>&lt;container-id&gt;</code> directory.</p>
+</li>
+<li>
+<p>If <code>closID</code> is set, <code>l3CacheSchema</code> and/or <code>memBwSchema</code> is set</p>
+<ul>
+<li>if <code>closID</code> directory in a mounted <code>resctrl</code> pseudo-filesystem doesn't exist, the runtimes MUST create it.</li>
+<li>if <code>closID</code> directory in a mounted <code>resctrl</code> pseudo-filesystem exists, runtimes MUST compare <code>l3CacheSchema</code> and/or <code>memBwSchema</code> value with <code>schemata</code> file, and <a href="runtime.html#errors">generate an error</a> if doesn't match.</li>
+</ul>
+</li>
+<li>
+<p>If <code>closID</code> is set, and neither of <code>l3CacheSchema</code> and <code>memBwSchema</code> are set, runtime MUST check if corresponding pre-configured directory <code>closID</code> is present in mounted <code>resctrl</code>. If such pre-configured directory <code>closID</code> exists, runtime MUST assign container to this <code>closID</code> and <a href="runtime.html#errors">generate an error</a> if directory does not exist.</p>
+</li>
+<li>
+<p><strong><code>enableCMT</code></strong> <em>(boolean, OPTIONAL)</em> - specifies if Intel RDT CMT should be enabled:</p>
+<ul>
+<li>CMT (Cache Monitoring Technology) supports monitoring of the last-level cache (LLC) occupancy
+for the container.</li>
+</ul>
+</li>
+<li>
+<p><strong><code>enableMBM</code></strong> <em>(boolean, OPTIONAL)</em> - specifies if Intel RDT MBM should be enabled:</p>
+<ul>
+<li>MBM (Memory Bandwidth Monitoring) supports monitoring of total and local memory bandwidth
+for the container.</li>
+</ul>
+</li>
+</ul>
+<h3 id="example-13"><a class="header" href="#example-13">Example</a></h3>
+<p>Consider a two-socket machine with two L3 caches where the default CBM is 0x7ff and the max CBM length is 11 bits,
+and minimum memory bandwidth of 10% with a memory bandwidth granularity of 10%.</p>
+<p>Tasks inside the container only have access to the &quot;upper&quot; 7/11 of L3 cache on socket 0 and the &quot;lower&quot; 5/11 L3 cache on socket 1,
+and may use a maximum memory bandwidth of 20% on socket 0 and 70% on socket 1.</p>
+<pre><code class="language-json">&quot;linux&quot;: {
+    &quot;intelRdt&quot;: {
+        &quot;closID&quot;: &quot;guaranteed_group&quot;,
+        &quot;l3CacheSchema&quot;: &quot;L3:0=7f0;1=1f&quot;,
+        &quot;memBwSchema&quot;: &quot;MB:0=20;1=70&quot;
+    }
+}
+</code></pre>
+<h2 id="sysctl"><a class="header" href="#sysctl"><a name="configLinuxSysctl" />Sysctl</a></h2>
+<p><strong><code>sysctl</code></strong> (object, OPTIONAL) allows kernel parameters to be modified at runtime for the container.
+For more information, see the <a href="http://man7.org/linux/man-pages/man8/sysctl.8.html">sysctl(8)</a> man page.</p>
+<h3 id="example-14"><a class="header" href="#example-14">Example</a></h3>
+<pre><code class="language-json">&quot;sysctl&quot;: {
+    &quot;net.ipv4.ip_forward&quot;: &quot;1&quot;,
+    &quot;net.core.somaxconn&quot;: &quot;256&quot;
+}
+</code></pre>
+<h2 id="seccomp"><a class="header" href="#seccomp"><a name="configLinuxSeccomp" />Seccomp</a></h2>
+<p>Seccomp provides application sandboxing mechanism in the Linux kernel.
+Seccomp configuration allows one to configure actions to take for matched syscalls and furthermore also allows matching on values passed as arguments to syscalls.
+For more information about Seccomp, see <a href="https://www.kernel.org/doc/Documentation/prctl/seccomp_filter.txt">Seccomp</a> kernel documentation.
+The actions, architectures, and operators are strings that match the definitions in seccomp.h from <a href="https://github.com/seccomp/libseccomp">libseccomp</a> and are translated to corresponding values.</p>
+<p><strong><code>seccomp</code></strong> (object, OPTIONAL)</p>
+<p>The following parameters can be specified to set up seccomp:</p>
+<ul>
+<li>
+<p><strong><code>defaultAction</code></strong> <em>(string, REQUIRED)</em> - the default action for seccomp. Allowed values are the same as <code>syscalls[].action</code>.</p>
+</li>
+<li>
+<p><strong><code>defaultErrnoRet</code></strong> <em>(uint, OPTIONAL)</em> - the errno return code to use.
+Some actions like <code>SCMP_ACT_ERRNO</code> and <code>SCMP_ACT_TRACE</code> allow to specify the errno code to return.
+When the action doesn't support an errno, the runtime MUST print and error and fail.
+If not specified then its default value is <code>EPERM</code>.</p>
+</li>
+<li>
+<p><strong><code>architectures</code></strong> <em>(array of strings, OPTIONAL)</em> - the architecture used for system calls.
+A valid list of constants as of libseccomp v2.5.0 is shown below.</p>
+<ul>
+<li><code>SCMP_ARCH_X86</code></li>
+<li><code>SCMP_ARCH_X86_64</code></li>
+<li><code>SCMP_ARCH_X32</code></li>
+<li><code>SCMP_ARCH_ARM</code></li>
+<li><code>SCMP_ARCH_AARCH64</code></li>
+<li><code>SCMP_ARCH_MIPS</code></li>
+<li><code>SCMP_ARCH_MIPS64</code></li>
+<li><code>SCMP_ARCH_MIPS64N32</code></li>
+<li><code>SCMP_ARCH_MIPSEL</code></li>
+<li><code>SCMP_ARCH_MIPSEL64</code></li>
+<li><code>SCMP_ARCH_MIPSEL64N32</code></li>
+<li><code>SCMP_ARCH_PPC</code></li>
+<li><code>SCMP_ARCH_PPC64</code></li>
+<li><code>SCMP_ARCH_PPC64LE</code></li>
+<li><code>SCMP_ARCH_S390</code></li>
+<li><code>SCMP_ARCH_S390X</code></li>
+<li><code>SCMP_ARCH_PARISC</code></li>
+<li><code>SCMP_ARCH_PARISC64</code></li>
+<li><code>SCMP_ARCH_RISCV64</code></li>
+</ul>
+</li>
+<li>
+<p><strong><code>flags</code></strong> <em>(array of strings, OPTIONAL)</em> - list of flags to use with seccomp(2).</p>
+<p>A valid list of constants is shown below.</p>
+<ul>
+<li><code>SECCOMP_FILTER_FLAG_TSYNC</code></li>
+<li><code>SECCOMP_FILTER_FLAG_LOG</code></li>
+<li><code>SECCOMP_FILTER_FLAG_SPEC_ALLOW</code></li>
+</ul>
+</li>
+<li>
+<p><strong><code>listenerPath</code></strong> <em>(string, OPTIONAL)</em> - specifies the path of UNIX domain socket over which the runtime will send the <a href="#containerprocessstate">container process state</a> data structure when the <code>SCMP_ACT_NOTIFY</code> action is used.
+This socket MUST use <code>AF_UNIX</code> domain and <code>SOCK_STREAM</code> type.
+The runtime MUST send exactly one <a href="#containerprocessstate">container process state</a> per connection.
+The connection MUST NOT be reused and it MUST be closed after sending a seccomp state.
+If sending to this socket fails, the runtime MUST <a href="runtime.html#errors">generate an error</a>.
+If the <code>SCMP_ACT_NOTIFY</code> action is not used this value is ignored.</p>
+<p>The runtime sends the following file descriptors using <code>SCM_RIGHTS</code> and set their names in the <code>fds</code> array of the <a href="#containerprocessstate">container process state</a>:</p>
+<ul>
+<li><strong><code>seccompFd</code></strong> (string, REQUIRED) is the seccomp file descriptor returned by the seccomp syscall.</li>
+</ul>
+</li>
+<li>
+<p><strong><code>listenerMetadata</code></strong> <em>(string, OPTIONAL)</em> - specifies an opaque data to pass to the seccomp agent.
+This string will be sent as the <code>metadata</code> field in the <a href="#containerprocessstate">container process state</a>.
+This field MUST NOT be set if <code>listenerPath</code> is not set.</p>
+</li>
+<li>
+<p><strong><code>syscalls</code></strong> <em>(array of objects, OPTIONAL)</em> - match a syscall in seccomp.
+While this property is OPTIONAL, some values of <code>defaultAction</code> are not useful without <code>syscalls</code> entries.
+For example, if <code>defaultAction</code> is <code>SCMP_ACT_KILL</code> and <code>syscalls</code> is empty or unset, the kernel will kill the container process on its first syscall.
+Each entry has the following structure:</p>
+<ul>
+<li>
+<p><strong><code>names</code></strong> <em>(array of strings, REQUIRED)</em> - the names of the syscalls.
+<code>names</code> MUST contain at least one entry.</p>
+</li>
+<li>
+<p><strong><code>action</code></strong> <em>(string, REQUIRED)</em> - the action for seccomp rules.
+A valid list of constants as of libseccomp v2.5.0 is shown below.</p>
+<ul>
+<li><code>SCMP_ACT_KILL</code></li>
+<li><code>SCMP_ACT_KILL_PROCESS</code></li>
+<li><code>SCMP_ACT_KILL_THREAD</code></li>
+<li><code>SCMP_ACT_TRAP</code></li>
+<li><code>SCMP_ACT_ERRNO</code></li>
+<li><code>SCMP_ACT_TRACE</code></li>
+<li><code>SCMP_ACT_ALLOW</code></li>
+<li><code>SCMP_ACT_LOG</code></li>
+<li><code>SCMP_ACT_NOTIFY</code></li>
+</ul>
+</li>
+<li>
+<p><strong><code>errnoRet</code></strong> <em>(uint, OPTIONAL)</em> - the errno return code to use.
+Some actions like <code>SCMP_ACT_ERRNO</code> and <code>SCMP_ACT_TRACE</code> allow to specify the errno code to return.
+When the action doesn't support an errno, the runtime MUST print and error and fail.
+If not specified its default value is <code>EPERM</code>.</p>
+</li>
+<li>
+<p><strong><code>args</code></strong> <em>(array of objects, OPTIONAL)</em> - the specific syscall in seccomp.
+Each entry has the following structure:</p>
+<ul>
+<li>
+<p><strong><code>index</code></strong> <em>(uint, REQUIRED)</em> - the index for syscall arguments in seccomp.</p>
+</li>
+<li>
+<p><strong><code>value</code></strong> <em>(uint64, REQUIRED)</em> - the value for syscall arguments in seccomp.</p>
+</li>
+<li>
+<p><strong><code>valueTwo</code></strong> <em>(uint64, OPTIONAL)</em> - the value for syscall arguments in seccomp.</p>
+</li>
+<li>
+<p><strong><code>op</code></strong> <em>(string, REQUIRED)</em> - the operator for syscall arguments in seccomp.
+A valid list of constants as of libseccomp v2.3.2 is shown below.</p>
+<ul>
+<li><code>SCMP_CMP_NE</code></li>
+<li><code>SCMP_CMP_LT</code></li>
+<li><code>SCMP_CMP_LE</code></li>
+<li><code>SCMP_CMP_EQ</code></li>
+<li><code>SCMP_CMP_GE</code></li>
+<li><code>SCMP_CMP_GT</code></li>
+<li><code>SCMP_CMP_MASKED_EQ</code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="example-15"><a class="header" href="#example-15">Example</a></h3>
+<pre><code class="language-json">&quot;seccomp&quot;: {
+    &quot;defaultAction&quot;: &quot;SCMP_ACT_ALLOW&quot;,
+    &quot;architectures&quot;: [
+        &quot;SCMP_ARCH_X86&quot;,
+        &quot;SCMP_ARCH_X32&quot;
+    ],
+    &quot;syscalls&quot;: [
+        {
+            &quot;names&quot;: [
+                &quot;getcwd&quot;,
+                &quot;chmod&quot;
+            ],
+            &quot;action&quot;: &quot;SCMP_ACT_ERRNO&quot;
+        }
+    ]
+}
+</code></pre>
+<h3 id="the-container-process-state"><a class="header" href="#the-container-process-state"><a name="containerprocessstate" />The Container Process State</a></h3>
+<p>The container process state is a data structure passed via a UNIX socket.
+The container runtime MUST send the container process state over the UNIX socket as regular payload serialized in JSON and file descriptors MUST be sent using <code>SCM_RIGHTS</code>.
+The container runtime MAY use several <code>sendmsg(2)</code> calls to send the aforementioned data.
+If more than one <code>sendmsg(2)</code> is used, the file descriptors MUST be sent only in the first call.</p>
+<p>The container process state includes the following properties:</p>
+<ul>
+<li><strong><code>ociVersion</code></strong> (string, REQUIRED) is version of the Open Container Initiative Runtime Specification with which the container process state complies.</li>
+<li><strong><code>fds</code></strong> (array, OPTIONAL) is a string array containing the names of the file descriptors passed.
+The index of the name in this array corresponds to index of the file descriptors in the <code>SCM_RIGHTS</code> array.</li>
+<li><strong><code>pid</code></strong> (int, REQUIRED) is the container process ID, as seen by the runtime.</li>
+<li><strong><code>metadata</code></strong> (string, OPTIONAL) opaque metadata.</li>
+<li><strong><code>state</code></strong> (<a href="runtime.html#state">state</a>, REQUIRED) is the state of the container.</li>
+</ul>
+<p>Example sending a single <code>seccompFD</code> file descriptor in the <code>SCM_RIGHTS</code> array:</p>
+<pre><code class="language-json">{
+    &quot;ociVersion&quot;: &quot;0.2.0&quot;,
+    &quot;fds&quot;: [
+        &quot;seccompFd&quot;
+    ],
+    &quot;pid&quot;: 4422,
+    &quot;metadata&quot;: &quot;MKNOD=/dev/null,/dev/net/tun;BPF_MAP_TYPES=hash,array&quot;,
+    &quot;state&quot;: {
+        &quot;ociVersion&quot;: &quot;0.2.0&quot;,
+        &quot;id&quot;: &quot;oci-container1&quot;,
+        &quot;status&quot;: &quot;creating&quot;,
+        &quot;pid&quot;: 4422,
+        &quot;bundle&quot;: &quot;/containers/redis&quot;,
+        &quot;annotations&quot;: {
+            &quot;myKey&quot;: &quot;myValue&quot;
+        }
+    }
+}
+</code></pre>
+<h2 id="rootfs-mount-propagation"><a class="header" href="#rootfs-mount-propagation"><a name="configLinuxRootfsMountPropagation" />Rootfs Mount Propagation</a></h2>
+<p><strong><code>rootfsPropagation</code></strong> (string, OPTIONAL) sets the rootfs's mount propagation.
+Its value is either <code>shared</code>, <code>slave</code>, <code>private</code> or <code>unbindable</code>.
+It's worth noting that a peer group is defined as a group of VFS mounts that propagate events to each other.
+A nested container is defined as a container launched inside an existing container.</p>
+<ul>
+<li><strong><code>shared</code></strong>: the rootfs mount belongs to a new peer group.
+This means that further mounts (e.g. nested containers) will also belong to that peer group and will propagate events to the rootfs.
+Note this does not mean that it's shared with the host.</li>
+<li><strong><code>slave</code></strong>: the rootfs mount receives propagation events from the host (e.g. if something is mounted on the host it will also appear in the container) but not the other way around.</li>
+<li><strong><code>private</code></strong>: the rootfs mount doesn't receive mount propagation events from the host and further mounts in nested containers will be isolated from the host and from the rootfs (even if the nested container <code>rootfsPropagation</code> option is shared).</li>
+<li><strong><code>unbindable</code></strong>: the rootfs mount is a private mount that cannot be bind-mounted.</li>
+</ul>
+<p>The <a href="https://www.kernel.org/doc/Documentation/filesystems/sharedsubtree.txt">Shared Subtrees</a> article in the kernel documentation has more information about mount propagation.</p>
+<h3 id="example-16"><a class="header" href="#example-16">Example</a></h3>
+<pre><code class="language-json">&quot;rootfsPropagation&quot;: &quot;slave&quot;,
+</code></pre>
+<h2 id="masked-paths"><a class="header" href="#masked-paths"><a name="configLinuxMaskedPaths" />Masked Paths</a></h2>
+<p><strong><code>maskedPaths</code></strong> (array of strings, OPTIONAL) will mask over the provided paths inside the container so that they cannot be read.
+The values MUST be absolute paths in the <a href="glossary.html#container_namespace">container namespace</a>.</p>
+<h3 id="example-17"><a class="header" href="#example-17">Example</a></h3>
+<pre><code class="language-json">&quot;maskedPaths&quot;: [
+    &quot;/proc/kcore&quot;
+]
+</code></pre>
+<h2 id="readonly-paths"><a class="header" href="#readonly-paths"><a name="configLinuxReadonlyPaths" />Readonly Paths</a></h2>
+<p><strong><code>readonlyPaths</code></strong> (array of strings, OPTIONAL) will set the provided paths as readonly inside the container.
+The values MUST be absolute paths in the <a href="glossary.html#container-namespace">container namespace</a>.</p>
+<h3 id="example-18"><a class="header" href="#example-18">Example</a></h3>
+<pre><code class="language-json">&quot;readonlyPaths&quot;: [
+    &quot;/proc/sys&quot;
+]
+</code></pre>
+<h2 id="mount-label"><a class="header" href="#mount-label"><a name="configLinuxMountLabel" />Mount Label</a></h2>
+<p><strong><code>mountLabel</code></strong> (string, OPTIONAL) will set the Selinux context for the mounts in the container.</p>
+<h3 id="example-19"><a class="header" href="#example-19">Example</a></h3>
+<pre><code class="language-json">&quot;mountLabel&quot;: &quot;system_u:object_r:svirt_sandbox_file_t:s0:c715,c811&quot;
+</code></pre>
+<h2 id="personality"><a class="header" href="#personality"><a name="configLinuxPersonality" />Personality</a></h2>
+<p><strong><code>personality</code></strong> (object, OPTIONAL) sets the Linux execution personality. For more information
+see the <a href="http://man7.org/linux/man-pages/man2/personality.2.html">personality</a> syscall documentation. As most of the options are
+obsolete and rarely used, and some reduce security, the currently supported set is a small
+subset of the available options.</p>
+<ul>
+<li>
+<p><strong><code>domain</code></strong> <em>(string, REQUIRED)</em> - the execution domain.
+The valid list of constants is shown below. <code>LINUX32</code> will set the <code>uname</code> system call to show
+a 32 bit CPU type, such as <code>i686</code>.</p>
+<ul>
+<li><code>LINUX</code></li>
+<li><code>LINUX32</code></li>
+</ul>
+</li>
+<li>
+<p><strong><code>flags</code></strong> <em>(array of strings, OPTIONAL)</em> - the additional flags to apply.
+Currently no flag values are supported.</p>
+</li>
+</ul>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="config.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+                            <a rel="next" href="config-solaris.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="config.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+                    <a rel="next" href="config-solaris.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+        <script type="text/javascript">
+            window.playground_copyable = true;
+        </script>
+        <script src="elasticlunr.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="mark.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="searcher.js" type="text/javascript" charset="utf-8"></script>
+        <script src="clipboard.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="highlight.js" type="text/javascript" charset="utf-8"></script>
+        <script src="book.js" type="text/javascript" charset="utf-8"></script>
+
+        <!-- Custom JS scripts -->
+    </body>
+</html>
