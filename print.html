@@ -1185,6 +1185,7 @@ Unless support for a valid value is explicitly required, runtimes MAY choose whi
                 &quot;realtimeRuntime&quot;: 950000,
                 &quot;realtimePeriod&quot;: 1000000,
                 &quot;cpus&quot;: &quot;2-3&quot;,
+                &quot;idle&quot;: 1,
                 &quot;mems&quot;: &quot;0-7&quot;
             },
             &quot;devices&quot;: [
@@ -1505,10 +1506,13 @@ configuration's <code>mounts</code> array contains an object where:</p>
 SHOULD NOT change the cgroup ownership.</p>
 <p>A runtime that changes the cgroup ownership SHOULD only change the
 ownership of the container's cgroup directory and files within that
-directory that are listed in <code>/sys/kernel/cgroup/delegate</code> (see
-<code>cgroups(7)</code> for details about this file).  If the
-<code>/sys/kernel/cgroup/delegate</code> file does not exist, the runtime MUST
-fall back to using the following list of files:</p>
+directory that are listed in <code>/sys/kernel/cgroup/delegate</code>.  See
+<code>cgroups(7)</code> for details about this file.  Note that not all files
+listed in <code>/sys/kernel/cgroup/delegate</code> necessarily exist in every
+cgroup.  Runtimes MUST NOT fail in this scenario, and SHOULD change
+the ownership of the listed files that do exist in the cgroup.</p>
+<p>If the <code>/sys/kernel/cgroup/delegate</code> file does not exist, the
+runtime MUST fall back to using the following list of files:</p>
 <pre><code>cgroup.procs
 cgroup.subtree_control
 cgroup.threads
@@ -1611,6 +1615,7 @@ For more information, see the kernel cgroups documentation about <a href="https:
 <li><strong><code>realtimePeriod</code></strong> <em>(uint64, OPTIONAL)</em> - same as <strong><code>period</code></strong> but applies to realtime scheduler only</li>
 <li><strong><code>cpus</code></strong> <em>(string, OPTIONAL)</em> - list of CPUs the container will run in</li>
 <li><strong><code>mems</code></strong> <em>(string, OPTIONAL)</em> - list of Memory Nodes the container will run in</li>
+<li><strong><code>idle</code></strong> <em>(int64, OPTIONAL)</em> - cgroups are configured with minimum weight, 0: default behavior, 1: SCHED_IDLE.</li>
 </ul>
 <h4 id="example-9"><a class="header" href="#example-9">Example</a></h4>
 <pre><code class="language-json">&quot;cpu&quot;: {
@@ -1620,7 +1625,8 @@ For more information, see the kernel cgroups documentation about <a href="https:
     &quot;realtimeRuntime&quot;: 950000,
     &quot;realtimePeriod&quot;: 1000000,
     &quot;cpus&quot;: &quot;2-3&quot;,
-    &quot;mems&quot;: &quot;0-7&quot;
+    &quot;mems&quot;: &quot;0-7&quot;,
+    &quot;idle&quot;: 0
 }
 </code></pre>
 <h3 id="block-io"><a class="header" href="#block-io"><a name="configLinuxBlockIO" />Block IO</a></h3>
@@ -2045,7 +2051,7 @@ The index of the name in this array corresponds to index of the file descriptors
 <li><strong><code>metadata</code></strong> (string, OPTIONAL) opaque metadata.</li>
 <li><strong><code>state</code></strong> (<a href="runtime.html#state">state</a>, REQUIRED) is the state of the container.</li>
 </ul>
-<p>Example sending a single <code>seccompFD</code> file descriptor in the <code>SCM_RIGHTS</code> array:</p>
+<p>Example sending a single <code>seccompFd</code> file descriptor in the <code>SCM_RIGHTS</code> array:</p>
 <pre><code class="language-json">{
     &quot;ociVersion&quot;: &quot;0.2.0&quot;,
     &quot;fds&quot;: [
@@ -2274,12 +2280,13 @@ The Windows container specification uses APIs provided by the Windows Host Compu
 </code></pre>
 <h3 id="cpu-1"><a class="header" href="#cpu-1"><a name="configWindowsCpu" />CPU</a></h3>
 <p><code>cpu</code> is an OPTIONAL configuration for the container's CPU usage.</p>
-<p>The following parameters can be specified:</p>
+<p>The following parameters can be specified (mutually exclusive):</p>
 <ul>
-<li><strong><code>count</code></strong> <em>(uint64, OPTIONAL)</em> - specifies the number of CPUs available to the container.</li>
-<li><strong><code>shares</code></strong> <em>(uint16, OPTIONAL)</em> - specifies the relative weight to other containers with CPU shares.</li>
-<li><strong><code>maximum</code></strong> <em>(uint16, OPTIONAL)</em> - specifies the portion of processor cycles that this container can use as a percentage times 100.</li>
+<li><strong><code>count</code></strong> <em>(uint64, OPTIONAL)</em> - specifies the number of CPUs available to the container. It represents the fraction of the configured processor <code>count</code> in a container in relation to the processors available in the host. The fraction ultimately determines the portion of processor cycles that the threads in a container can use during each scheduling interval, as the number of cycles per 10,000 cycles.</li>
+<li><strong><code>shares</code></strong> <em>(uint16, OPTIONAL)</em> - limits the share of processor time given to the container relative to other workloads on the processor. The processor <code>shares</code> (<code>weight</code> at the platform level) is a value between 0 and 10,000.</li>
+<li><strong><code>maximum</code></strong> <em>(uint16, OPTIONAL)</em> - determines the portion of processor cycles that the threads in a container can use during each scheduling interval, as the number of cycles per 10,000 cycles. Set processor <code>maximum</code> to a percentage times 100.</li>
 </ul>
+<p>Ref: https://docs.microsoft.com/en-us/virtualization/api/hcs/schemareference#Container_Processor</p>
 <h4 id="example-32"><a class="header" href="#example-32">Example</a></h4>
 <pre><code class="language-json">&quot;windows&quot;: {
     &quot;resources&quot;: {

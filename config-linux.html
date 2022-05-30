@@ -338,10 +338,13 @@ configuration's <code>mounts</code> array contains an object where:</p>
 SHOULD NOT change the cgroup ownership.</p>
 <p>A runtime that changes the cgroup ownership SHOULD only change the
 ownership of the container's cgroup directory and files within that
-directory that are listed in <code>/sys/kernel/cgroup/delegate</code> (see
-<code>cgroups(7)</code> for details about this file).  If the
-<code>/sys/kernel/cgroup/delegate</code> file does not exist, the runtime MUST
-fall back to using the following list of files:</p>
+directory that are listed in <code>/sys/kernel/cgroup/delegate</code>.  See
+<code>cgroups(7)</code> for details about this file.  Note that not all files
+listed in <code>/sys/kernel/cgroup/delegate</code> necessarily exist in every
+cgroup.  Runtimes MUST NOT fail in this scenario, and SHOULD change
+the ownership of the listed files that do exist in the cgroup.</p>
+<p>If the <code>/sys/kernel/cgroup/delegate</code> file does not exist, the
+runtime MUST fall back to using the following list of files:</p>
 <pre><code>cgroup.procs
 cgroup.subtree_control
 cgroup.threads
@@ -444,6 +447,7 @@ For more information, see the kernel cgroups documentation about <a href="https:
 <li><strong><code>realtimePeriod</code></strong> <em>(uint64, OPTIONAL)</em> - same as <strong><code>period</code></strong> but applies to realtime scheduler only</li>
 <li><strong><code>cpus</code></strong> <em>(string, OPTIONAL)</em> - list of CPUs the container will run in</li>
 <li><strong><code>mems</code></strong> <em>(string, OPTIONAL)</em> - list of Memory Nodes the container will run in</li>
+<li><strong><code>idle</code></strong> <em>(int64, OPTIONAL)</em> - cgroups are configured with minimum weight, 0: default behavior, 1: SCHED_IDLE.</li>
 </ul>
 <h4 id="example-6"><a class="header" href="#example-6">Example</a></h4>
 <pre><code class="language-json">&quot;cpu&quot;: {
@@ -453,7 +457,8 @@ For more information, see the kernel cgroups documentation about <a href="https:
     &quot;realtimeRuntime&quot;: 950000,
     &quot;realtimePeriod&quot;: 1000000,
     &quot;cpus&quot;: &quot;2-3&quot;,
-    &quot;mems&quot;: &quot;0-7&quot;
+    &quot;mems&quot;: &quot;0-7&quot;,
+    &quot;idle&quot;: 0
 }
 </code></pre>
 <h3 id="block-io"><a class="header" href="#block-io"><a name="configLinuxBlockIO" />Block IO</a></h3>
@@ -878,7 +883,7 @@ The index of the name in this array corresponds to index of the file descriptors
 <li><strong><code>metadata</code></strong> (string, OPTIONAL) opaque metadata.</li>
 <li><strong><code>state</code></strong> (<a href="runtime.html#state">state</a>, REQUIRED) is the state of the container.</li>
 </ul>
-<p>Example sending a single <code>seccompFD</code> file descriptor in the <code>SCM_RIGHTS</code> array:</p>
+<p>Example sending a single <code>seccompFd</code> file descriptor in the <code>SCM_RIGHTS</code> array:</p>
 <pre><code class="language-json">{
     &quot;ociVersion&quot;: &quot;0.2.0&quot;,
     &quot;fds&quot;: [
