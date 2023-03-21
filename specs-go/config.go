@@ -12,6 +12,8 @@ type Spec struct {
 	Root *Root `json:"root,omitempty"`
 	// Hostname configures the container's hostname.
 	Hostname string `json:"hostname,omitempty"`
+	// Domainname configures the container's domainname.
+	Domainname string `json:"domainname,omitempty"`
 	// Mounts configures additional mounts (on top of Root).
 	Mounts []Mount `json:"mounts,omitempty"`
 	// Hooks configures callbacks for container lifecycle events.
@@ -117,6 +119,11 @@ type Mount struct {
 	Source string `json:"source,omitempty"`
 	// Options are fstab style mount options.
 	Options []string `json:"options,omitempty"`
+
+	// UID/GID mappings used for changing file owners w/o calling chown, fs should support it.
+	// Every mount point could have its own mapping.
+	UIDMappings []LinuxIDMapping `json:"uidMappings,omitempty" platform:"linux"`
+	GIDMappings []LinuxIDMapping `json:"gidMappings,omitempty" platform:"linux"`
 }
 
 // Hook specifies a command that is run at a particular event in the lifecycle of a container
@@ -184,6 +191,8 @@ type Linux struct {
 	IntelRdt *LinuxIntelRdt `json:"intelRdt,omitempty"`
 	// Personality contains configuration for the Linux personality syscall
 	Personality *LinuxPersonality `json:"personality,omitempty"`
+	// TimeOffsets specifies the offset for supporting time namespaces.
+	TimeOffsets map[string]LinuxTimeOffset `json:"timeOffsets,omitempty"`
 }
 
 // LinuxNamespace is the configuration for a Linux namespace
@@ -213,6 +222,8 @@ const (
 	UserNamespace LinuxNamespaceType = "user"
 	// CgroupNamespace for isolating cgroup hierarchies
 	CgroupNamespace LinuxNamespaceType = "cgroup"
+	// TimeNamespace for isolating the clocks
+	TimeNamespace LinuxNamespaceType = "time"
 )
 
 // LinuxIDMapping specifies UID/GID mappings
@@ -223,6 +234,14 @@ type LinuxIDMapping struct {
 	HostID uint32 `json:"hostID"`
 	// Size is the number of IDs to be mapped
 	Size uint32 `json:"size"`
+}
+
+// LinuxTimeOffset specifies the offset for Time Namespace
+type LinuxTimeOffset struct {
+	// Secs is the offset of clock (in secs) in the container
+	Secs int64 `json:"secs,omitempty"`
+	// Nanosecs is the additional offset for Secs (in nanosecs)
+	Nanosecs uint32 `json:"nanosecs,omitempty"`
 }
 
 // POSIXRlimit type and restrictions
@@ -312,6 +331,10 @@ type LinuxMemory struct {
 	DisableOOMKiller *bool `json:"disableOOMKiller,omitempty"`
 	// Enables hierarchical memory accounting
 	UseHierarchy *bool `json:"useHierarchy,omitempty"`
+	// CheckBeforeUpdate enables checking if a new memory limit is lower
+	// than the current usage during update, and if so, rejecting the new
+	// limit.
+	CheckBeforeUpdate *bool `json:"checkBeforeUpdate,omitempty"`
 }
 
 // LinuxCPU for Linux cgroup 'cpu' resource management
@@ -320,6 +343,9 @@ type LinuxCPU struct {
 	Shares *uint64 `json:"shares,omitempty"`
 	// CPU hardcap limit (in usecs). Allowed cpu time in a given period.
 	Quota *int64 `json:"quota,omitempty"`
+	// CPU hardcap burst limit (in usecs). Allowed accumulated cpu time additionally for burst in a
+	// given period.
+	Burst *uint64 `json:"burst,omitempty"`
 	// CPU period to be used for hardcapping (in usecs).
 	Period *uint64 `json:"period,omitempty"`
 	// How much time realtime scheduling may use (in usecs).
@@ -626,6 +652,23 @@ type Arch string
 
 // LinuxSeccompFlag is a flag to pass to seccomp(2).
 type LinuxSeccompFlag string
+
+const (
+	// LinuxSeccompFlagLog is a seccomp flag to request all returned
+	// actions except SECCOMP_RET_ALLOW to be logged. An administrator may
+	// override this filter flag by preventing specific actions from being
+	// logged via the /proc/sys/kernel/seccomp/actions_logged file. (since
+	// Linux 4.14)
+	LinuxSeccompFlagLog LinuxSeccompFlag = "SECCOMP_FILTER_FLAG_LOG"
+
+	// LinuxSeccompFlagSpecAllow can be used to disable Speculative Store
+	// Bypass mitigation. (since Linux 4.17)
+	LinuxSeccompFlagSpecAllow LinuxSeccompFlag = "SECCOMP_FILTER_FLAG_SPEC_ALLOW"
+
+	// LinuxSeccompFlagWaitKillableRecv can be used to switch to the wait
+	// killable semantics. (since Linux 5.19)
+	LinuxSeccompFlagWaitKillableRecv LinuxSeccompFlag = "SECCOMP_FILTER_FLAG_WAIT_KILLABLE_RECV"
+)
 
 // Additional architectures permitted to be used for system calls
 // By default only the native architecture of the kernel is permitted

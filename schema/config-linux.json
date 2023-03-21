@@ -110,6 +110,9 @@
                             "quota": {
                                 "$ref": "defs.json#/definitions/int64"
                             },
+                            "burst": {
+                                "$ref": "defs.json#/definitions/uint64"
+                            },
                             "realtimePeriod": {
                                 "$ref": "defs.json#/definitions/uint64"
                             },
@@ -168,6 +171,9 @@
                                 "type": "boolean"
                             },
                             "useHierarchy": {
+                                "type": "boolean"
+                            },
+                            "checkBeforeUpdate": {
                                 "type": "boolean"
                             }
                         }
@@ -274,6 +280,12 @@
             "personality": {
                 "type": "object",
                 "$ref": "defs-linux.json#/definitions/Personality"
+            },
+            "timeOffsets": {
+                "type": "object",
+                "additionalProperties": {
+                    "$ref": "defs-linux.json#/definitions/TimeOffsets"
+                }
             }
         }
     }

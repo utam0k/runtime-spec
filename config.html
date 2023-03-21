@@ -4,8 +4,10 @@
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
         <title>Configuration - OCI Runtime Specification</title>
+
+
         <!-- Custom HTML head -->
-        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="theme-color" content="#ffffff" />
@@ -16,25 +18,29 @@
         <link rel="stylesheet" href="css/general.css">
         <link rel="stylesheet" href="css/chrome.css">
         <link rel="stylesheet" href="css/print.css" media="print">
+
         <!-- Fonts -->
         <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
         <link rel="stylesheet" href="fonts/fonts.css">
+
         <!-- Highlight.js Stylesheets -->
         <link rel="stylesheet" href="highlight.css">
         <link rel="stylesheet" href="tomorrow-night.css">
         <link rel="stylesheet" href="ayu-highlight.css">
 
         <!-- Custom theme stylesheets -->
+
     </head>
     <body>
+    <div id="body-container">
         <!-- Provide site root to javascript -->
-        <script type="text/javascript">
+        <script>
             var path_to_root = "";
             var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
         </script>
 
         <!-- Work around some values being stored in localStorage wrapped in quotes -->
-        <script type="text/javascript">
+        <script>
             try {
                 var theme = localStorage.getItem('mdbook-theme');
                 var sidebar = localStorage.getItem('mdbook-sidebar');
@@ -50,7 +56,7 @@
         </script>
 
         <!-- Set the theme before any content is loaded, prevents flash -->
-        <script type="text/javascript">
+        <script>
             var theme;
             try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
             if (theme === null || theme === undefined) { theme = default_theme; }
@@ -62,12 +68,14 @@
         </script>
 
         <!-- Hide / unhide sidebar before it is displayed -->
-        <script type="text/javascript">
+        <script>
             var html = document.querySelector('html');
-            var sidebar = 'hidden';
+            var sidebar = null;
             if (document.body.clientWidth >= 1080) {
                 try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
                 sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
             }
             html.classList.remove('sidebar-visible');
             html.classList.add("sidebar-" + sidebar);
@@ -83,7 +91,7 @@
         <div id="page-wrapper" class="page-wrapper">
 
             <div class="page">
-                <div id="menu-bar-hover-placeholder"></div>
+                                <div id="menu-bar-hover-placeholder"></div>
                 <div id="menu-bar" class="menu-bar sticky bordered">
                     <div class="left-buttons">
                         <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
@@ -93,7 +101,7 @@
                             <i class="fa fa-paint-brush"></i>
                         </button>
                         <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
-                            <li role="none"><button role="menuitem" class="theme" id="light">Light (default)</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
@@ -110,6 +118,7 @@
                         <a href="print.html" title="Print this book" aria-label="Print this book">
                             <i id="print-button" class="fa fa-print"></i>
                         </a>
+
                     </div>
                 </div>
 
@@ -123,8 +132,9 @@
                         </ul>
                     </div>
                 </div>
+
                 <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
-                <script type="text/javascript">
+                <script>
                     document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
                     document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
                     Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
@@ -209,13 +219,85 @@ A mount is a bind mount if it has either <code>bind</code> or <code>rbind</code>
 </li>
 <li><strong><code>options</code></strong> (array of strings, OPTIONAL) Mount options of the filesystem to be used.
 <ul>
-<li>Linux: supported options are listed in the <a href="http://man7.org/linux/man-pages/man8/mount.8.html">mount(8)</a> man page.
-Note both <a href="http://man7.org/linux/man-pages/man8/mount.8.html#FILESYSTEM-INDEPENDENT_MOUNT_OPTIONS">filesystem-independent</a> and <a href="http://man7.org/linux/man-pages/man8/mount.8.html#FILESYSTEM-SPECIFIC_MOUNT_OPTIONS">filesystem-specific</a> options are listed.</li>
+<li>Linux: See <a href="#configLinuxMountOptions">Linux mount options</a> below.</li>
 <li>Solaris: corresponds to &quot;options&quot; of the fs resource in <a href="http://docs.oracle.com/cd/E86824_01/html/E54764/zonecfg-1m.html">zonecfg(1M)</a>.</li>
 <li>Windows: runtimes MUST support <code>ro</code>, mounting the filesystem read-only when <code>ro</code> is given.</li>
 </ul>
 </li>
 </ul>
+<h3 id="linux-mount-options"><a class="header" href="#linux-mount-options"><a name="configLinuxMountOptions" />Linux mount options</a></h3>
+<p>Runtimes MUST/SHOULD/MAY implement the following option strings for Linux:</p>
+<div class="table-wrapper"><table><thead><tr><th>Option name</th><th>Requirement</th><th>Description</th></tr></thead><tbody>
+<tr><td><code>async</code></td><td>MUST</td><td><sup class="footnote-reference"><a href="#1">1</a></sup></td></tr>
+<tr><td><code>atime</code></td><td>MUST</td><td><sup class="footnote-reference"><a href="#1">1</a></sup></td></tr>
+<tr><td><code>bind</code></td><td>MUST</td><td><sup class="footnote-reference"><a href="#2">2</a></sup> (bind mounts)</td></tr>
+<tr><td><code>defaults</code></td><td>MUST</td><td><sup class="footnote-reference"><a href="#1">1</a></sup></td></tr>
+<tr><td><code>dev</code></td><td>MUST</td><td><sup class="footnote-reference"><a href="#1">1</a></sup></td></tr>
+<tr><td><code>diratime</code></td><td>MUST</td><td><sup class="footnote-reference"><a href="#1">1</a></sup></td></tr>
+<tr><td><code>dirsync</code></td><td>MUST</td><td><sup class="footnote-reference"><a href="#1">1</a></sup></td></tr>
+<tr><td><code>exec</code></td><td>MUST</td><td><sup class="footnote-reference"><a href="#1">1</a></sup></td></tr>
+<tr><td><code>iversion</code></td><td>MUST</td><td><sup class="footnote-reference"><a href="#1">1</a></sup></td></tr>
+<tr><td><code>lazytime</code></td><td>MUST</td><td><sup class="footnote-reference"><a href="#1">1</a></sup></td></tr>
+<tr><td><code>loud</code></td><td>MUST</td><td><sup class="footnote-reference"><a href="#1">1</a></sup></td></tr>
+<tr><td><code>mand</code></td><td>MAY</td><td><sup class="footnote-reference"><a href="#1">1</a></sup> (Deprecated in kernel 5.15, util-linux 2.38)</td></tr>
+<tr><td><code>noatime</code></td><td>MUST</td><td><sup class="footnote-reference"><a href="#1">1</a></sup></td></tr>
+<tr><td><code>nodev</code></td><td>MUST</td><td><sup class="footnote-reference"><a href="#1">1</a></sup></td></tr>
+<tr><td><code>nodiratime</code></td><td>MUST</td><td><sup class="footnote-reference"><a href="#1">1</a></sup></td></tr>
+<tr><td><code>noexec</code></td><td>MUST</td><td><sup class="footnote-reference"><a href="#1">1</a></sup></td></tr>
+<tr><td><code>noiversion</code></td><td>MUST</td><td><sup class="footnote-reference"><a href="#1">1</a></sup></td></tr>
+<tr><td><code>nolazytime</code></td><td>MUST</td><td><sup class="footnote-reference"><a href="#1">1</a></sup></td></tr>
+<tr><td><code>nomand</code></td><td>MAY</td><td><sup class="footnote-reference"><a href="#1">1</a></sup></td></tr>
+<tr><td><code>norelatime</code></td><td>MUST</td><td><sup class="footnote-reference"><a href="#1">1</a></sup></td></tr>
+<tr><td><code>nostrictatime</code></td><td>MUST</td><td><sup class="footnote-reference"><a href="#1">1</a></sup></td></tr>
+<tr><td><code>nosuid</code></td><td>MUST</td><td><sup class="footnote-reference"><a href="#1">1</a></sup></td></tr>
+<tr><td><code>nosymfollow</code></td><td>SHOULD</td><td><sup class="footnote-reference"><a href="#1">1</a></sup> (Introduced in kernel 5.10, util-linux 2.38)</td></tr>
+<tr><td><code>private</code></td><td>MUST</td><td><sup class="footnote-reference"><a href="#2">2</a></sup> (bind mounts)</td></tr>
+<tr><td><code>ratime</code></td><td>SHOULD</td><td>Recursive <code>atime</code> <sup class="footnote-reference"><a href="#3">3</a></sup></td></tr>
+<tr><td><code>rbind</code></td><td>MUST</td><td><sup class="footnote-reference"><a href="#2">2</a></sup> (bind mounts)</td></tr>
+<tr><td><code>rdev</code></td><td>SHOULD</td><td>Recursive <code>dev</code> <sup class="footnote-reference"><a href="#3">3</a></sup></td></tr>
+<tr><td><code>rdiratime</code></td><td>SHOULD</td><td>Recursive <code>diratime</code> <sup class="footnote-reference"><a href="#3">3</a></sup></td></tr>
+<tr><td><code>relatime</code></td><td>MUST</td><td><sup class="footnote-reference"><a href="#1">1</a></sup></td></tr>
+<tr><td><code>remount</code></td><td>MUST</td><td><sup class="footnote-reference"><a href="#1">1</a></sup></td></tr>
+<tr><td><code>rexec</code></td><td>SHOULD</td><td>Recursive <code>dev</code> <sup class="footnote-reference"><a href="#3">3</a></sup></td></tr>
+<tr><td><code>rnoatime</code></td><td>SHOULD</td><td>Recursive <code>noatime</code> <sup class="footnote-reference"><a href="#3">3</a></sup></td></tr>
+<tr><td><code>rnodiratime</code></td><td>SHOULD</td><td>Recursive <code>nodiratime</code> <sup class="footnote-reference"><a href="#3">3</a></sup></td></tr>
+<tr><td><code>rnoexec</code></td><td>SHOULD</td><td>Recursive <code>noexec</code> <sup class="footnote-reference"><a href="#3">3</a></sup></td></tr>
+<tr><td><code>rnorelatime</code></td><td>SHOULD</td><td>Recursive <code>norelatime</code> <sup class="footnote-reference"><a href="#3">3</a></sup></td></tr>
+<tr><td><code>rnostrictatime</code></td><td>SHOULD</td><td>Recursive <code>nostrictatime</code> <sup class="footnote-reference"><a href="#3">3</a></sup></td></tr>
+<tr><td><code>rnosuid</code></td><td>SHOULD</td><td>Recursive <code>nosuid</code> <sup class="footnote-reference"><a href="#3">3</a></sup></td></tr>
+<tr><td><code>rnosymfollow</code></td><td>SHOULD</td><td>Recursive <code>nosymfollow</code> <sup class="footnote-reference"><a href="#3">3</a></sup></td></tr>
+<tr><td><code>ro</code></td><td>MUST</td><td><sup class="footnote-reference"><a href="#1">1</a></sup></td></tr>
+<tr><td><code>rprivate</code></td><td>MUST</td><td><sup class="footnote-reference"><a href="#2">2</a></sup> (bind mounts)</td></tr>
+<tr><td><code>rrelatime  </code></td><td>SHOULD</td><td>Recursive <code>relatime</code> <sup class="footnote-reference"><a href="#3">3</a></sup></td></tr>
+<tr><td><code>rro</code></td><td>SHOULD</td><td>Recursive <code>ro</code> <sup class="footnote-reference"><a href="#3">3</a></sup></td></tr>
+<tr><td><code>rrw</code></td><td>SHOULD</td><td>Recursive <code>rw</code> <sup class="footnote-reference"><a href="#3">3</a></sup></td></tr>
+<tr><td><code>rshared</code></td><td>MUST</td><td><sup class="footnote-reference"><a href="#2">2</a></sup> (bind mounts)</td></tr>
+<tr><td><code>rslave</code></td><td>MUST</td><td><sup class="footnote-reference"><a href="#2">2</a></sup> (bind mounts)</td></tr>
+<tr><td><code>rstrictatime</code></td><td>SHOULD</td><td>Recursive <code>strictatime</code> <sup class="footnote-reference"><a href="#3">3</a></sup></td></tr>
+<tr><td><code>rsuid</code></td><td>SHOULD</td><td>Recursive <code>suid</code> <sup class="footnote-reference"><a href="#3">3</a></sup></td></tr>
+<tr><td><code>rsymfollow</code></td><td>SHOULD</td><td>Recursive <code>symfollow</code> <sup class="footnote-reference"><a href="#3">3</a></sup></td></tr>
+<tr><td><code>runbindable</code></td><td>MUST</td><td><sup class="footnote-reference"><a href="#2">2</a></sup> (bind mounts)</td></tr>
+<tr><td><code>rw</code></td><td>MUST</td><td><sup class="footnote-reference"><a href="#1">1</a></sup></td></tr>
+<tr><td><code>shared</code></td><td>MUST</td><td><sup class="footnote-reference"><a href="#1">1</a></sup></td></tr>
+<tr><td><code>silent</code></td><td>MUST</td><td><sup class="footnote-reference"><a href="#1">1</a></sup></td></tr>
+<tr><td><code>slave</code></td><td>MUST</td><td><sup class="footnote-reference"><a href="#2">2</a></sup> (bind mounts)</td></tr>
+<tr><td><code>strictatime</code></td><td>MUST</td><td><sup class="footnote-reference"><a href="#1">1</a></sup></td></tr>
+<tr><td><code>suid</code></td><td>MUST</td><td><sup class="footnote-reference"><a href="#1">1</a></sup></td></tr>
+<tr><td><code>symfollow</code></td><td>SHOULD</td><td>Opposite of <code>nosymfollow</code></td></tr>
+<tr><td><code>sync</code></td><td>MUST</td><td><sup class="footnote-reference"><a href="#1">1</a></sup></td></tr>
+<tr><td><code>tmpcopyup</code></td><td>MAY</td><td>copy up the contents to a tmpfs</td></tr>
+<tr><td><code>unbindable</code></td><td>MUST</td><td><sup class="footnote-reference"><a href="#2">2</a></sup> (bind mounts)</td></tr>
+</tbody></table>
+</div>
+<div class="footnote-definition" id="1"><sup class="footnote-definition-label">1</sup>
+<p>Corresponds to <a href="http://man7.org/linux/man-pages/man8/mount.8.html#FILESYSTEM-INDEPENDENT_MOUNT_OPTIONS"><code>mount(8)</code> (filesystem-independent)</a>.
+<sup class="footnote-reference"><a href="#2">2</a></sup>: Corresponds to <a href="http://man7.org/linux/man-pages/man8/mount.8.html#FILESYSTEM-SPECIFIC_MOUNT_OPTIONS"><code>mount(8)</code> (filesystem-specific)</a>.
+<sup class="footnote-reference"><a href="#3">3</a></sup>: These <code>AT_RECURSIVE</code> options need kernel 5.12 or later. See <a href="http://man7.org/linux/man-pages/man2/mount_setattr.2.html"><code>mount_setattr(2)</code></a></p>
+</div>
+<p>The &quot;MUST&quot; options correspond to <a href="http://man7.org/linux/man-pages/man8/mount.8.html"><code>mount(8)</code></a>.</p>
+<p>Runtimes MAY also implement custom option strings that are not listed in the table above.
+If a custom option string is already recognized by <a href="http://man7.org/linux/man-pages/man8/mount.8.html"><code>mount(8)</code></a>, the runtime SHOULD follow the behavior of <a href="http://man7.org/linux/man-pages/man8/mount.8.html"><code>mount(8)</code></a>.</p>
+<p>Runtimes SHOULD pass unknown options to <a href="http://man7.org/linux/man-pages/man2/mount.2.html"><code>mount(2)</code></a> via the fifth argument (<code>const void *data</code>).</p>
 <h3 id="example-windows-1"><a class="header" href="#example-windows-1">Example (Windows)</a></h3>
 <pre><code class="language-json">&quot;mounts&quot;: [
     {
@@ -234,6 +316,10 @@ Note both <a href="http://man7.org/linux/man-pages/man8/mount.8.html#FILESYSTEM-
 <li>Solaris: corresponds to &quot;type&quot; of the fs resource in <a href="http://docs.oracle.com/cd/E86824_01/html/E54764/zonecfg-1m.html">zonecfg(1M)</a>.</li>
 </ul>
 </li>
+<li><strong><code>uidMappings</code></strong> (array of type LinuxIDMapping, OPTIONAL) The mapping to convert UIDs from the source file system to the destination mount point.<br />
+The format is the same as <a href="config-linux.html#user-namespace-mappings">user namespace mappings</a>.</li>
+<li><strong><code>gidMappings</code></strong> (array of type LinuxIDMapping, OPTIONAL) The mapping to convert GIDs from the source file system to the destination mount point.
+For more details see <code>uidMappings</code>.</li>
 </ul>
 <h3 id="example-linux"><a class="header" href="#example-linux">Example (Linux)</a></h3>
 <pre><code class="language-json">&quot;mounts&quot;: [
@@ -477,6 +563,15 @@ Depending on your <a href="config-linux.html#namespaces">namespace configuration
 <h3 id="example-1"><a class="header" href="#example-1">Example</a></h3>
 <pre><code class="language-json">&quot;hostname&quot;: &quot;mrsdalloway&quot;
 </code></pre>
+<h2 id="domainname"><a class="header" href="#domainname"><a name="configDomainname" />Domainname</a></h2>
+<ul>
+<li><strong><code>domainname</code></strong> (string, OPTIONAL) specifies the container's domainname as seen by processes running inside the container.
+On Linux, for example, this will change the domainname in the <a href="glossary.html#container-namespace">container</a> <a href="http://man7.org/linux/man-pages/man7/namespaces.7.html">UTS namespace</a>.
+Depending on your <a href="config-linux.html#namespaces">namespace configuration</a>, the container UTS namespace may be the <a href="glossary.html#runtime-namespace">runtime</a> <a href="http://man7.org/linux/man-pages/man7/namespaces.7.html">UTS namespace</a>.</li>
+</ul>
+<h3 id="example-2"><a class="header" href="#example-2">Example</a></h3>
+<pre><code class="language-json">&quot;domainname&quot;: &quot;foobarbaz.test&quot;
+</code></pre>
 <h2 id="platform-specific-configuration"><a class="header" href="#platform-specific-configuration"><a name="configPlatformSpecificConfiguration" />Platform-specific configuration</a></h2>
 <ul>
 <li><strong><code>linux</code></strong> (object, OPTIONAL) <a href="config-linux.html">Linux-specific configuration</a>.
@@ -573,8 +668,9 @@ If set, <code>timeout</code> MUST be greater than zero.</li>
 Hooks MUST be called in the listed order.
 The <a href="runtime.html#state">state</a> of the container MUST be passed to hooks over stdin so that they may do work appropriate to the current state of the container.</p>
 <h3 id="prestart"><a class="header" href="#prestart"><a name="configHooksPrestart" />Prestart</a></h3>
-<p>The <code>prestart</code> hooks MUST be called after the <a href="runtime.html#start"><code>start</code></a> operation is called but <a href="runtime.html#lifecycle">before the user-specified program command is executed</a>.
-On Linux, for example, they are called after the container namespaces are created, so they provide an opportunity to customize the container (e.g. the network namespace could be specified in this hook).</p>
+<p>The <code>prestart</code> hooks MUST be called as part of the <a href="runtime.html#create"><code>create</code></a> operation after the runtime environment has been created (according to the configuration in config.json) but before the <code>pivot_root</code> or any equivalent operation has been executed.
+On Linux, for example, they are called after the container namespaces are created, so they provide an opportunity to customize the container (e.g. the network namespace could be specified in this hook).
+The <code>prestart</code> hooks MUST be called before the <code>createRuntime</code> hooks.</p>
 <p>Note: <code>prestart</code> hooks were deprecated in favor of <code>createRuntime</code>, <code>createContainer</code> and <code>startContainer</code> hooks, which allow more granular hook control during the create and start phase.</p>
 <p>The <code>prestart</code> hooks' path MUST resolve in the <a href="glossary.html#runtime-namespace">runtime namespace</a>.
 The <code>prestart</code> hooks MUST be executed in the <a href="glossary.html#runtime-namespace">runtime namespace</a>.</p>
@@ -584,7 +680,6 @@ The <code>prestart</code> hooks MUST be executed in the <a href="glossary.html#r
 The <code>createRuntime</code> hooks MUST be executed in the <a href="glossary.html#runtime-namespace">runtime namespace</a>.</p>
 <p>On Linux, for example, they are called after the container namespaces are created, so they provide an opportunity to customize the container (e.g. the network namespace could be specified in this hook).</p>
 <p>The definition of <code>createRuntime</code> hooks is currently underspecified and hooks authors, should only expect from the runtime that the mount namespace have been created and the mount operations performed. Other operations such as cgroups and SELinux/AppArmor labels might not have been performed by the runtime.</p>
-<p>Note: <code>runc</code> originally implemented <code>prestart</code> hooks contrary to the spec, namely as part of the <code>create</code> operation (instead of during the <code>start</code> operation). This incorrect implementation actually corresponds to <code>createRuntime</code> hooks. For runtimes that implement the deprecated <code>prestart</code> hooks as <code>createRuntime</code> hooks, <code>createRuntime</code> hooks MUST be called after the <code>prestart</code> hooks.</p>
 <h3 id="createcontainer-hooks"><a class="header" href="#createcontainer-hooks"><a name="configHooksCreateContainer" />CreateContainer Hooks</a></h3>
 <p>The <code>createContainer</code> hooks MUST be called as part of the <a href="runtime.html#create"><code>create</code></a> operation after the runtime environment has been created (according to the configuration in config.json) but before the <code>pivot_root</code> or any equivalent operation has been executed.
 The <code>createContainer</code> hooks MUST be called after the <code>createRuntime</code> hooks.</p>
@@ -609,7 +704,7 @@ Cleanup or debugging functions are examples of such a hook.</p>
 The <code>poststop</code> hooks MUST be executed in the <a href="glossary.html#runtime-namespace">runtime namespace</a>.</p>
 <h3 id="summary"><a class="header" href="#summary">Summary</a></h3>
 <p>See the below table for a summary of hooks and when they are called:</p>
-<table><thead><tr><th>Name</th><th>Namespace</th><th>When</th></tr></thead><tbody>
+<div class="table-wrapper"><table><thead><tr><th>Name</th><th>Namespace</th><th>When</th></tr></thead><tbody>
 <tr><td><code>prestart</code> (Deprecated)</td><td>runtime</td><td>After the start  operation is called but before the user-specified program command is executed.</td></tr>
 <tr><td><code>createRuntime</code></td><td>runtime</td><td>During the create operation, after the runtime environment has been created and before the pivot root or any equivalent operation.</td></tr>
 <tr><td><code>createContainer</code></td><td>container</td><td>During the create operation, after the runtime environment has been created and before the pivot root or any equivalent operation.</td></tr>
@@ -617,7 +712,8 @@ The <code>poststop</code> hooks MUST be executed in the <a href="glossary.html#r
 <tr><td><code>poststart</code></td><td>runtime</td><td>After the user-specified process is executed but before the start operation returns.</td></tr>
 <tr><td><code>poststop</code></td><td>runtime</td><td>After the container is deleted but before the delete operation returns.</td></tr>
 </tbody></table>
-<h3 id="example-2"><a class="header" href="#example-2">Example</a></h3>
+</div>
+<h3 id="example-3"><a class="header" href="#example-3">Example</a></h3>
 <pre><code class="language-json">&quot;hooks&quot;: {
     &quot;prestart&quot;: [
         {
@@ -1018,6 +1114,16 @@ Unless support for a valid value is explicitly required, runtimes MAY choose whi
                 }
             ]
         },
+        &quot;timeOffsets&quot;: {
+            &quot;monotonic&quot;: {
+                &quot;secs&quot;: 172800,
+                &quot;nanosecs&quot;: 0
+            },
+            &quot;boottime&quot;: {
+                &quot;secs&quot;: 604800,
+                &quot;nanosecs&quot;: 0
+            }
+        },
         &quot;namespaces&quot;: [
             {
                 &quot;type&quot;: &quot;pid&quot;
@@ -1039,6 +1145,9 @@ Unless support for a valid value is explicitly required, runtimes MAY choose whi
             },
             {
                 &quot;type&quot;: &quot;cgroup&quot;
+            },
+            {
+                &quot;type&quot;: &quot;time&quot;
             }
         ],
         &quot;maskedPaths&quot;: [
@@ -1071,9 +1180,11 @@ Unless support for a valid value is explicitly required, runtimes MAY choose whi
                             <a rel="prev" href="runtime-linux.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                                 <i class="fa fa-angle-left"></i>
                             </a>
+
                             <a rel="next" href="config-linux.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                                 <i class="fa fa-angle-right"></i>
                             </a>
+
                         <div style="clear: both"></div>
                     </nav>
                 </div>
@@ -1083,6 +1194,7 @@ Unless support for a valid value is explicitly required, runtimes MAY choose whi
                     <a rel="prev" href="runtime-linux.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                         <i class="fa fa-angle-left"></i>
                     </a>
+
                     <a rel="next" href="config-linux.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                         <i class="fa fa-angle-right"></i>
                     </a>
@@ -1090,16 +1202,25 @@ Unless support for a valid value is explicitly required, runtimes MAY choose whi
 
         </div>
 
-        <script type="text/javascript">
+
+
+
+        <script>
             window.playground_copyable = true;
         </script>
-        <script src="elasticlunr.min.js" type="text/javascript" charset="utf-8"></script>
-        <script src="mark.min.js" type="text/javascript" charset="utf-8"></script>
-        <script src="searcher.js" type="text/javascript" charset="utf-8"></script>
-        <script src="clipboard.min.js" type="text/javascript" charset="utf-8"></script>
-        <script src="highlight.js" type="text/javascript" charset="utf-8"></script>
-        <script src="book.js" type="text/javascript" charset="utf-8"></script>
+
+
+        <script src="elasticlunr.min.js"></script>
+        <script src="mark.min.js"></script>
+        <script src="searcher.js"></script>
+
+        <script src="clipboard.min.js"></script>
+        <script src="highlight.js"></script>
+        <script src="book.js"></script>
 
         <!-- Custom JS scripts -->
+
+
+    </div>
     </body>
 </html>

@@ -4,8 +4,10 @@
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
         <title>Linux Container Configuration - OCI Runtime Specification</title>
+
+
         <!-- Custom HTML head -->
-        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="theme-color" content="#ffffff" />
@@ -16,25 +18,29 @@
         <link rel="stylesheet" href="css/general.css">
         <link rel="stylesheet" href="css/chrome.css">
         <link rel="stylesheet" href="css/print.css" media="print">
+
         <!-- Fonts -->
         <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
         <link rel="stylesheet" href="fonts/fonts.css">
+
         <!-- Highlight.js Stylesheets -->
         <link rel="stylesheet" href="highlight.css">
         <link rel="stylesheet" href="tomorrow-night.css">
         <link rel="stylesheet" href="ayu-highlight.css">
 
         <!-- Custom theme stylesheets -->
+
     </head>
     <body>
+    <div id="body-container">
         <!-- Provide site root to javascript -->
-        <script type="text/javascript">
+        <script>
             var path_to_root = "";
             var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
         </script>
 
         <!-- Work around some values being stored in localStorage wrapped in quotes -->
-        <script type="text/javascript">
+        <script>
             try {
                 var theme = localStorage.getItem('mdbook-theme');
                 var sidebar = localStorage.getItem('mdbook-sidebar');
@@ -50,7 +56,7 @@
         </script>
 
         <!-- Set the theme before any content is loaded, prevents flash -->
-        <script type="text/javascript">
+        <script>
             var theme;
             try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
             if (theme === null || theme === undefined) { theme = default_theme; }
@@ -62,12 +68,14 @@
         </script>
 
         <!-- Hide / unhide sidebar before it is displayed -->
-        <script type="text/javascript">
+        <script>
             var html = document.querySelector('html');
-            var sidebar = 'hidden';
+            var sidebar = null;
             if (document.body.clientWidth >= 1080) {
                 try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
                 sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
             }
             html.classList.remove('sidebar-visible');
             html.classList.add("sidebar-" + sidebar);
@@ -83,7 +91,7 @@
         <div id="page-wrapper" class="page-wrapper">
 
             <div class="page">
-                <div id="menu-bar-hover-placeholder"></div>
+                                <div id="menu-bar-hover-placeholder"></div>
                 <div id="menu-bar" class="menu-bar sticky bordered">
                     <div class="left-buttons">
                         <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
@@ -93,7 +101,7 @@
                             <i class="fa fa-paint-brush"></i>
                         </button>
                         <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
-                            <li role="none"><button role="menuitem" class="theme" id="light">Light (default)</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
@@ -110,6 +118,7 @@
                         <a href="print.html" title="Print this book" aria-label="Print this book">
                             <i id="print-button" class="fa fa-print"></i>
                         </a>
+
                     </div>
                 </div>
 
@@ -123,8 +132,9 @@
                         </ul>
                     </div>
                 </div>
+
                 <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
-                <script type="text/javascript">
+                <script>
                     document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
                     document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
                     Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
@@ -141,12 +151,13 @@ The Linux container specification uses various kernel features like namespaces, 
 <p>The Linux ABI includes both syscalls and several special file paths.
 Applications expecting a Linux environment will very likely expect these file paths to be set up correctly.</p>
 <p>The following filesystems SHOULD be made available in each container's filesystem:</p>
-<table><thead><tr><th>Path</th><th>Type</th></tr></thead><tbody>
+<div class="table-wrapper"><table><thead><tr><th>Path</th><th>Type</th></tr></thead><tbody>
 <tr><td>/proc</td><td><a href="https://www.kernel.org/doc/Documentation/filesystems/proc.txt">proc</a></td></tr>
 <tr><td>/sys</td><td><a href="https://www.kernel.org/doc/Documentation/filesystems/sysfs.txt">sysfs</a></td></tr>
 <tr><td>/dev/pts</td><td><a href="https://www.kernel.org/doc/Documentation/filesystems/devpts.txt">devpts</a></td></tr>
 <tr><td>/dev/shm</td><td><a href="https://www.kernel.org/doc/Documentation/filesystems/tmpfs.txt">tmpfs</a></td></tr>
 </tbody></table>
+</div>
 <h2 id="namespaces"><a class="header" href="#namespaces"><a name="configLinuxNamespaces" />Namespaces</a></h2>
 <p>A namespace wraps a global system resource in an abstraction that makes it appear to the processes within the namespace that they have their own isolated instance of the global resource.
 Changes to the global resource are visible to other processes that are members of the namespace, but are invisible to other processes.
@@ -164,6 +175,7 @@ The following parameters can be specified to set up namespaces:</p>
 <li><strong><code>uts</code></strong> the container will be able to have its own hostname and domain name.</li>
 <li><strong><code>user</code></strong> the container will be able to remap user and group IDs from the host to local users and groups within the container.</li>
 <li><strong><code>cgroup</code></strong> the container will have an isolated view of the cgroup hierarchy.</li>
+<li><strong><code>time</code></strong> the container will be able to have its own clocks.</li>
 </ul>
 </li>
 <li>
@@ -200,6 +212,9 @@ If a <code>namespaces</code> field contains duplicated namespaces with same <cod
     },
     {
         &quot;type&quot;: &quot;cgroup&quot;
+    },
+    {
+        &quot;type&quot;: &quot;time&quot;
     }
 ]
 </code></pre>
@@ -230,6 +245,15 @@ Note that the number of mapping entries MAY be limited by the <a href="http://ma
     }
 ]
 </code></pre>
+<h2 id="offset-for-time-namespace"><a class="header" href="#offset-for-time-namespace"><a name="configLinuxTimeOffset" />Offset for Time Namespace</a></h2>
+<p><strong><code>timeOffsets</code></strong> (object, OPTIONAL) sets the offset for Time Namespace. For more information
+see the <a href="https://man7.org/linux/man-pages/man7/time_namespaces.7.html">time_namespaces</a>.</p>
+<p>The name of the clock is the entry key.
+Entry values are objects with the following properties:</p>
+<ul>
+<li><strong><code>secs</code></strong> <em>(int64, OPTIONAL)</em> - is the offset of clock (in seconds) in the container.</li>
+<li><strong><code>nanosecs</code></strong> <em>(uint32, OPTIONAL)</em> - is the offset of clock (in nanoseconds) in the container.</li>
+</ul>
 <h2 id="devices"><a class="header" href="#devices"><a name="configLinuxDevices" />Devices</a></h2>
 <p><strong><code>devices</code></strong> (array of objects, OPTIONAL) lists devices that MUST be available in the container.
 The runtime MAY supply them however it likes (with <a href="http://man7.org/linux/man-pages/man2/mknod.2.html"><code>mknod</code></a>, by bind mounting from the runtime mount namespace, using symlinks, etc.).</p>
@@ -238,7 +262,8 @@ The runtime MAY supply them however it likes (with <a href="http://man7.org/linu
 <li><strong><code>type</code></strong> <em>(string, REQUIRED)</em> - type of device: <code>c</code>, <code>b</code>, <code>u</code> or <code>p</code>.
 More info in <a href="http://man7.org/linux/man-pages/man1/mknod.1.html">mknod(1)</a>.</li>
 <li><strong><code>path</code></strong> <em>(string, REQUIRED)</em> - full path to device inside container.
-If a <a href="http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap03.html#tag_03_164">file</a> already exists at <code>path</code> that does not match the requested device, the runtime MUST generate an error.</li>
+If a <a href="http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap03.html#tag_03_164">file</a> already exists at <code>path</code> that does not match the requested device, the runtime MUST generate an error.
+The path MAY be anywhere in the container filesystem, notably outside of <code>/dev</code>.</li>
 <li><strong><code>major, minor</code></strong> <em>(int64, REQUIRED unless <code>type</code> is <code>p</code>)</em> - <a href="https://www.kernel.org/doc/Documentation/admin-guide/devices.txt">major, minor numbers</a> for the device.</li>
 <li><strong><code>fileMode</code></strong> <em>(uint32, OPTIONAL)</em> - file mode for the device.
 You can also control access to devices <a href="#configLinuxDeviceAllowedlist">with cgroups</a>.</li>
@@ -246,6 +271,12 @@ You can also control access to devices <a href="#configLinuxDeviceAllowedlist">w
 <li><strong><code>gid</code></strong> <em>(uint32, OPTIONAL)</em> - id of device group in the <a href="glossary.html#container-namespace">container namespace</a>.</li>
 </ul>
 <p>The same <code>type</code>, <code>major</code> and <code>minor</code> SHOULD NOT be used for multiple devices.</p>
+<p>Containers MAY NOT access any device node that is not either explicitly
+referenced in the <strong><code>devices</code></strong> array or listed as being part of the
+<a href="#configLinuxDefaultDevices">default devices</a>.
+Rationale: runtimes based on virtual machines need to be able to adjust the node
+devices, and accessing device nodes that were not adjusted could have undefined
+behaviour.</p>
 <h3 id="example-2"><a class="header" href="#example-2">Example</a></h3>
 <pre><code class="language-json">&quot;devices&quot;: [
     {
@@ -423,6 +454,11 @@ The OOM killer is enabled by default in every cgroup using the <code>memory</cod
 To disable it, specify a value of <code>true</code>.</li>
 <li><strong><code>useHierarchy</code></strong> <em>(bool, OPTIONAL)</em> - enables or disables hierarchical memory accounting.
 If enabled (<code>true</code>), child cgroups will share the memory limits of this cgroup.</li>
+<li><strong><code>checkBeforeUpdate</code></strong> <em>(bool, OPTIONAL)</em> - enables container memory usage check before setting a new limit.
+If enabled (<code>true</code>), runtime MAY check if a new memory limit is lower than the current usage, and MUST
+reject the new limit. Practically, when cgroup v1 is used, the kernel rejects the limit lower than the
+current usage, and when cgroup v2 is used, an OOM killer is invoked. This setting can be used on
+cgroup v2 to mimic the cgroup v1 behavior.</li>
 </ul>
 <h4 id="example-5"><a class="header" href="#example-5">Example</a></h4>
 <pre><code class="language-json">&quot;memory&quot;: {
@@ -441,7 +477,10 @@ For more information, see the kernel cgroups documentation about <a href="https:
 <p>The following parameters can be specified to set up the controller:</p>
 <ul>
 <li><strong><code>shares</code></strong> <em>(uint64, OPTIONAL)</em> - specifies a relative share of CPU time available to the tasks in a cgroup</li>
-<li><strong><code>quota</code></strong> <em>(int64, OPTIONAL)</em> - specifies the total amount of time in microseconds for which all tasks in a cgroup can run during one period (as defined by <strong><code>period</code></strong> below)</li>
+<li><strong><code>quota</code></strong> <em>(int64, OPTIONAL)</em> - specifies the total amount of time in microseconds for which all tasks in a cgroup can run during one period (as defined by <strong><code>period</code></strong> below)
+If specified with any (valid) positive value, it MUST be no smaller than <code>burst</code> (runtimes MAY generate an error).</li>
+<li><strong><code>burst</code></strong> <em>(uint64, OPTIONAL)</em> - specifies the maximum amount of accumulated time in microseconds for which all tasks in a cgroup can run additionally for burst during one period (as defined by <strong><code>period</code></strong> below)
+If specified, this value MUST be no larger than any positive <code>quota</code> (runtimes MAY generate an error).</li>
 <li><strong><code>period</code></strong> <em>(uint64, OPTIONAL)</em> - specifies a period of time in microseconds for how regularly a cgroup's access to CPU resources should be reallocated (CFS scheduler only)</li>
 <li><strong><code>realtimeRuntime</code></strong> <em>(int64, OPTIONAL)</em> - specifies a period of time in microseconds for the longest continuous period in which the tasks in a cgroup have access to CPU resources</li>
 <li><strong><code>realtimePeriod</code></strong> <em>(uint64, OPTIONAL)</em> - same as <strong><code>period</code></strong> but applies to realtime scheduler only</li>
@@ -453,6 +492,7 @@ For more information, see the kernel cgroups documentation about <a href="https:
 <pre><code class="language-json">&quot;cpu&quot;: {
     &quot;shares&quot;: 1024,
     &quot;quota&quot;: 1000000,
+    &quot;burst&quot;: 1000000,
     &quot;period&quot;: 500000,
     &quot;realtimeRuntime&quot;: 950000,
     &quot;realtimePeriod&quot;: 1000000,
@@ -770,6 +810,7 @@ A valid list of constants as of libseccomp v2.5.0 is shown below.</p>
 <li><code>SECCOMP_FILTER_FLAG_TSYNC</code></li>
 <li><code>SECCOMP_FILTER_FLAG_LOG</code></li>
 <li><code>SECCOMP_FILTER_FLAG_SPEC_ALLOW</code></li>
+<li><code>SECCOMP_FILTER_FLAG_WAIT_KILLABLE_RECV</code></li>
 </ul>
 </li>
 <li>
@@ -969,9 +1010,11 @@ Currently no flag values are supported.</p>
                             <a rel="prev" href="config.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                                 <i class="fa fa-angle-left"></i>
                             </a>
+
                             <a rel="next" href="config-solaris.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                                 <i class="fa fa-angle-right"></i>
                             </a>
+
                         <div style="clear: both"></div>
                     </nav>
                 </div>
@@ -981,6 +1024,7 @@ Currently no flag values are supported.</p>
                     <a rel="prev" href="config.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                         <i class="fa fa-angle-left"></i>
                     </a>
+
                     <a rel="next" href="config-solaris.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                         <i class="fa fa-angle-right"></i>
                     </a>
@@ -988,16 +1032,25 @@ Currently no flag values are supported.</p>
 
         </div>
 
-        <script type="text/javascript">
+
+
+
+        <script>
             window.playground_copyable = true;
         </script>
-        <script src="elasticlunr.min.js" type="text/javascript" charset="utf-8"></script>
-        <script src="mark.min.js" type="text/javascript" charset="utf-8"></script>
-        <script src="searcher.js" type="text/javascript" charset="utf-8"></script>
-        <script src="clipboard.min.js" type="text/javascript" charset="utf-8"></script>
-        <script src="highlight.js" type="text/javascript" charset="utf-8"></script>
-        <script src="book.js" type="text/javascript" charset="utf-8"></script>
+
+
+        <script src="elasticlunr.min.js"></script>
+        <script src="mark.min.js"></script>
+        <script src="searcher.js"></script>
+
+        <script src="clipboard.min.js"></script>
+        <script src="highlight.js"></script>
+        <script src="book.js"></script>
 
         <!-- Custom JS scripts -->
+
+
+    </div>
     </body>
 </html>
