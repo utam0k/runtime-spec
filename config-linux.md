@@ -34,6 +34,7 @@ The following parameters can be specified to set up namespaces:
     * **`uts`** the container will be able to have its own hostname and domain name.
     * **`user`** the container will be able to remap user and group IDs from the host to local users and groups within the container.
     * **`cgroup`** the container will have an isolated view of the cgroup hierarchy.
+    * **`time`** the container will be able to have its own clocks.
 * **`path`** *(string, OPTIONAL)* - namespace file.
     This value MUST be an absolute path in the [runtime mount namespace](glossary.md#runtime-namespace).
     The runtime MUST place the container process in the namespace associated with that `path`.
@@ -70,6 +71,9 @@ If a `namespaces` field contains duplicated namespaces with same `type`, the run
     },
     {
         "type": "cgroup"
+    },
+    {
+        "type": "time"
     }
 ]
 ```
@@ -107,6 +111,17 @@ Note that the number of mapping entries MAY be limited by the [kernel][user-name
 ]
 ```
 
+## <a name="configLinuxTimeOffset" />Offset for Time Namespace
+
+**`timeOffsets`** (object, OPTIONAL) sets the offset for Time Namespace. For more information
+see the [time_namespaces][time_namespaces.7].
+
+The name of the clock is the entry key.
+Entry values are objects with the following properties:
+
+* **`secs`** *(int64, OPTIONAL)* - is the offset of clock (in seconds) in the container.
+* **`nanosecs`** *(uint32, OPTIONAL)* - is the offset of clock (in nanoseconds) in the container.
+
 ## <a name="configLinuxDevices" />Devices
 
 **`devices`** (array of objects, OPTIONAL) lists devices that MUST be available in the container.
@@ -118,6 +133,7 @@ Each entry has the following structure:
     More info in [mknod(1)][mknod.1].
 * **`path`** *(string, REQUIRED)* - full path to device inside container.
     If a [file][] already exists at `path` that does not match the requested device, the runtime MUST generate an error.
+    The path MAY be anywhere in the container filesystem, notably outside of `/dev`.
 * **`major, minor`** *(int64, REQUIRED unless `type` is `p`)* - [major, minor numbers][devices] for the device.
 * **`fileMode`** *(uint32, OPTIONAL)* - file mode for the device.
     You can also control access to devices [with cgroups](#configLinuxDeviceAllowedlist).
@@ -125,6 +141,14 @@ Each entry has the following structure:
 * **`gid`** *(uint32, OPTIONAL)* - id of device group in the [container namespace](glossary.md#container-namespace).
 
 The same `type`, `major` and `minor` SHOULD NOT be used for multiple devices.
+
+Containers MAY NOT access any device node that is not either explicitly
+referenced in the **`devices`** array or listed as being part of the
+[default devices](#configLinuxDefaultDevices).
+Rationale: runtimes based on virtual machines need to be able to adjust the node
+devices, and accessing device nodes that were not adjusted could have undefined
+behaviour.
+
 
 ### Example
 
@@ -336,6 +360,11 @@ The following properties do not specify memory limits, but are covered by the `m
     To disable it, specify a value of `true`.
 * **`useHierarchy`** *(bool, OPTIONAL)* - enables or disables hierarchical memory accounting.
     If enabled (`true`), child cgroups will share the memory limits of this cgroup.
+* **`checkBeforeUpdate`** *(bool, OPTIONAL)* - enables container memory usage check before setting a new limit.
+    If enabled (`true`), runtime MAY check if a new memory limit is lower than the current usage, and MUST
+    reject the new limit. Practically, when cgroup v1 is used, the kernel rejects the limit lower than the
+    current usage, and when cgroup v2 is used, an OOM killer is invoked. This setting can be used on
+    cgroup v2 to mimic the cgroup v1 behavior.
 
 #### Example
 
@@ -360,6 +389,9 @@ The following parameters can be specified to set up the controller:
 
 * **`shares`** *(uint64, OPTIONAL)* - specifies a relative share of CPU time available to the tasks in a cgroup
 * **`quota`** *(int64, OPTIONAL)* - specifies the total amount of time in microseconds for which all tasks in a cgroup can run during one period (as defined by **`period`** below)
+    If specified with any (valid) positive value, it MUST be no smaller than `burst` (runtimes MAY generate an error).
+* **`burst`** *(uint64, OPTIONAL)* - specifies the maximum amount of accumulated time in microseconds for which all tasks in a cgroup can run additionally for burst during one period (as defined by **`period`** below)
+    If specified, this value MUST be no larger than any positive `quota` (runtimes MAY generate an error).
 * **`period`** *(uint64, OPTIONAL)* - specifies a period of time in microseconds for how regularly a cgroup's access to CPU resources should be reallocated (CFS scheduler only)
 * **`realtimeRuntime`** *(int64, OPTIONAL)* - specifies a period of time in microseconds for the longest continuous period in which the tasks in a cgroup have access to CPU resources
 * **`realtimePeriod`** *(uint64, OPTIONAL)* - same as **`period`** but applies to realtime scheduler only
@@ -373,6 +405,7 @@ The following parameters can be specified to set up the controller:
 "cpu": {
     "shares": 1024,
     "quota": 1000000,
+    "burst": 1000000,
     "period": 500000,
     "realtimeRuntime": 950000,
     "realtimePeriod": 1000000,
@@ -701,6 +734,7 @@ The following parameters can be specified to set up seccomp:
     * `SECCOMP_FILTER_FLAG_TSYNC`
     * `SECCOMP_FILTER_FLAG_LOG`
     * `SECCOMP_FILTER_FLAG_SPEC_ALLOW`
+    * `SECCOMP_FILTER_FLAG_WAIT_KILLABLE_RECV`
 
 * **`listenerPath`** *(string, OPTIONAL)* - specifies the path of UNIX domain socket over which the runtime will send the [container process state](#containerprocessstate) data structure when the `SCMP_ACT_NOTIFY` action is used.
     This socket MUST use `AF_UNIX` domain and `SOCK_STREAM` type.
@@ -929,3 +963,4 @@ subset of the available options.
 [zero.4]: http://man7.org/linux/man-pages/man4/zero.4.html
 [user-namespaces]: http://man7.org/linux/man-pages/man7/user_namespaces.7.html
 [intel-rdt-cat-kernel-interface]: https://www.kernel.org/doc/Documentation/x86/intel_rdt_ui.txt
+[time_namespaces.7]: https://man7.org/linux/man-pages/man7/time_namespaces.7.html

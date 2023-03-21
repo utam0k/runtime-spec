@@ -77,10 +77,86 @@ For Solaris, the mount entry corresponds to the 'fs' resource in the [zonecfg(1M
     * Windows: a local directory on the filesystem of the container host. UNC paths and mapped drives are not supported.
     * Solaris: corresponds to "special" of the fs resource in [zonecfg(1M)][zonecfg.1m].
 * **`options`** (array of strings, OPTIONAL) Mount options of the filesystem to be used.
-    * Linux: supported options are listed in the [mount(8)][mount.8] man page.
-      Note both [filesystem-independent][mount.8-filesystem-independent] and [filesystem-specific][mount.8-filesystem-specific] options are listed.
+    * Linux: See [Linux mount options](#configLinuxMountOptions) below.
     * Solaris: corresponds to "options" of the fs resource in [zonecfg(1M)][zonecfg.1m].
     * Windows: runtimes MUST support `ro`, mounting the filesystem read-only when `ro` is given.
+
+### <a name="configLinuxMountOptions" />Linux mount options
+
+Runtimes MUST/SHOULD/MAY implement the following option strings for Linux:
+
+ Option name      | Requirement | Description
+------------------|-------------|-----------------------------------------------------
+ `async`          | MUST        | [^1]
+ `atime`          | MUST        | [^1]
+ `bind`           | MUST        | [^2] (bind mounts)
+ `defaults`       | MUST        | [^1]
+ `dev`            | MUST        | [^1]
+ `diratime`       | MUST        | [^1]
+ `dirsync`        | MUST        | [^1]
+ `exec`           | MUST        | [^1]
+ `iversion`       | MUST        | [^1]
+ `lazytime`       | MUST        | [^1]
+ `loud`           | MUST        | [^1]
+ `mand`           | MAY         | [^1] (Deprecated in kernel 5.15, util-linux 2.38)
+ `noatime`        | MUST        | [^1]
+ `nodev`          | MUST        | [^1]
+ `nodiratime`     | MUST        | [^1]
+ `noexec`         | MUST        | [^1]
+ `noiversion`     | MUST        | [^1]
+ `nolazytime`     | MUST        | [^1]
+ `nomand`         | MAY         | [^1]
+ `norelatime`     | MUST        | [^1]
+ `nostrictatime`  | MUST        | [^1]
+ `nosuid`         | MUST        | [^1]
+ `nosymfollow`    | SHOULD      | [^1] (Introduced in kernel 5.10, util-linux 2.38)
+ `private`        | MUST        | [^2] (bind mounts)
+ `ratime`         | SHOULD      | Recursive `atime` [^3]
+ `rbind`          | MUST        | [^2] (bind mounts)
+ `rdev`           | SHOULD      | Recursive `dev` [^3]
+ `rdiratime`      | SHOULD      | Recursive `diratime` [^3]
+ `relatime`       | MUST        | [^1]
+ `remount`        | MUST        | [^1]
+ `rexec`          | SHOULD      | Recursive `dev` [^3]
+ `rnoatime`       | SHOULD      | Recursive `noatime` [^3]
+ `rnodiratime`    | SHOULD      | Recursive `nodiratime` [^3]
+ `rnoexec`        | SHOULD      | Recursive `noexec` [^3]
+ `rnorelatime`    | SHOULD      | Recursive `norelatime` [^3]
+ `rnostrictatime` | SHOULD      | Recursive `nostrictatime` [^3]
+ `rnosuid`        | SHOULD      | Recursive `nosuid` [^3]
+ `rnosymfollow`   | SHOULD      | Recursive `nosymfollow` [^3]
+ `ro`             | MUST        | [^1]
+ `rprivate`       | MUST        | [^2] (bind mounts)
+ `rrelatime  `    | SHOULD      | Recursive `relatime` [^3]
+ `rro`            | SHOULD      | Recursive `ro` [^3]
+ `rrw`            | SHOULD      | Recursive `rw` [^3]
+ `rshared`        | MUST        | [^2] (bind mounts)
+ `rslave`         | MUST        | [^2] (bind mounts)
+ `rstrictatime`   | SHOULD      | Recursive `strictatime` [^3]
+ `rsuid`          | SHOULD      | Recursive `suid` [^3]
+ `rsymfollow`     | SHOULD      | Recursive `symfollow` [^3]
+ `runbindable`    | MUST        | [^2] (bind mounts)
+ `rw`             | MUST        | [^1]
+ `shared`         | MUST        | [^1]
+ `silent`         | MUST        | [^1]
+ `slave`          | MUST        | [^2] (bind mounts)
+ `strictatime`    | MUST        | [^1]
+ `suid`           | MUST        | [^1]
+ `symfollow`      | SHOULD      | Opposite of `nosymfollow`
+ `sync`           | MUST        | [^1]
+ `tmpcopyup`      | MAY         | copy up the contents to a tmpfs
+ `unbindable`     | MUST        | [^2] (bind mounts)
+
+[^1]: Corresponds to [`mount(8)` (filesystem-independent)][mount.8-filesystem-independent].
+[^2]: Corresponds to [`mount(8)` (filesystem-specific)][mount.8-filesystem-specific].
+[^3]: These `AT_RECURSIVE` options need kernel 5.12 or later. See [`mount_setattr(2)`][mount_setattr.2]
+
+The "MUST" options correspond to [`mount(8)`][mount.8].
+
+Runtimes MAY also implement custom option strings that are not listed in the table above.
+If a custom option string is already recognized by [`mount(8)`][mount.8], the runtime SHOULD follow the behavior of [`mount(8)`][mount.8].
+
+Runtimes SHOULD pass unknown options to [`mount(2)`][mount.2] via the fifth argument (`const void *data`).
 
 ### Example (Windows)
 
@@ -101,6 +177,11 @@ For POSIX platforms the `mounts` structure has the following fields:
 * **`type`** (string, OPTIONAL) The type of the filesystem to be mounted.
     * Linux: filesystem types supported by the kernel as listed in */proc/filesystems* (e.g., "minix", "ext2", "ext3", "jfs", "xfs", "reiserfs", "msdos", "proc", "nfs", "iso9660"). For bind mounts (when `options` include either `bind` or `rbind`), the type is a dummy, often "none" (not listed in */proc/filesystems*).
     * Solaris: corresponds to "type" of the fs resource in [zonecfg(1M)][zonecfg.1m].
+* **`uidMappings`** (array of type LinuxIDMapping, OPTIONAL) The mapping to convert UIDs from the source file system to the destination mount point.\
+The format is the same as [user namespace mappings](config-linux.md#user-namespace-mappings).
+* **`gidMappings`** (array of type LinuxIDMapping, OPTIONAL) The mapping to convert GIDs from the source file system to the destination mount point.
+For more details see `uidMappings`.
+
 
 ### Example (Linux)
 
@@ -350,6 +431,18 @@ For Windows based systems the user structure has the following fields:
 "hostname": "mrsdalloway"
 ```
 
+## <a name="configDomainname" />Domainname
+
+* **`domainname`** (string, OPTIONAL) specifies the container's domainname as seen by processes running inside the container.
+    On Linux, for example, this will change the domainname in the [container](glossary.md#container-namespace) [UTS namespace][uts-namespace.7].
+    Depending on your [namespace configuration](config-linux.md#namespaces), the container UTS namespace may be the [runtime](glossary.md#runtime-namespace) [UTS namespace][uts-namespace.7].
+
+### Example
+
+```json
+"domainname": "foobarbaz.test"
+```
+
 ## <a name="configPlatformSpecificConfiguration" />Platform-specific configuration
 
 * **`linux`** (object, OPTIONAL) [Linux-specific configuration](config-linux.md).
@@ -425,8 +518,9 @@ The [state](runtime.md#state) of the container MUST be passed to hooks over stdi
 
 ### <a name="configHooksPrestart" />Prestart
 
-The `prestart` hooks MUST be called after the [`start`](runtime.md#start) operation is called but [before the user-specified program command is executed](runtime.md#lifecycle).
+The `prestart` hooks MUST be called as part of the [`create`](runtime.md#create) operation after the runtime environment has been created (according to the configuration in config.json) but before the `pivot_root` or any equivalent operation has been executed.
 On Linux, for example, they are called after the container namespaces are created, so they provide an opportunity to customize the container (e.g. the network namespace could be specified in this hook).
+The `prestart` hooks MUST be called before the `createRuntime` hooks.
 
 Note: `prestart` hooks were deprecated in favor of `createRuntime`, `createContainer` and `startContainer` hooks, which allow more granular hook control during the create and start phase.
 
@@ -443,8 +537,6 @@ The `createRuntime` hooks MUST be executed in the [runtime namespace](glossary.m
 On Linux, for example, they are called after the container namespaces are created, so they provide an opportunity to customize the container (e.g. the network namespace could be specified in this hook).
 
 The definition of `createRuntime` hooks is currently underspecified and hooks authors, should only expect from the runtime that the mount namespace have been created and the mount operations performed. Other operations such as cgroups and SELinux/AppArmor labels might not have been performed by the runtime.
-
-Note: `runc` originally implemented `prestart` hooks contrary to the spec, namely as part of the `create` operation (instead of during the `start` operation). This incorrect implementation actually corresponds to `createRuntime` hooks. For runtimes that implement the deprecated `prestart` hooks as `createRuntime` hooks, `createRuntime` hooks MUST be called after the `prestart` hooks.
 
 ### <a name="configHooksCreateContainer" />CreateContainer Hooks
 
@@ -912,6 +1004,16 @@ Here is a full example `config.json` for reference.
                 }
             ]
         },
+        "timeOffsets": {
+            "monotonic": {
+                "secs": 172800,
+                "nanosecs": 0
+            },
+            "boottime": {
+                "secs": 604800,
+                "nanosecs": 0
+            }
+        },
         "namespaces": [
             {
                 "type": "pid"
@@ -933,6 +1035,9 @@ Here is a full example `config.json` for reference.
             },
             {
                 "type": "cgroup"
+            },
+            {
+                "type": "time"
             }
         ],
         "maskedPaths": [
@@ -975,6 +1080,7 @@ Here is a full example `config.json` for reference.
 [mount.8]: http://man7.org/linux/man-pages/man8/mount.8.html
 [mount.8-filesystem-independent]: http://man7.org/linux/man-pages/man8/mount.8.html#FILESYSTEM-INDEPENDENT_MOUNT_OPTIONS
 [mount.8-filesystem-specific]: http://man7.org/linux/man-pages/man8/mount.8.html#FILESYSTEM-SPECIFIC_MOUNT_OPTIONS
+[mount_setattr.2]: http://man7.org/linux/man-pages/man2/mount_setattr.2.html
 [getrlimit.2]: http://man7.org/linux/man-pages/man2/getrlimit.2.html
 [getrlimit.3]: http://pubs.opengroup.org/onlinepubs/9699919799/functions/getrlimit.html
 [stdin.3]: http://man7.org/linux/man-pages/man3/stdin.3.html

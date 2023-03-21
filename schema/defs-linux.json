@@ -70,7 +70,8 @@
             "enum": [
                 "SECCOMP_FILTER_FLAG_TSYNC",
                 "SECCOMP_FILTER_FLAG_LOG",
-                "SECCOMP_FILTER_FLAG_SPEC_ALLOW"
+                "SECCOMP_FILTER_FLAG_SPEC_ALLOW",
+                "SECCOMP_FILTER_FLAG_WAIT_KILLABLE_RECV"
             ]
         },
         "SeccompOperators": {
@@ -294,7 +295,8 @@
                 "uts",
                 "ipc",
                 "user",
-                "cgroup"
+                "cgroup",
+                "time"
             ]
         },
         "NamespaceReference": {
@@ -310,6 +312,17 @@
             "required": [
                 "type"
             ]
+        },
+        "TimeOffsets": {
+            "type": "object",
+            "properties": {
+                "secs": {
+                    "$ref": "defs.json#/definitions/int64"
+                },
+                "nanosecs": {
+                    "$ref": "defs.json#/definitions/uint32"
+                }
+            }
         }
     }
 }
