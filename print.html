@@ -154,11 +154,11 @@ The execution environment is specified to ensure that applications running insid
 <h1 id="platforms"><a class="header" href="#platforms"><a name="ociRuntimeSpecPlatforms" />Platforms</a></h1>
 <p>Platforms defined by this specification are:</p>
 <ul>
-<li><code>linux</code>: <a href="runtime.html">runtime.md</a>, <a href="config.html">config.md</a>, <a href="config-linux.html">config-linux.md</a>, and <a href="runtime-linux.html">runtime-linux.md</a>.</li>
-<li><code>solaris</code>: <a href="runtime.html">runtime.md</a>, <a href="config.html">config.md</a>, and <a href="config-solaris.html">config-solaris.md</a>.</li>
-<li><code>windows</code>: <a href="runtime.html">runtime.md</a>, <a href="config.html">config.md</a>, and <a href="config-windows.html">config-windows.md</a>.</li>
-<li><code>vm</code>: <a href="runtime.html">runtime.md</a>, <a href="config.html">config.md</a>, and <a href="config-vm.html">config-vm.md</a>.</li>
-<li><code>zos</code>: <a href="runtime.html">runtime.md</a>, <a href="config.html">config.md</a>, and <a href="config-zos.html">config-zos.md</a>.</li>
+<li><code>linux</code>: <a href="runtime.html">runtime.md</a>, <a href="config.html">config.md</a>, <a href="features.html">features.md</a>, <a href="config-linux.html">config-linux.md</a>, <a href="runtime-linux.html">runtime-linux.md</a>, and <a href="features-linux.html">features-linux.md</a>.</li>
+<li><code>solaris</code>: <a href="runtime.html">runtime.md</a>, <a href="config.html">config.md</a>, <a href="features.html">features.md</a>, and <a href="config-solaris.html">config-solaris.md</a>.</li>
+<li><code>windows</code>: <a href="runtime.html">runtime.md</a>, <a href="config.html">config.md</a>, <a href="features.html">features.md</a>, and <a href="config-windows.html">config-windows.md</a>.</li>
+<li><code>vm</code>: <a href="runtime.html">runtime.md</a>, <a href="config.html">config.md</a>, <a href="features.html">features.md</a>, and <a href="config-vm.html">config-vm.md</a>.</li>
+<li><code>zos</code>: <a href="runtime.html">runtime.md</a>, <a href="config.html">config.md</a>, <a href="features.html">features.md</a>, and <a href="config-zos.html">config-zos.md</a>.</li>
 </ul>
 <h1 id="table-of-contents"><a class="header" href="#table-of-contents"><a name="ociRuntimeSpecTOC" />Table of Contents</a></h1>
 <ul>
@@ -181,6 +181,11 @@ The execution environment is specified to ensure that applications running insid
 <li><a href="config-windows.html">Windows-specific Configuration</a></li>
 <li><a href="config-vm.html">Virtual-Machine-specific Configuration</a></li>
 <li><a href="config-zos.html">z/OS-specific Configuration</a></li>
+</ul>
+</li>
+<li><a href="features.html">Features Document</a>
+<ul>
+<li><a href="features-linux.html">Linux-specific Features Document</a></li>
 </ul>
 </li>
 <li><a href="glossary.html">Glossary</a></li>
@@ -348,7 +353,7 @@ This operation MUST create a new container.</p>
 The remaining <code>process</code> properties MAY be applied by this operation.
 If the runtime cannot apply a property as specified in the <a href="config.html">configuration</a>, it MUST <a href="runtime.html#errors">generate an error</a> and a new container MUST NOT be created.</p>
 <p>The runtime MAY validate <code>config.json</code> against this spec, either generically or with respect to the local system capabilities, before creating the container (<a href="runtime.html#lifecycle">step 2</a>).
-Runtime callers who are interested in pre-create validation can run <a href="implementations.html#testing--tools">bundle-validation tools</a> before invoking the create operation.</p>
+<a href="glossary.html#runtime-caller">Runtime callers</a> who are interested in pre-create validation can run <a href="implementations.html#testing--tools">bundle-validation tools</a> before invoking the create operation.</p>
 <p>Any changes made to the <a href="config.html"><code>config.json</code></a> file after this operation will not have an effect on the container.</p>
 <h3 id="start"><a class="header" href="#start"><a name="runtimeStart" />Start</a></h3>
 <p><code>start &lt;container-id&gt;</code></p>
@@ -1771,7 +1776,8 @@ If specified, this value MUST be no larger than any positive <code>quota</code> 
 </code></pre>
 <h3 id="block-io"><a class="header" href="#block-io"><a name="configLinuxBlockIO" />Block IO</a></h3>
 <p><strong><code>blockIO</code></strong> (object, OPTIONAL) represents the cgroup subsystem <code>blkio</code> which implements the block IO controller.
-For more information, see the kernel cgroups documentation about <a href="https://www.kernel.org/doc/Documentation/cgroup-v1/blkio-controller.txt">blkio</a>.</p>
+For more information, see the kernel cgroups documentation about <a href="https://www.kernel.org/doc/Documentation/cgroup-v1/blkio-controller.txt">blkio</a> of cgroup v1 or <a href="https://docs.kernel.org/admin-guide/cgroup-v2.html#io">io</a> of cgroup v2, .</p>
+<p>Note that I/O throttling settings in cgroup v1 apply only to Direct I/O due to kernel implementation constraints, while this limitation does not exist in cgroup v2.</p>
 <p>The following parameters can be specified to set up the controller:</p>
 <ul>
 <li>
@@ -1844,16 +1850,28 @@ For more information, see the <a href="http://man7.org/linux/man-pages/man1/mkno
 }
 </code></pre>
 <h3 id="huge-page-limits"><a class="header" href="#huge-page-limits"><a name="configLinuxHugePageLimits" />Huge page limits</a></h3>
-<p><strong><code>hugepageLimits</code></strong> (array of objects, OPTIONAL) represents the <code>hugetlb</code> controller which allows to limit the
-HugeTLB usage per control group and enforces the controller limit during page fault.
-For more information, see the kernel cgroups documentation about <a href="https://www.kernel.org/doc/Documentation/cgroup-v1/hugetlb.txt">HugeTLB</a>.</p>
+<p><strong><code>hugepageLimits</code></strong> (array of objects, OPTIONAL) represents the <code>hugetlb</code> controller which allows to limit the HugeTLB reservations (if supported) or usage (page fault).
+By default if supported by the kernel, <code>hugepageLimits</code> defines the hugepage sizes and limits for HugeTLB controller
+reservation accounting, which allows to limit the HugeTLB reservations per control group and enforces the controller
+limit at reservation time and at the fault of HugeTLB memory for which no reservation exists.
+Otherwise if not supported by the kernel, this should fallback to the page fault accounting, which allows users to limit
+the HugeTLB usage (page fault) per control group and enforces the limit during page fault.</p>
+<p>Note that reservation limits are superior to page fault limits, since reservation limits are enforced at reservation
+time (on mmap or shget), and never causes the application to get SIGBUS signal if the memory was reserved before hand.
+This allows for easier fallback to alternatives such as non-HugeTLB memory for example. In the case of page fault
+accounting, it's very hard to avoid processes getting SIGBUS since the sysadmin needs precisely know the HugeTLB usage
+of all the tasks in the system and make sure there is enough pages to satisfy all requests. Avoiding tasks getting
+SIGBUS on overcommited systems is practically impossible with page fault accounting.</p>
+<p>For more information, see the kernel cgroups documentation about <a href="https://www.kernel.org/doc/Documentation/cgroup-v1/hugetlb.txt">HugeTLB</a>.</p>
 <p>Each entry has the following structure:</p>
 <ul>
-<li><strong><code>pageSize</code></strong> <em>(string, REQUIRED)</em> - hugepage size
+<li><strong><code>pageSize</code></strong> <em>(string, REQUIRED)</em> - hugepage size.
 The value has the format <code>&lt;size&gt;&lt;unit-prefix&gt;B</code> (64KB, 2MB, 1GB), and must match the <code>&lt;hugepagesize&gt;</code> of the
-corresponding control file found in <code>/sys/fs/cgroup/hugetlb/hugetlb.&lt;hugepagesize&gt;.limit_in_bytes</code>.
+corresponding control file found in <code>/sys/fs/cgroup/hugetlb/hugetlb.&lt;hugepagesize&gt;.rsvd.limit_in_bytes</code> (if
+hugetlb_cgroup reservation is supported) or <code>/sys/fs/cgroup/hugetlb/hugetlb.&lt;hugepagesize&gt;.limit_in_bytes</code> (if not
+supported).
 Values of <code>&lt;unit-prefix&gt;</code> are intended to be parsed using base 1024 (&quot;1KB&quot; = 1024, &quot;1MB&quot; = 1048576, etc).</li>
-<li><strong><code>limit</code></strong> <em>(uint64, REQUIRED)</em> - limit in bytes of <em>hugepagesize</em> HugeTLB usage</li>
+<li><strong><code>limit</code></strong> <em>(uint64, REQUIRED)</em> - limit in bytes of <em>hugepagesize</em> HugeTLB reservations (if supported) or usage.</li>
 </ul>
 <h4 id="example-13"><a class="header" href="#example-13">Example</a></h4>
 <pre><code class="language-json">&quot;hugepageLimits&quot;: [
@@ -2596,6 +2614,9 @@ If a file already exists at <code>path</code> that does not match the requested 
 For example, namespaces, resource limits, and mounts are all part of the container environment.</p>
 <h2 id="container-namespace"><a class="header" href="#container-namespace"><a name="glossaryContainerNamespace" />Container namespace</a></h2>
 <p>On Linux,the <a href="http://man7.org/linux/man-pages/man7/namespaces.7.html">namespaces</a> in which the <a href="config.html#process">configured process</a> executes.</p>
+<h2 id="features-document"><a class="header" href="#features-document"><a name="glossaryFeaturesDocument" />Features Document</a></h2>
+<p>A <a href="https://tools.ietf.org/html/rfc8259">JSON</a> document that represents <a href="glossary.html#features.md">the implemented features</a> of the <a href="glossary.html#runtime">runtime</a>.
+Irrelevant to the actual availability of the features in the host operating system.</p>
 <h2 id="json"><a class="header" href="#json"><a name="glossaryJson" />JSON</a></h2>
 <p>All configuration <a href="https://tools.ietf.org/html/rfc8259">JSON</a> MUST be encoded in <a href="http://www.unicode.org/versions/Unicode8.0.0/ch03.pdf">UTF-8</a>.
 JSON objects MUST NOT include duplicate names.
@@ -2603,6 +2624,11 @@ The order of entries in JSON objects is not significant.</p>
 <h2 id="runtime"><a class="header" href="#runtime"><a name="glossaryRuntime" />Runtime</a></h2>
 <p>An implementation of this specification.
 It reads the <a href="glossary.html#configuration">configuration files</a> from a <a href="glossary.html#bundle">bundle</a>, uses that information to create a <a href="glossary.html#container">container</a>, launches a process inside the container, and performs other <a href="runtime.html">lifecycle actions</a>.</p>
+<h2 id="runtime-caller"><a class="header" href="#runtime-caller"><a name="glossaryRuntimeCaller" />Runtime caller</a></h2>
+<p>An external program to execute a <a href="glossary.html#runtime">runtime</a>, directly or indirectly.</p>
+<p>Examples of direct callers include containerd, CRI-O, and Podman.
+Examples of indirect callers include Docker/Moby and Kubernetes.</p>
+<p>Runtime callers often execute a runtime via <a href="https://github.com/opencontainers/runc">runc</a>-compatible command line interface, however, its interaction interface is currently out of the scope of the Open Container Initiative Runtime Specification.</p>
 <h2 id="runtime-namespace"><a class="header" href="#runtime-namespace"><a name="glossaryRuntimeNamespace" />Runtime namespace</a></h2>
 <p>On Linux, the namespaces from which new <a href="glossary.html#container-namespace">container namespaces</a> are <a href="config-linux.html#namespaces">created</a> and from which some configured resources are accessed.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="implementations"><a class="header" href="#implementations"><a name="implementations" />Implementations</a></h1>

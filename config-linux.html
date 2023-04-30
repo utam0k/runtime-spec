@@ -503,7 +503,8 @@ If specified, this value MUST be no larger than any positive <code>quota</code> 
 </code></pre>
 <h3 id="block-io"><a class="header" href="#block-io"><a name="configLinuxBlockIO" />Block IO</a></h3>
 <p><strong><code>blockIO</code></strong> (object, OPTIONAL) represents the cgroup subsystem <code>blkio</code> which implements the block IO controller.
-For more information, see the kernel cgroups documentation about <a href="https://www.kernel.org/doc/Documentation/cgroup-v1/blkio-controller.txt">blkio</a>.</p>
+For more information, see the kernel cgroups documentation about <a href="https://www.kernel.org/doc/Documentation/cgroup-v1/blkio-controller.txt">blkio</a> of cgroup v1 or <a href="https://docs.kernel.org/admin-guide/cgroup-v2.html#io">io</a> of cgroup v2, .</p>
+<p>Note that I/O throttling settings in cgroup v1 apply only to Direct I/O due to kernel implementation constraints, while this limitation does not exist in cgroup v2.</p>
 <p>The following parameters can be specified to set up the controller:</p>
 <ul>
 <li>
@@ -576,16 +577,28 @@ For more information, see the <a href="http://man7.org/linux/man-pages/man1/mkno
 }
 </code></pre>
 <h3 id="huge-page-limits"><a class="header" href="#huge-page-limits"><a name="configLinuxHugePageLimits" />Huge page limits</a></h3>
-<p><strong><code>hugepageLimits</code></strong> (array of objects, OPTIONAL) represents the <code>hugetlb</code> controller which allows to limit the
-HugeTLB usage per control group and enforces the controller limit during page fault.
-For more information, see the kernel cgroups documentation about <a href="https://www.kernel.org/doc/Documentation/cgroup-v1/hugetlb.txt">HugeTLB</a>.</p>
+<p><strong><code>hugepageLimits</code></strong> (array of objects, OPTIONAL) represents the <code>hugetlb</code> controller which allows to limit the HugeTLB reservations (if supported) or usage (page fault).
+By default if supported by the kernel, <code>hugepageLimits</code> defines the hugepage sizes and limits for HugeTLB controller
+reservation accounting, which allows to limit the HugeTLB reservations per control group and enforces the controller
+limit at reservation time and at the fault of HugeTLB memory for which no reservation exists.
+Otherwise if not supported by the kernel, this should fallback to the page fault accounting, which allows users to limit
+the HugeTLB usage (page fault) per control group and enforces the limit during page fault.</p>
+<p>Note that reservation limits are superior to page fault limits, since reservation limits are enforced at reservation
+time (on mmap or shget), and never causes the application to get SIGBUS signal if the memory was reserved before hand.
+This allows for easier fallback to alternatives such as non-HugeTLB memory for example. In the case of page fault
+accounting, it's very hard to avoid processes getting SIGBUS since the sysadmin needs precisely know the HugeTLB usage
+of all the tasks in the system and make sure there is enough pages to satisfy all requests. Avoiding tasks getting
+SIGBUS on overcommited systems is practically impossible with page fault accounting.</p>
+<p>For more information, see the kernel cgroups documentation about <a href="https://www.kernel.org/doc/Documentation/cgroup-v1/hugetlb.txt">HugeTLB</a>.</p>
 <p>Each entry has the following structure:</p>
 <ul>
-<li><strong><code>pageSize</code></strong> <em>(string, REQUIRED)</em> - hugepage size
+<li><strong><code>pageSize</code></strong> <em>(string, REQUIRED)</em> - hugepage size.
 The value has the format <code>&lt;size&gt;&lt;unit-prefix&gt;B</code> (64KB, 2MB, 1GB), and must match the <code>&lt;hugepagesize&gt;</code> of the
-corresponding control file found in <code>/sys/fs/cgroup/hugetlb/hugetlb.&lt;hugepagesize&gt;.limit_in_bytes</code>.
+corresponding control file found in <code>/sys/fs/cgroup/hugetlb/hugetlb.&lt;hugepagesize&gt;.rsvd.limit_in_bytes</code> (if
+hugetlb_cgroup reservation is supported) or <code>/sys/fs/cgroup/hugetlb/hugetlb.&lt;hugepagesize&gt;.limit_in_bytes</code> (if not
+supported).
 Values of <code>&lt;unit-prefix&gt;</code> are intended to be parsed using base 1024 (&quot;1KB&quot; = 1024, &quot;1MB&quot; = 1048576, etc).</li>
-<li><strong><code>limit</code></strong> <em>(uint64, REQUIRED)</em> - limit in bytes of <em>hugepagesize</em> HugeTLB usage</li>
+<li><strong><code>limit</code></strong> <em>(uint64, REQUIRED)</em> - limit in bytes of <em>hugepagesize</em> HugeTLB reservations (if supported) or usage.</li>
 </ul>
 <h4 id="example-8"><a class="header" href="#example-8">Example</a></h4>
 <pre><code class="language-json">&quot;hugepageLimits&quot;: [

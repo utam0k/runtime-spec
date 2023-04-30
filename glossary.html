@@ -154,6 +154,9 @@
 For example, namespaces, resource limits, and mounts are all part of the container environment.</p>
 <h2 id="container-namespace"><a class="header" href="#container-namespace"><a name="glossaryContainerNamespace" />Container namespace</a></h2>
 <p>On Linux,the <a href="http://man7.org/linux/man-pages/man7/namespaces.7.html">namespaces</a> in which the <a href="config.html#process">configured process</a> executes.</p>
+<h2 id="features-document"><a class="header" href="#features-document"><a name="glossaryFeaturesDocument" />Features Document</a></h2>
+<p>A <a href="https://tools.ietf.org/html/rfc8259">JSON</a> document that represents <a href="#features.md">the implemented features</a> of the <a href="#runtime">runtime</a>.
+Irrelevant to the actual availability of the features in the host operating system.</p>
 <h2 id="json"><a class="header" href="#json"><a name="glossaryJson" />JSON</a></h2>
 <p>All configuration <a href="https://tools.ietf.org/html/rfc8259">JSON</a> MUST be encoded in <a href="http://www.unicode.org/versions/Unicode8.0.0/ch03.pdf">UTF-8</a>.
 JSON objects MUST NOT include duplicate names.
@@ -161,6 +164,11 @@ The order of entries in JSON objects is not significant.</p>
 <h2 id="runtime"><a class="header" href="#runtime"><a name="glossaryRuntime" />Runtime</a></h2>
 <p>An implementation of this specification.
 It reads the <a href="#configuration">configuration files</a> from a <a href="#bundle">bundle</a>, uses that information to create a <a href="#container">container</a>, launches a process inside the container, and performs other <a href="runtime.html">lifecycle actions</a>.</p>
+<h2 id="runtime-caller"><a class="header" href="#runtime-caller"><a name="glossaryRuntimeCaller" />Runtime caller</a></h2>
+<p>An external program to execute a <a href="#runtime">runtime</a>, directly or indirectly.</p>
+<p>Examples of direct callers include containerd, CRI-O, and Podman.
+Examples of indirect callers include Docker/Moby and Kubernetes.</p>
+<p>Runtime callers often execute a runtime via <a href="https://github.com/opencontainers/runc">runc</a>-compatible command line interface, however, its interaction interface is currently out of the scope of the Open Container Initiative Runtime Specification.</p>
 <h2 id="runtime-namespace"><a class="header" href="#runtime-namespace"><a name="glossaryRuntimeNamespace" />Runtime namespace</a></h2>
 <p>On Linux, the namespaces from which new <a href="#container-namespace">container namespaces</a> are <a href="config-linux.html#namespaces">created</a> and from which some configured resources are accessed.</p>
 

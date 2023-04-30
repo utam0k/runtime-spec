@@ -250,7 +250,7 @@ This operation MUST create a new container.</p>
 The remaining <code>process</code> properties MAY be applied by this operation.
 If the runtime cannot apply a property as specified in the <a href="config.html">configuration</a>, it MUST <a href="#errors">generate an error</a> and a new container MUST NOT be created.</p>
 <p>The runtime MAY validate <code>config.json</code> against this spec, either generically or with respect to the local system capabilities, before creating the container (<a href="#lifecycle">step 2</a>).
-Runtime callers who are interested in pre-create validation can run <a href="implementations.html#testing--tools">bundle-validation tools</a> before invoking the create operation.</p>
+<a href="glossary.html#runtime-caller">Runtime callers</a> who are interested in pre-create validation can run <a href="implementations.html#testing--tools">bundle-validation tools</a> before invoking the create operation.</p>
 <p>Any changes made to the <a href="config.html"><code>config.json</code></a> file after this operation will not have an effect on the container.</p>
 <h3 id="start"><a class="header" href="#start"><a name="runtimeStart" />Start</a></h3>
 <p><code>start &lt;container-id&gt;</code></p>
