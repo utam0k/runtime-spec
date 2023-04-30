@@ -1,4 +1,8 @@
 {
+
+
+
+
     "definitions": {
         "Device": {
             "type": "object",

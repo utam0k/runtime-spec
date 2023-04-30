@@ -1,5 +1,8 @@
 # <a name="VirtualMachineSpecificContainerConfiguration" /> Virtual-machine-specific Container Configuration
 
+
+
+
 This section describes the schema for the [virtual-machine-specific section](config.md#platform-specific-configuration) of the [container configuration](config.md).
 The virtual-machine container specification provides additional configuration for the hypervisor, kernel, and image.
 
