@@ -1,0 +1,62 @@
+{
+  "$schema": "https://aka.ms/codetour-schema",
+  "title": "adventure",
+  "steps": [
+    {
+      "file": "CODEOWNERS",
+      "description": "",
+      "line": 1
+    },
+    {
+      "file": "principles.md",
+      "description": "",
+      "line": 8
+    },
+    {
+      "file": "spec.md",
+      "description": "",
+      "line": 1
+    },
+    {
+      "file": "bundle.md",
+      "description": "```bash\n$ mkdir -p tutorial/rootfs\n$ cd tutorial\n$ docker export $(docker create busybox) | tar -C rootfs -xvf -\n$ runc spec\n$ tree -L 1\n```",
+      "line": 13
+    },
+    {
+      "file": "spec.md",
+      "description": "",
+      "line": 30
+    },
+    {
+      "file": "config.md",
+      "description": "",
+      "line": 1
+    },
+    {
+      "file": "config.md",
+      "description": "```sh\n$ code config.json\n```\n\ndiff:\n\n```diff\n4c4\n<               \"terminal\": false,\n---\n>               \"terminal\": true,\n10,11c10\n<                       \"sleep\",\n<                       \"30\"\n---\n>                       \"sh\"\n```",
+      "line": 237
+    },
+    {
+      "file": "config-linux.md",
+      "description": "",
+      "line": 1
+    },
+    {
+      "file": "spec.md",
+      "description": "",
+      "line": 28
+    },
+    {
+      "file": "runtime.md",
+      "description": "```\n# create a container with name `tutorial_container`\n$ sudo runc create -b . tutorial_container\n\n# you can see the state the container is `created`\n$ sudo runc state tutorial_container\n\n# start the container\n$ sudo runc start tutorial_container\n\n# will show the list of containers, the container is `running`\n$ sudo runc list\n\n# delete the container\n$ sudo runc delete tutorial_container\n```",
+      "line": 1
+    },
+    {
+      "file": "features.md",
+      "description": "```sh\n$ runc features\n```",
+      "line": 1
+    }
+  ],
+  "ref": "v1.2.0"
+}
