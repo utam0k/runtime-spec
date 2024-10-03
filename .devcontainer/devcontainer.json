@@ -1,0 +1,16 @@
+{    
+    "customizations": {
+		"vscode": {
+			"extensions": [
+				"vsls-contrib.codetour"
+			]
+		}
+	},
+	"features": {    
+		"docker-in-docker": {
+			"version": "latest",
+			"moby": true,
+			"dockerDashComposeVersion": "v2"
+		}
+	}
+}

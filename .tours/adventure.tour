@@ -49,7 +49,7 @@
     },
     {
       "file": "runtime.md",
-      "description": "```\n# create a container with name `tutorial_container`\n$ sudo runc create -b . tutorial_container\n\n# you can see the state the container is `created`\n$ sudo runc state tutorial_container\n\n# start the container\n$ sudo runc start tutorial_container\n\n# will show the list of containers, the container is `running`\n$ sudo runc list\n\n# delete the container\n$ sudo runc delete tutorial_container\n```",
+      "description": "```\n# create a container with name `tutorial_container`\n$ sudo runc create -b . tutorial_container\n\n# you can see the state the container is `created`\n$ sudo runc state tutorial_container\n$ sudo cat /var/run/runc/tutorial_container/state.json | jq \n\n# start the container\n$ sudo runc start tutorial_container\n\n# will show the list of containers, the container is `running`\n$ sudo runc list\n\n# delete the container\n$ sudo runc delete tutorial_container\n```",
       "line": 1
     },
     {
@@ -58,5 +58,5 @@
       "line": 1
     }
   ],
-  "ref": "v1.2.0"
+  "ref": "adventure-v1.2.0-with-runc"
 }
